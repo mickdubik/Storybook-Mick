@@ -1,16 +1,26 @@
 import type { Meta, StoryObj } from "@storybook-astro/framework";
 import Glyph from "./Glyph.astro";
+import { metric, metricAny } from "./storybook/data";
 
+// Every metric below is a real one from src/data/work.ts.
 const meta = {
   title: "Components/Glyph",
   component: Glyph,
-  args: { metric: { value: "−68", unit: "%", label: "Duplicated components, 167 to 53", kind: "percent", magnitude: 68, direction: "down" } },
+  tags: ["autodocs"],
+  args: { metric: metric("Duplicated components, 167 to 53") },
 } satisfies Meta<typeof Glyph>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Percent: Story = {};
-export const Share: Story = { args: { metric: { value: "85", unit: "%", label: "Design system adoption", kind: "share", magnitude: 85 } } };
-export const Multiple: Story = { args: { metric: { value: "2", unit: "×", label: "Features shipped per sprint", kind: "multiple", magnitude: 2, direction: "up", qualifier: "up to" } } };
-export const Score: Story = { args: { metric: { value: "78.3", unit: "", label: "Score vs benchmark", kind: "score", magnitude: 78, benchmark: { value: 60, label: "Industry" } } } };
-export const Plain: Story = { args: { metric: { value: "Top 3", unit: "", label: "Ranking", kind: "plain" } } };
+/** Reduction: a dashed removed share. */
+export const Reduction: Story = {};
+/** Gain: past a 100% baseline. */
+export const Gain: Story = { args: { metric: metric("Feature adoption among existing customers") } };
+/** Share: filled on a track. */
+export const Share: Story = { args: { metric: metric("Task success, non-technical persona") } };
+/** Multiple: one block per unit. */
+export const Multiple: Story = { args: { metric: metric("Features shipped per sprint") } };
+/** Score: a bar against a benchmark. */
+export const Score: Story = { args: { metric: metric("SUS usability score for the hi-fi prototype") } };
+/** Levels get no drawing. */
+export const Plain: Story = { args: { metric: metricAny("Unbounce customers using the AI-driven experiences (company-wide, for scale)") } };

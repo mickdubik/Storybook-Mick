@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook-astro/framework";
 import Button from "./Button.astro";
+import { contact } from "../data/site";
 
 const meta = {
   title: "Components/Button",
   component: Button,
-  args: { href: "#", variant: "primary", size: "md", icon: "arrow", slots: { default: "Get in touch" } },
+  tags: ["autodocs"],
+  args: { href: contact.booking, variant: "primary", size: "md", icon: "arrow", slots: { default: "Book a 15-min call" } },
   argTypes: {
     variant: { control: "inline-radio", options: ["primary", "ghost", "secondary"] },
     size: { control: "inline-radio", options: ["md", "sm"] },
