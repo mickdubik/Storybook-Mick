@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/addon-docs/blocks";
+import { stats } from "../components/storybook/stats";
 
 <Meta title="Getting started" />
 
@@ -7,6 +8,15 @@ import { Meta } from "@storybook/addon-docs/blocks";
 The design system behind Mick Dubik's portfolio, a static Astro site. The site is set like an annual report: outcomes are the headline, the design work is the supporting story. Every case leads with its reported figure in large Geist numerals before any process.
 
 This Storybook shows the tokens and the real components. Both read from the site's own source (`src/styles/global.css` and `src/components/`), so they cannot drift from the live pages. The site also has an unlinked reference page at `/system`.
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "12px", margin: "24px 0" }}>
+  {stats.map((s) => (
+    <div key={s.label} style={{ border: "1px solid #dcdce3", borderRadius: "12px", padding: "14px 16px" }}>
+      <div style={{ fontSize: "2rem", fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.1 }}>{s.n}</div>
+      <div style={{ fontSize: "0.8125rem", opacity: 0.7, marginTop: "4px" }}>{s.label}</div>
+    </div>
+  ))}
+</div>
 
 ## Principles
 
@@ -25,6 +35,7 @@ All tokens live in `src/styles/global.css`. Never hard-code a colour. Light and 
 - [Typography](?path=/story/foundations-typography--tokens): one family, Geist Variable, plus Geist Mono for meta labels. No serif, no italics.
 - [Space and shape](?path=/story/foundations-space-and-shape--tokens): gutters, section and block spacing, frame padding and radii.
 - [Motion](?path=/story/foundations-motion--tokens): duration and easing tokens.
+- [Layout](?path=/story/foundations-layout--sheet): the page wrapper and the 12-column sheet with its rail and body.
 
 ## Components
 

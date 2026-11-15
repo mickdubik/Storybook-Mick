@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "check:contrast": "node scripts/check-contrast.mjs"
   },
   "dependencies": {
     "@amplitude/unified": "^1.2.2",
@@ -30,6 +31,7 @@
     "@storybook/addon-a11y": "^10.6.7",
     "@storybook/addon-docs": "^10.6.7",
     "@storybook/builder-vite": "^10.6.7",
-    "storybook": "^10.6.7"
+    "storybook": "^10.6.7",
+    "storybook-addon-pseudo-states": "^10.6.7"
   }
 }

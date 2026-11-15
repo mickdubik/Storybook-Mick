@@ -16,6 +16,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Colour tokens must keep their text contrast (WCAG AA) before anything is published.
+      - run: npm run check:contrast
       - run: npm run build-storybook
       # Publish from main only. Pull requests build Storybook as a check and never replace the live site.
       - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
