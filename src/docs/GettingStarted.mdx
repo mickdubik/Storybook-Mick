@@ -1,0 +1,55 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Getting started" />
+
+# The Outcome Ledger
+
+The design system behind Mick Dubik's portfolio, a static Astro site. The site is set like an annual report: outcomes are the headline, the design work is the supporting story. Every case leads with its reported figure in large Geist numerals before any process.
+
+This Storybook shows the tokens and the real components. Both read from the site's own source (`src/styles/global.css` and `src/components/`), so they cannot drift from the live pages. The site also has an unlinked reference page at `/system`.
+
+## Principles
+
+1. **The Signal Rule.** The accent (`--signal`) marks a measured result or an interactive state. Nothing else, and never a large fill.
+2. **Outcome first.** The figure leads, process follows. Figures come only from the owner's confirmed facts.
+3. **Hairlines, not boxes.** Sections divide by ruled lines. Inset surfaces step one tone off the page (`--paper-2`). No card shadows.
+4. **Concentric corners.** Inner radius = outer radius minus the gap between them.
+5. **Transform and opacity only.** Nothing animates width, height, padding or margin. Reduced motion shows the same end states instantly.
+6. **Honest drawings.** Glyphs draw real values. Diagrams are titled and say they are illustrative.
+
+## Tokens
+
+All tokens live in `src/styles/global.css`. Never hard-code a colour. Light and dark are both defined: the site follows the system preference unless the header toggle sets `data-theme`. Use the **Theme** switch in the Storybook toolbar to flip it here.
+
+- [Colour](?path=/story/foundations-colour--tokens): paper, ink, rule and signal, with light and dark values and contrast.
+- [Typography](?path=/story/foundations-typography--tokens): one family, Geist Variable, plus Geist Mono for meta labels. No serif, no italics.
+- [Space and shape](?path=/story/foundations-space-and-shape--tokens): gutters, section and block spacing, frame padding and radii.
+- [Motion](?path=/story/foundations-motion--tokens): duration and easing tokens.
+
+## Components
+
+- **Button**: Primary, secondary and ghost links in medium (52px) and small (44px). Pick the size from the container, not the importance of the action. Add an icon only when it carries meaning: arrow = go to, ↗ = leaves the site, ↓ = scrolls down.
+- **ButtonStates**: A looping demo of the Unbounce design system's primary button states.
+- **Glyph**: A small honest drawing of one metric: gain, reduction, share, score or multiple. Labels are HTML, never SVG text.
+- **Shot**: The one frame for every product image. Transparent images sit on the canvas as a single frame, never a frame inside a frame.
+- **Plate**: An illustrative SVG diagram, at most one per case: traffic, tokens, portal or care.
+- **Avail**: The availability line, with the year rolling in like an odometer.
+- **Demos**: Animated case covers: Smart Traffic, DocPortal and Doctor Online. They play on screen only, and reduced motion shows a still.
+
+## Run it
+
+Node 22. From the `Core/` folder:
+
+```bash
+npm run storybook        # dev server on port 6006
+npm run build-storybook  # static build into storybook-static/
+npm run build            # the site build, the only automated check
+```
+
+Stories use the community Astro framework (`@storybook-astro/framework`), because Storybook has no official Astro support.
+
+## Known gaps
+
+- **Portrait and Blueprint** have no usage note in `docs/DESIGN.md` yet. Their stories show what they render, not when to use them.
+- **Story content** for Glyph, Plate and Shot is sample text added for Storybook, not case-study copy.
+- **Components are shown alone.** Page context such as the header, the 12-column sheet and the case template is not part of Storybook.

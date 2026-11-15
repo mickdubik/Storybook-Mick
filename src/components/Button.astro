@@ -1,0 +1,63 @@
+---
+// Buttons, rebuilt in round 10 to match the full hover sequence of beew.studio's buttons (the owner's
+// reference), measured frame by frame in the browser:
+//   1. the leading tile expands from a square to fill the whole button (~380ms, ease-out);
+//   2. at the same time the arrow is swapped: the current arrow slides out to the left and a fresh one
+//      slides in from the right, inside a clipped box;
+//   3. the label rolls: the resting copy moves up and out while a second copy (in the hover colour) moves
+//      up into place;
+//   4. on mouse-leave or blur, everything reverses along the same path.
+// Rebuilt on Outcome Ledger tokens. Primary: solid ink with a paper tile, and the tile expands to fill the
+// button in paper (label and arrow turn ink; no cobalt, owner 2026-10-29). Ghost: hairline, the surface tints and the label rolls; its trailing glyph swaps
+// along its own direction. Only transform, opacity and colour animate: the "expanding" tile is a full-width
+// fill translated out of a rounded clip. Concentric radii: tile radius = --btn-r − --btn-inset. Reduced
+// motion: the same end states, instantly. The second label copy and all glyphs are aria-hidden.
+interface Props {
+  href: string;
+  variant?: "primary" | "ghost" | "secondary";
+  icon?: "arrow" | "external" | "down" | "none";
+  external?: boolean;
+  size?: "md" | "sm";
+  class?: string;
+  /** Shorter label shown below 420px (e.g. masthead "Contact"). The accessible name stays the full label. */
+  short?: string;
+}
+const { href, variant = "primary", icon = variant === "primary" || variant === "secondary" ? "arrow" : "none", external = false, size = "md", class: cls = "", short } = Astro.props;
+const label = await Astro.slots.render("default");
+const paths = {
+  arrow: "M4 10h11M11 5l5 5-5 5",
+  external: "M6 14 14 6M7.5 6H14v6.5",
+  down: "M10 4v11M5 10.5l5 5 5-5",
+  none: "",
+};
+const d = paths[icon];
+const tile = variant === "primary" && icon !== "none";
+---
+
+<a
+  class:list={["btn", `btn--${variant}`, size === "sm" && "btn--sm", tile && "btn--tile", cls]}
+  data-icon={icon}
+  href={href}
+  {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+>
+  {tile && <span class="btn__track" aria-hidden="true"><span class="btn__fill"></span></span>}
+  {d && (
+    <span class="btn__glyphs" aria-hidden="true">
+      <span class="btn__clip">
+        <svg viewBox="0 0 20 20" class="btn__glyph btn__glyph--a"><path d={d} fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <svg viewBox="0 0 20 20" class="btn__glyph btn__glyph--b"><path d={d} fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </span>
+    </span>
+  )}
+  <span class:list={["btn__roll", short && "btn__roll--long"]}>
+    <span class="btn__text" set:html={label} />
+    <span class="btn__text btn__text--echo" aria-hidden="true" set:html={label} />
+  </span>
+  {short && (
+    <span class="btn__roll btn__roll--short" aria-hidden="true">
+      <span class="btn__text">{short}</span>
+      <span class="btn__text btn__text--echo">{short}</span>
+    </span>
+  )}
+  {external && <span class="sr-only"> (opens in a new tab)</span>}
+</a>

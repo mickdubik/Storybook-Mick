@@ -1,0 +1,61 @@
+---
+// "Open to new projects in 2027", with the year rolling in like an odometer the first time it comes into view:
+// the digits rise in one after another, and the last one ticks over from the current year's digit to the next.
+// Screen readers get the plain sentence; the animated digits are hidden from them. No motion if reduced.
+import { availability } from "../data/site";
+
+const m = availability.match(/^(.*?)(\d{4})$/);
+const lead = m ? m[1] : availability;
+const year = m ? m[2] : "";
+const digits = year.split("");
+const last = digits.pop() ?? "";
+const prev = String((Number(last) + 9) % 10);
+---
+
+{year ? (
+  <span class="avail" data-avail>
+    {lead}<span class="sr-only">{year}</span><span class="avail__year" aria-hidden="true">
+      {digits.map((d, i) => <span class="avail__clip"><span class="avail__d" style={`--i:${i}`}>{d}</span></span>)}
+      <span class="avail__clip"><span class="avail__d avail__d--tick" style={`--i:${digits.length}`}><span>{prev}</span><span>{last}</span></span></span>
+    </span>
+  </span>
+) : <span>{availability}</span>}
+
+<script>
+  const els = document.querySelectorAll<HTMLElement>("[data-avail]");
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        (e.target as HTMLElement).dataset.on = "";
+        io.unobserve(e.target);
+      }),
+      { threshold: 1 }
+    );
+    els.forEach((el) => io.observe(el));
+  } else {
+    els.forEach((el) => (el.dataset.on = ""));
+  }
+</script>
+
+<style>
+  .avail__year { display: inline-flex; vertical-align: bottom; }
+  /* Each digit sits in a one-line window; only transform and opacity animate. */
+  .avail__clip { display: inline-block; height: 1lh; overflow: hidden; }
+  .avail__d { display: inline-block; }
+  .avail__d--tick { display: inline-flex; flex-direction: column; transform: translateY(-50%); }
+  @media (prefers-reduced-motion: no-preference) {
+    .avail__d { transform: translateY(110%); opacity: 0; }
+    .avail__d--tick { transform: translateY(0); }
+    [data-avail][data-on] .avail__d {
+      transform: none;
+      opacity: 1;
+      transition: transform 600ms var(--ease-out) calc(var(--i) * 70ms), opacity 300ms ease calc(var(--i) * 70ms);
+    }
+    /* The last digit shows the current year's digit first, then ticks over to the next year. */
+    [data-avail][data-on] .avail__d--tick {
+      transform: translateY(-50%);
+      transition: transform 700ms var(--ease-out) calc(var(--i) * 70ms + 450ms), opacity 300ms ease calc(var(--i) * 70ms);
+    }
+  }
+</style>

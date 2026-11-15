@@ -1,0 +1,55 @@
+---
+import { light, dark, ratio, grade } from "./tokens";
+
+// Roles are the owner's, copied from src/pages/system.astro.
+const roles: Record<string, string> = {
+  paper: "Page background",
+  "paper-2": "Inset panels: frames, plates, cards",
+  "paper-3": "Glyph tracks, wireframe fills",
+  raised: "Raised surfaces: the current-role card",
+  card: "Hero photo card",
+  ink: "Primary text, primary button",
+  "ink-2": "Body and secondary copy",
+  "ink-3": "Meta labels",
+  rule: "Hairlines",
+  signal: "Results and interactive states only",
+};
+const text = new Set(["ink", "ink-2", "ink-3", "signal"]);
+const names = Object.keys(light);
+const rows = names.map((n) => {
+  const d = dark[n] ?? light[n];
+  return {
+    n,
+    role: roles[n] ?? "",
+    l: light[n],
+    d,
+    lr: text.has(n) ? ratio(light[n], light.paper) : null,
+    dr: text.has(n) ? ratio(d, dark.paper ?? light.paper) : null,
+  };
+});
+---
+
+<table class="tok">
+  <thead>
+    <tr><th>Token</th><th>Light</th><th>Dark</th><th>Contrast on paper (light / dark)</th><th>Use</th></tr>
+  </thead>
+  <tbody>
+    {rows.map((r) => (
+      <tr>
+        <td><code>--{r.n}</code></td>
+        <td><span class="sw" style={`background:${r.l}`}></span><code>{r.l}</code></td>
+        <td><span class="sw" style={`background:${r.d}`}></span><code>{r.d}</code></td>
+        <td>{r.lr && r.dr ? `${r.lr.toFixed(1)} (${grade(r.lr)}) / ${r.dr.toFixed(1)} (${grade(r.dr)})` : "—"}</td>
+        <td>{r.role}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+<style>
+  .tok { width: 100%; border-collapse: collapse; font-size: var(--t-small); color: var(--ink); }
+  .tok th { text-align: left; font-weight: 500; color: var(--ink-3); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--rule); }
+  .tok td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .tok code { font-family: var(--font-mono); font-size: var(--t-small); }
+  .sw { display: inline-block; width: 28px; height: 28px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--rule-strong, var(--rule)); vertical-align: middle; margin-right: 10px; }
+</style>

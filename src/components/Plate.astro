@@ -1,0 +1,318 @@
+---
+// Explanatory diagrams (not screenshots), one per case at most, each captioned with a short title (e.g. "How Smart Traffic works").
+// Every label comes from that case's content in work.ts or its live page:
+//   traffic — Smart Traffic analyses each visitor (device, location, browser and more) and sends them to the landing-page variant most
+//   likely to convert (Overview). Wording follows Unbounce's own product page (unbounce.com/product/smart-traffic/), which describes
+//   routing between VARIANTS of one page, and the owner's note that businesses build different pages for different purposes or campaigns.
+//   tokens  — tokens layered global → semantic (e.g. text-primary) → component-level overrides (Structure and
+//             foundations), feeding the core components named in the case's architecture image.
+//   portal  — three separate development tools replaced by one documentation portal (In brief) with four
+//             pathways (UI docs, API docs, tutorials, glossary) and search (cover, "What shipped").
+//   care    — consult a doctor, order lab tests and get a treatment plan without leaving home (Overview).
+// Text never renders below 12px: each diagram has a viewBox width W and a min-width of 80% of it (the smallest text is 15 units, so 12px), and scrolls sideways below that.
+// The two card rows (tokens, care) use 204-wide cards with 20 units of padding and 44 units between cards; each arrow keeps 8 units clear of both cards.
+// Frame: the same concentric rule as Shot (radius = 10px + padding) on the theme-aware paper-2 surface.
+interface Props {
+  variant: "traffic" | "tokens" | "portal" | "care";
+  title: string;
+  caption: string;
+  /** Longer explanation that does not fit the 2-line caption: a paragraph under the frame. */
+  note?: string;
+}
+const { variant, title, caption, note } = Astro.props;
+
+const aria = {
+  traffic:
+    "Illustrative diagram: visitors, described by device, location and browser, pass through Smart Traffic, which sends each one to the landing-page variant that is the best match for them. The variants are versions of the same page, for example a promo offer, a new headline or a new hero image. In this example the visitor is looking for a holiday promo, so Variant A, which says promo offer, is the best match.",
+  tokens:
+    "Illustrative diagram: design tokens layered from global tokens (raw brand values) to semantic tokens (purpose-driven, such as text-primary) to component-level overrides where needed, feeding the core components: buttons, inputs, navigation, layout and feedback states.",
+  portal:
+    "Illustrative diagram: three separate development tools replaced by one unified documentation portal, with search and four pathways: UI docs, API docs, tutorials and glossary.",
+  care:
+    "Illustrative diagram: from home, a patient consults a doctor, orders lab tests and gets a treatment plan, without visiting a clinic.",
+}[variant];
+// care: the caption carries the title, so the diagram has no label of its own and its viewBox starts just above the cards (y 36).
+const H = { traffic: 472, tokens: 256, portal: 360, care: 180 }[variant];
+const Y0 = variant === "care" ? 36 : 0;
+const W = { traffic: 800, tokens: 996, portal: 800, care: 996 }[variant];
+const CARD = 204, PAD = 20, GAP = 44;
+
+// Traffic: one example visitor (looking for a holiday promo, owner's framing). Smart Traffic picks the best-matching variant per visitor;
+// A is highlighted because it says "promo offer" (the heavier line), not as a variant that wins for everyone. Illustrative.
+const variants = [
+  { y: 40, name: "Variant A", note: "Promo offer", hot: true, w: 7 },
+  { y: 192, name: "Variant B", note: "New headline", hot: false, w: 2 },
+  { y: 344, name: "Variant C", note: "New hero image", hot: false, w: 2 },
+];
+const tokenCols = [
+  { x: 24, title: "Global tokens", sub: ["Raw brand values"] },
+  { x: 24 + (CARD + GAP), title: "Semantic tokens", sub: ["Purpose-driven"] },
+  { x: 24 + 2 * (CARD + GAP), title: "Component-level", sub: ["Overrides", "where needed"] },
+  { x: 24 + 3 * (CARD + GAP), title: "Core components", sub: ["Buttons, inputs,", "navigation, layout"] },
+];
+const pathways = ["UI docs", "API docs", "Tutorials", "Glossary"];
+const steps = [
+  { x: 24, t: "At home", s: ["Without leaving", "home"] },
+  { x: 24 + (CARD + GAP), t: "Consult a doctor", s: ["Video or chat"] },
+  { x: 24 + 2 * (CARD + GAP), t: "Order lab tests", s: ["Lab orders"] },
+  { x: 24 + 3 * (CARD + GAP), t: "Treatment plan", s: ["Prescriptions"] },
+];
+---
+
+<div class="plate-wrap">
+<figure class="plate" style={`--ar: ${(W / H).toFixed(4)}; --mw: ${Math.round(W * 0.8)}px`}>
+  <div class="plate__scroll" role="group" aria-label="Diagram, scrolls sideways on small screens" data-plate-scroll>
+    <svg viewBox={`0 ${Y0} ${W} ${H}`} style={`min-width:${Math.round(W * 0.8)}px`} role="img" aria-label={aria}>
+      {variant === "traffic" && (
+        <>
+          {/* One visitor, one example: a visitor looking for a holiday promo is sent to the variant that says "promo offer". */}
+          <rect x="24" y="176" width="190" height="120" rx="10" class="p-card" />
+          <circle cx="44" cy="206" r="5.5" class="p-fill-signal" />
+          <text x="60" y="211" class="p-label">Visitor</text>
+          <text x="40" y="248" class="p-title">Looking for a</text>
+          <text x="40" y="272" class="p-title">holiday promo</text>
+          <path d="M 222 236 H 266" class="p-line p-line--ink" marker-end="url(#t-arrow)" />
+          <rect x="274" y="186" width="190" height="100" rx="10" class="p-node" />
+          <text x="369" y="243" text-anchor="middle" class="p-node-title">Smart Traffic</text>
+          <text x="369" y="326" text-anchor="middle" class="p-label p-label--sub">Reads device,</text>
+          <text x="369" y="346" text-anchor="middle" class="p-label p-label--sub">location, browser</text>
+          {variants.map((v) => (
+            <>
+              <path d={`M 464 236 C 512 236, 508 ${v.y + 44}, 552 ${v.y + 44}`} class={v.hot ? "p-line p-line--signal" : "p-line p-line--ink"} style={`stroke-width:${v.w}`} />
+              <rect x="560" y={v.y} width="216" height="88" rx="8" class={v.hot ? "p-card p-card--signal" : "p-card"} />
+              <text x="580" y={v.y + 30} class="p-card-text">{v.note}</text>
+              <rect x="580" y={v.y + 40} width="150" height="4" class="p-fill-muted" />
+              <rect x="580" y={v.y + 50} width="124" height="4" class="p-fill-muted" />
+              <rect x="580" y={v.y + 62} width="52" height="14" rx="3" class={v.hot ? "p-fill-signal" : "p-fill-ink"} />
+              <text x="776" y={v.y - 16} text-anchor="end" class={v.hot ? "p-label p-label--signal" : "p-label"}>{v.hot ? `${v.name} · best match` : v.name}</text>
+            </>
+          ))}
+          <defs>
+            <marker id="t-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="p-fill-ink" />
+            </marker>
+          </defs>
+        </>
+      )}
+
+      {variant === "tokens" && (
+        <>
+          {tokenCols.map((c, i) => (
+            <>
+              <rect x={c.x} y="16" width={CARD} height="224" rx="10" class={i === 3 ? "p-node" : "p-card"} />
+              <text x={c.x + PAD} y="46" class={i === 3 ? "p-label p-label--inv" : "p-label"}>{`0${i + 1}`}</text>
+              <text x={c.x + PAD} y="78" class={i === 3 ? "p-title p-title--inv" : "p-title"}>{c.title}</text>
+              <text x={c.x + PAD} y="106" class={i === 3 ? "p-small p-small--inv" : "p-small"}>{c.sub.map((l, k) => <tspan x={c.x + PAD} dy={k ? 20 : 0}>{l}</tspan>)}</text>
+              {i < 3 && <path d={`M ${c.x + CARD + 8} 128 H ${c.x + CARD + GAP - 8}`} class="p-line p-line--ink" marker-end="url(#p-arrow)" />}
+            </>
+          ))}
+          {/* 01 swatches */}
+          {[0, 1, 2, 3].map((k) => <rect x={tokenCols[0].x + PAD + k * 40} y="162" width="26" height="26" rx="5" class={k === 1 ? "p-fill-signal" : k === 3 ? "p-fill-muted" : "p-fill-ink"} />)}
+          {/* 02 semantic chip */}
+          <rect x={tokenCols[1].x + PAD} y="160" width={CARD - 2 * PAD} height="30" rx="15" class="p-chip" />
+          <text x={tokenCols[1].x + CARD / 2} y="180" text-anchor="middle" class="p-small">text-primary</text>
+          {/* 03 override */}
+          <rect x={tokenCols[2].x + PAD} y="160" width="116" height="30" rx="6" class="p-chip" />
+          <rect x={tokenCols[2].x + PAD} y="198" width="80" height="30" rx="6" class="p-chip p-chip--signal" />
+          {/* 04 components */}
+          <rect x={tokenCols[3].x + PAD} y="160" width="96" height="30" rx="7" class="p-fill-paper" />
+          <rect x={tokenCols[3].x + PAD + 110} y="160" width="54" height="30" rx="7" class="p-outline-paper" />
+          <rect x={tokenCols[3].x + PAD} y="198" width={CARD - 2 * PAD} height="26" rx="5" class="p-outline-paper" />
+          <defs>
+            <marker id="p-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="p-fill-ink" />
+            </marker>
+          </defs>
+        </>
+      )}
+
+      {variant === "portal" && (
+        <>
+          <text x="24" y="36" class="p-label">Before</text>
+          {[0, 1, 2].map((k) => (
+            <>
+              <rect x="24" y={56 + k * 96} width="190" height="72" rx="10" class="p-card" />
+              <rect x="40" y={74 + k * 96} width="90" height="8" class="p-fill-ink" />
+              <rect x="40" y={92 + k * 96} width="150" height="4" class="p-fill-muted" />
+              <rect x="40" y={102 + k * 96} width="120" height="4" class="p-fill-muted" />
+              <path d={`M 214 ${92 + k * 96} C 300 ${92 + k * 96}, 300 188, 380 188`} class="p-line p-line--ink" />
+            </>
+          ))}
+          <text x="24" y={H - 16} class="p-small">3 separate development tools</text>
+          <text x="776" y="36" text-anchor="end" class="p-label p-label--signal">After</text>
+          <rect x="380" y="56" width="396" height="264" rx="12" class="p-card p-card--signal" />
+          <text x="400" y="92" class="p-title">Documentation portal</text>
+          <rect x="400" y="110" width="356" height="38" rx="19" class="p-chip" />
+          <circle cx="422" cy="129" r="6" class="p-stroke-ink" />
+          <path d="M 426.5 133.5 L 431 138" class="p-stroke-ink" />
+          <text x="442" y="134" class="p-small">Search</text>
+          {pathways.map((p, k) => (
+            <>
+              <rect x={400 + (k % 2) * 182} y={168 + Math.floor(k / 2) * 66} width="174" height="54" rx="8" class={k === 0 ? "p-chip p-chip--signal" : "p-chip"} />
+              <text x={416 + (k % 2) * 182} y={200 + Math.floor(k / 2) * 66} class="p-small p-small--strong">{p}</text>
+            </>
+          ))}
+        </>
+      )}
+
+      {variant === "care" && (
+        <>
+          {steps.map((st, i) => (
+            <>
+              <rect x={st.x} y="56" width={CARD} height="140" rx="10" class={i === 3 ? "p-card p-card--signal" : "p-card"} />
+              <text x={st.x + PAD} y="90" class={i === 3 ? "p-label p-label--signal" : "p-label"}>{`0${i + 1}`}</text>
+              <text x={st.x + PAD} y="122" class="p-title">{st.t}</text>
+              <text x={st.x + PAD} y="148" class="p-small">{st.s.map((l, k) => <tspan x={st.x + PAD} dy={k ? 20 : 0}>{l}</tspan>)}</text>
+              {i < 3 && <path d={`M ${st.x + CARD + 8} 126 H ${st.x + CARD + GAP - 8}`} class="p-line p-line--ink" marker-end="url(#p-arrow-c)" />}
+            </>
+          ))}
+          <defs>
+            <marker id="p-arrow-c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="p-fill-ink" />
+            </marker>
+          </defs>
+        </>
+      )}
+    </svg>
+  </div>
+  <div class="plate__bar">
+    <button type="button" class="plate__nav plate__nav--prev mono" data-dir="-1" aria-label="Scroll the diagram back to the left"><span aria-hidden="true">←</span> Scroll sideways</button>
+    <button type="button" class="plate__nav plate__nav--next mono" data-dir="1" aria-label="Scroll the diagram to the right">Scroll sideways <span aria-hidden="true">→</span></button>
+  </div>
+  <figcaption class="plate__caption"><strong class="plate__title">{title}.</strong> {caption}</figcaption>
+</figure>
+{note && <p class="plate__note">{note}</p>}
+</div>
+
+<script>
+  // Only make the diagram a tab stop when it actually scrolls (keyboard users can then scroll it),
+  // and show the Scroll buttons (right while there is more to the right, left once scrolled) plus an edge fade until the end.
+  const scrollers = [...document.querySelectorAll<HTMLElement>("[data-plate-scroll]")];
+  const sync = (el: HTMLElement) => {
+    const plate = el.closest(".plate") as HTMLElement;
+    const scrollable = el.scrollWidth > el.clientWidth + 1;
+    if (scrollable) el.setAttribute("tabindex", "0");
+    else el.removeAttribute("tabindex");
+    plate.dataset.scrollable = String(scrollable);
+    plate.dataset.atEnd = String(el.scrollLeft + el.clientWidth >= el.scrollWidth - 8);
+    plate.dataset.atStart = String(el.scrollLeft <= 8);
+  };
+  const syncAll = () => scrollers.forEach(sync);
+  syncAll();
+  addEventListener("resize", syncAll, { passive: true });
+  scrollers.forEach((el) => el.addEventListener("scroll", () => sync(el), { passive: true }));
+  const calm = matchMedia("(prefers-reduced-motion: reduce)");
+  document.querySelectorAll<HTMLButtonElement>(".plate__nav").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const el = btn.closest(".plate")!.querySelector<HTMLElement>("[data-plate-scroll]")!;
+      el.scrollBy({ left: Number(btn.dataset.dir) * el.clientWidth * 0.8, behavior: calm.matches ? "auto" : "smooth" });
+    });
+  });
+</script>
+
+<style>
+  /* Same frame as the animated screens: 16:9, the diagram dead centre with the same inset all round, the caption 12px under it
+     as support, and the Scroll buttons in the frame's top right corner (12px in, like Replay on the left). The diagram and its caption are centred together; a tall diagram
+     or a long caption makes the frame taller rather than spilling out of it. */
+  .plate-wrap { container-type: inline-size; margin-top: 28px; }
+  .plate {
+    --plate-inner: 10px;
+    --plate-pad: var(--frame-pad);
+    /* --ar is the diagram's aspect, --mw its minimum width (it scrolls sideways below that): its height is known, so the caption can follow it. */
+    --dh: calc(max(100cqi - var(--plate-pad) * 4, var(--mw)) / var(--ar));
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    min-height: calc(var(--dh) + var(--plate-pad) * 4.8);
+    padding: calc(var(--plate-pad) * 2.4) calc(var(--plate-pad) * 2);
+    width: 100%; /* explicit, so the min-height cannot widen the frame through the aspect ratio */
+    max-width: 100%;
+    min-width: 0;
+    border-radius: var(--frame-radius);
+    background: var(--paper-2);
+  }
+  /* Support text: at most two lines, 12px under the diagram, which sits dead centre (same as the animated frames). Anything longer goes in the note below the frame. */
+  .plate__caption { position: absolute; left: 0; right: 0; top: calc(50% + var(--dh) / 2 + min(12px, var(--plate-pad) * 0.45)); margin: 0; padding-inline: calc(var(--plate-pad) * 2); text-align: center; }
+  .plate__note { margin: 16px 0 0; padding-inline: var(--frame-radius); color: var(--ink-2); font-size: var(--t-small); }
+  .plate__bar { position: absolute; top: 12px; right: 12px; z-index: 2; }
+  /* Narrow frames (phones): no fixed ratio; diagram, caption and buttons stack. */
+  @container (max-width: 559px) {
+    .plate { aspect-ratio: auto; min-height: 0; justify-content: flex-start; padding: var(--plate-pad); }
+    .plate__caption { position: static; margin-top: 12px; padding-inline: 0; text-align: left; }
+    .plate__bar { position: static; margin-top: 12px; }
+  }
+  /* Mid widths: less side padding so the diagram keeps more room before it has to scroll. */
+  @container (min-width: 560px) and (max-width: 899px) {
+    .plate { --dh: calc(max(100cqi - var(--plate-pad) * 3, var(--mw)) / var(--ar)); padding-inline: calc(var(--plate-pad) * 1.5); }
+  }
+  .plate__title { color: var(--ink); font-weight: 500; }
+  /* Scroll buttons (top right corner of the frame): "Scroll sideways" while there is more to the right, "Scroll back" (to its
+     left) once scrolled. Pill buttons in the same style as the Replay hint. */
+  .plate__bar { display: none; justify-content: flex-end; gap: 8px; }
+  .plate[data-scrollable="true"] .plate__bar { display: flex; }
+  .plate__nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 10%, transparent);
+    color: var(--ink);
+    font-size: var(--t-micro);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 200ms ease, background-color 200ms ease;
+  }
+  .plate__nav:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+  @media (hover: hover) { .plate__nav:hover { color: var(--signal); } }
+  .plate[data-at-start="true"] .plate__nav--prev, .plate[data-at-end="true"] .plate__nav--next { display: none; }
+  /* Edge fade on the scrolling canvas: a cue that the diagram continues to the right. */
+  .plate[data-scrollable="true"]:not([data-at-end="true"]) .plate__scroll {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+  }
+  /* No inner panel: the diagram sits straight on the frame's canvas, one box per figure (same rule as Shot's transparent images). */
+  .plate__scroll { overflow-x: auto; scrollbar-width: none; } /* the Scroll buttons replace the scrollbar; touch, trackpad and keyboard still scroll */
+  .plate__scroll::-webkit-scrollbar { display: none; }
+  .plate__scroll svg { width: 100%; height: auto; } /* min-width is set per diagram (80% of its viewBox width) */
+  .plate__caption { color: var(--ink-2); font-size: var(--t-small); }
+
+  .plate :global(.p-fill-ink) { fill: var(--ink); }
+  .plate :global(.p-fill-paper) { fill: var(--paper); }
+  .plate :global(.p-outline-paper) { fill: none; stroke: var(--paper); stroke-width: 1.5; opacity: 0.8; }
+  .plate :global(.p-stroke-ink) { fill: none; stroke: var(--ink); stroke-width: 1.8; }
+  .plate :global(.p-fill-muted) { fill: var(--ink-3); opacity: 0.45; }
+  .plate :global(.p-fill-signal) { fill: var(--signal); }
+  .plate :global(.p-card) { fill: var(--paper); stroke: var(--ink); stroke-width: 1.25; }
+  .plate :global(.p-card--signal) { stroke: var(--signal); stroke-width: 2.5; }
+  .plate :global(.p-chip) { fill: var(--paper-2); stroke: var(--ink-3); stroke-width: 1; }
+  .plate :global(.p-chip--signal) { stroke: var(--signal); stroke-width: 2; }
+  .plate :global(.p-node) { fill: var(--ink); }
+  .plate :global(.p-node-title) { fill: var(--paper); font-family: var(--font-sans); font-weight: 600; font-size: 19px; letter-spacing: -0.02em; }
+  .plate :global(.p-title) { fill: var(--ink); font-family: var(--font-sans); font-weight: 600; font-size: 18px; letter-spacing: -0.02em; }
+  .plate :global(.p-title--inv) { fill: var(--paper); }
+  .plate :global(.p-small) { fill: var(--ink-2); font-family: var(--font-sans); font-size: 15px; }
+  .plate :global(.p-small--inv) { fill: var(--paper); opacity: 0.85; }
+  .plate :global(.p-small--strong) { fill: var(--ink); font-weight: 500; }
+  .plate :global(.p-line) { fill: none; stroke: var(--ink-3); stroke-width: 1; }
+  .plate :global(.p-line--ink) { stroke: var(--ink-2); stroke-width: 1.5; }
+  .plate :global(.p-line--signal) { stroke: var(--signal); }
+  .plate :global(.p-label) {
+    fill: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .plate :global(.p-label--signal) { fill: var(--signal); }
+  /* The example headline of each variant card: what makes the variants different (a promo, a headline, a hero image). */
+  .plate :global(.p-card-text) { fill: var(--ink); font-family: var(--font-sans); font-size: 13px; font-weight: 500; letter-spacing: 0; }
+  .plate :global(.p-label--sub) { fill: var(--ink-3); font-size: 12.5px; letter-spacing: 0.02em; text-transform: none; }
+  .plate :global(.p-label--inv) { fill: var(--paper); opacity: 0.8; }
+</style>

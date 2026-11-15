@@ -1,0 +1,253 @@
+---
+// The Doctor Online cover: ten of the app's own screens (English UI) drifting slowly in five columns. No devices, just the product screens as
+// rounded tiles. Column 1 always moves down, column 2 up, column 3 down, column 4 up, column 5 down, each a seamless loop at a slow, constant
+// speed (about 1% of the frame width per second, a little different per column). Screens are the owner's Figma group "14_Screens"
+// (mickdubik.webflow 2025, 13443:68011), exported at 4x (2026-10-24, from the owner's refreshed frame 13455:27454) with no device, one column per "Row" group, each read top to bottom:
+//   1 Measuring, Catalog   2 Order medicine, Symptom checker   3 Order tests, Video call   4 Consultation, Treatment   5 Order, Information
+// Every screen belongs to one column only, so no screen is ever repeated across columns. A column of two repeats every two tiles, so at the
+// 16:10 frame a screen's twin can show at the other edge; three screens per column would remove that. Only transform animates, one linear
+// Web Animation per column.
+//
+// `backdrop` (case-page hero, 2026-10-23): decorative and frameless; the columns drift for 5 s, slowing to a stop (ease-out), and rest, so the
+// motion stops by itself (WCAG 2.2.2).
+//
+// Plays only while on screen. There is no pause button (owner, 2026-10-20): the loop holds still while the figure or the home card is hovered or
+// focused. Reduced motion: a still of the first screens.
+import { Picture } from "astro:assets";
+import Replay from "../Replay.astro";
+import measuring from "../../assets/work/doctor-online-launch/do-s-measuring.webp";
+import catalog from "../../assets/work/doctor-online-launch/do-s-catalog.webp";
+import map from "../../assets/work/doctor-online-launch/do-s-map.webp";
+import symptom from "../../assets/work/doctor-online-launch/do-s-symptom.webp";
+import tests from "../../assets/work/doctor-online-launch/do-s-tests.webp";
+import video from "../../assets/work/doctor-online-launch/do-s-video.webp";
+import consult from "../../assets/work/doctor-online-launch/do-s-consult.webp";
+import treatment from "../../assets/work/doctor-online-launch/do-s-treatment.webp";
+import cart from "../../assets/work/doctor-online-launch/do-s-cart.webp";
+import info from "../../assets/work/doctor-online-launch/do-s-info.webp";
+
+interface Props {
+  bare?: boolean;
+  sizes?: string;
+  backdrop?: boolean;
+}
+const { bare = false, backdrop = false, sizes = backdrop ? "340px" : "(min-width: 1440px) 235px, 18vw" } = Astro.props;
+const columns = [
+  [measuring, catalog],
+  [map, symptom],
+  [tests, video],
+  [consult, treatment],
+  [cart, info],
+];
+const framed = !bare && !backdrop;
+// Five columns (down, up, down, up, down), each with its own drift speed (cqw per second).
+const SPEEDS = [0.95, 1.15, 1.0, 1.25, 0.85];
+const cols = columns.map((screens, i) => ({ screens, dir: i % 2 === 0 ? "down" : "up", speed: SPEEDS[i] }));
+const label =
+  "Doctor Online app screens drifting slowly in five columns, the first column downwards, the second upwards, and so on in turn: health measurements, medication catalog, pharmacy map, doctor appointment, lab tests, video consultation, doctors list, prescribed medications, shopping cart and order details.";
+---
+
+<figure class={`dod${bare || backdrop ? " dod--bare" : ""}${backdrop ? " dod--backdrop" : ""}${framed ? " dod--framed" : ""}`} data-dod data-backdrop={backdrop ? "" : undefined} aria-hidden={backdrop ? "true" : undefined}>
+  <div class="dod__frame">
+    <div class="dod__stage" role={backdrop ? undefined : "img"} aria-label={backdrop ? undefined : label}>
+      <div class="dod__cols">
+        {cols.map((col) => (
+          <div class="dod__col">
+            <div class="dod__track" data-track data-dir={col.dir} data-speed={col.speed}>
+              {[0, 1].map((copy) =>
+                col.screens.map((s, i) => (
+                  <div class="dod__tile" aria-hidden={copy === 1 ? "true" : undefined}>
+                    <Picture
+                      src={s}
+                      alt=""
+                      widths={[300, 450, 595, 792]}
+                      sizes={sizes}
+                      formats={["avif", "webp"]}
+                      fallbackFormat="webp"
+                      quality={82}
+                      loading={copy === 0 && i === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    {framed && <Replay label="the Doctor Online screens" pausable />}
+  </div>
+</figure>
+
+<script>
+  import { bindCtl } from "../../scripts/anim-control";
+  // Each track carries data-speed (cqw per second: a bit different per column so the wall never moves in step) and data-dir (down | up).
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+
+  document.querySelectorAll<HTMLElement>("[data-dod]").forEach((root) => {
+    const stage = root.querySelector<HTMLElement>(".dod__stage")!;
+    const tracks = [...root.querySelectorAll<HTMLElement>("[data-track]")];
+    if (reduce.matches) {
+      return;
+    }
+    if (root.hasAttribute("data-backdrop")) {
+      // A short drift that decelerates to a stop: the same directions as the cover (down, up, down, up, down), then it rests.
+      let started = false;
+      const go = () => {
+        if (started) return;
+        const w = stage.getBoundingClientRect().width;
+        if (!w) return;
+        started = true;
+        tracks.forEach((tr, i) => {
+          const half = tr.getBoundingClientRect().height / 2;
+          const dist = Math.min((Number(tr.dataset.speed) * w) / 100 * 9, half * 0.8); // as far as ~9 s of the cover's drift
+          const down = tr.dataset.dir === "down";
+          const from = down ? -half : 0, to = down ? -half + dist : -dist;
+          tr.animate([{ transform: `translateY(${from}px)` }, { transform: `translateY(${to}px)` }], { duration: 5000, easing: "cubic-bezier(.2,.65,.25,1)", fill: "forwards" });
+        });
+      };
+      new IntersectionObserver((es) => { if (es[0].isIntersecting) go(); }, { threshold: 0.2 }).observe(root);
+      return;
+    }
+    // Case page (owner, 2026-11-12): one drift in the cover's directions that slows to a stop (about 16 s of the cover's travel over 12 s), then it rests.
+    // One control pauses, resumes and replays it; the old endless loop and "hold while hovered" are gone.
+    const ctlBtn = root.querySelector<HTMLElement>(".replay");
+    if (ctlBtn) {
+      let anims: Animation[] = [], visible = false, userPaused = false, done = false;
+      const sync = () => anims.forEach((a) => (visible && !userPaused && !done ? a.play() : a.pause()));
+      const build = () => {
+        const w = stage.getBoundingClientRect().width;
+        if (!w) return false; // not laid out yet: the ResizeObserver below retries
+        anims.forEach((a) => a.cancel());
+        done = false;
+        anims = tracks.map((tr) => {
+          const half = tr.getBoundingClientRect().height / 2;
+          const dist = Math.min((Number(tr.dataset.speed) * w) / 100 * 16, half * 0.8);
+          const down = tr.dataset.dir === "down";
+          const from = down ? -half : 0, to = down ? -half + dist : -dist;
+          return tr.animate([{ transform: `translateY(${from}px)` }, { transform: `translateY(${to}px)` }], { duration: 12000, easing: "cubic-bezier(.2,.65,.25,1)", fill: "forwards" });
+        });
+        if (anims[0]) anims[0].onfinish = () => { done = true; ctl.set("done"); };
+        sync();
+        return true;
+      };
+      const ctl = bindCtl(ctlBtn, {
+        pause: () => { userPaused = true; sync(); },
+        resume: () => { userPaused = false; sync(); },
+        restart: () => { userPaused = false; build(); },
+      });
+      let built = build();
+      if (!built) new ResizeObserver(() => { if (!built) built = build(); }).observe(stage);
+      new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }, { threshold: 0.3 }).observe(root);
+      return;
+    }
+    // One copy of a column is half of its track; travelling exactly one copy lands where it started, so the loop has no seam.
+    // Column 1, 3 and 5 move down (-50% to 0), column 2 and 4 move up (0 to -50%).
+    let anims: Animation[] = [];
+    const build = () => {
+      anims.forEach((a) => a.cancel());
+      anims = [];
+      const w = stage.getBoundingClientRect().width;
+      if (!w) return; // not laid out yet (the script can run before the stylesheet applies): the ResizeObserver below retries
+      anims = tracks.flatMap((tr, i) => {
+        const half = tr.getBoundingClientRect().height / 2;
+        const sec = half / ((Number(tr.dataset.speed) * w) / 100);
+        if (!(sec > 0) || !isFinite(sec)) return []; // zero-height track: an invalid duration would throw and stop every script after this one
+        const down = tr.dataset.dir === "down";
+        const frames = down ? [{ transform: "translateY(-50%)" }, { transform: "translateY(0)" }] : [{ transform: "translateY(0)" }, { transform: "translateY(-50%)" }];
+        return [tr.animate(frames, { duration: sec * 1000, iterations: Infinity, easing: "linear" })];
+      });
+      sync();
+    };
+    // Home cards on hover-capable screens play only while hovered or focused (owner, 2026-10-22); everywhere else the loop plays while on screen and holds while hovered or focused.
+    const onCard = !!root.closest("a") && matchMedia("(hover: hover)").matches;
+    let visible = false, holding = false, active = false;
+    const playing = () => (onCard ? active && visible : !holding && visible);
+    const sync = () => anims.forEach((a) => (playing() ? a.play() : a.pause()));
+    build();
+    // The Replay button restarts the drift from the start.
+    root.querySelector(".replay")?.addEventListener("click", () => { anims.forEach((a) => { a.currentTime = 0; }); sync(); });
+    // Rebuild whenever the stage gets (or changes) its size: the loop length depends on it.
+    let lastW = stage.getBoundingClientRect().width;
+    new ResizeObserver(() => {
+      const w = stage.getBoundingClientRect().width;
+      if (w !== lastW) { lastW = w; build(); }
+    }).observe(stage);
+    new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }, { threshold: 0.3 }).observe(root);
+
+    // No pause button: the animation holds still while the figure (or the home card, which is a link) is hovered or has keyboard focus.
+    const host = root.closest("a") ?? root;
+    host.addEventListener("pointerenter", () => { holding = active = true; sync(); });
+    host.addEventListener("pointerleave", () => { holding = active = false; sync(); });
+    host.addEventListener("focusin", () => { holding = active = true; sync(); });
+    host.addEventListener("focusout", () => { holding = active = false; sync(); });
+  });
+</script>
+
+<style>
+  .dod { margin: 0; min-width: 0; position: relative; }
+  /* Same frame family as Shot: screen radius 10px, frame radius = 10px + padding, theme-aware outer canvas, hairline. */
+  .dod__frame {
+    --dod-inner: 10px;
+    --dod-pad: var(--frame-pad);
+    padding: var(--dod-pad);
+    border-radius: var(--frame-radius);
+    background: var(--paper-2);
+  }
+  /* A light canvas in both themes (the app screens are light): a very pale blue taken from the app's own blue, so the white screens separate
+     from it without a hard contrast. */
+  .dod__stage {
+    --dod-bg: #e4edf8;
+    --dod-gap: 1.3cqw;
+    position: relative;
+    aspect-ratio: 16 / 10; /* the same shape as the Smart Traffic and DataRobot previews, so the home cards line up */
+    overflow: hidden;
+    container-type: inline-size;
+    border-radius: var(--dod-inner);
+    background: var(--dod-bg);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent);
+  }
+  /* No margin at all: the first and last columns bleed past the left and right edges, so a screen is cut by the frame and no screen corner ever sits
+     beside the frame's own corner (two nested corners read as a double corner). The gap between columns is the same 1.3% as between rows. */
+  .dod__cols { position: absolute; inset: 0 -3.4cqw; display: grid; grid-template-columns: repeat(5, 1fr); column-gap: var(--dod-gap); }
+  .dod__col { position: relative; overflow: hidden; }
+  .dod__track { display: block; }
+  /* The gap is each tile's bottom margin (not a flex gap), so one copy of a column is exactly half of its track and the loop has no jump. */
+  .dod__tile {
+    position: relative;
+    aspect-ratio: 198 / 429;
+    margin-bottom: var(--dod-gap);
+    border-radius: 1.5cqw;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgba(25, 70, 140, 0.07), 0 0.35cqw 1.3cqw rgba(25, 70, 140, 0.14);
+  }
+  .dod__tile :global(picture), .dod__tile :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .dod__tile :global(img) { object-fit: cover; user-select: none; -webkit-user-drag: none; }
+
+  /* Hero backdrop: no frame, no canvas, no hairline (the case page sizes and clips it). */
+  .dod--backdrop .dod__frame::after { display: none; }
+
+  /* Framed (case page): a 16:9 frame like Shot's wide frames. The wall sits dead centre (roomier at the sides) and the Replay
+     button in the frame's top left corner. */
+  .dod--framed { container-type: inline-size; }
+  .dod--framed .dod__frame { aspect-ratio: 16 / 9; position: relative; padding: 0; overflow: hidden; }
+  /* A cropped animation gets one box: the outer frame crops it (owner, 2026-11-09), so the wall runs from the frame's top edge to its bottom edge and the
+     frame's own rounded corners clip it. No inner box, no second corner. The screens keep the size they had in the inner box: the stage is that box's
+     width (the frame's height less its padding, at 16:10), centred and as tall as the frame, with its edges left open. The wall does not have to fill the
+     frame's width: the sides stay clear. */
+  .dod--framed .dod__stage { position: absolute; top: 0; bottom: 0; left: 50%; width: calc(90cqi - 6.4 * var(--dod-pad)); transform: translateX(-50%); aspect-ratio: auto; overflow: visible; background: transparent; border-radius: 0; box-shadow: none; }
+  .dod--framed .dod__frame > :global(.replay) { top: 12px; left: 12px; z-index: 2; }
+  /* The control now sits on the pale screens, not on the frame's canvas: a solid dark disc and pill with white ink, readable in both themes. */
+  .dod--framed .dod__frame > :global(.replay) { background: #17171a; color: #fff; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18); }
+  .dod--framed .dod__frame > :global(.replay .replay__hint) { background: #17171a; color: #fff; }
+  @media (hover: hover) { .dod--framed .dod__frame > :global(.replay:hover) { background: #2a2a30; } }
+  @container (max-width: 559px) { .dod--framed .dod__frame > :global(.replay) { display: none; } }
+
+  /* Home card: the image carries the one radius and hairline, no canvas (same as Shot's bare mode). */
+  .dod--bare .dod__frame { padding: 0; background: transparent; border-radius: clamp(3px, 1.5cqi, 8px); position: relative; overflow: hidden; }
+  .dod--bare .dod__stage { border-radius: 0; box-shadow: none; }
+  .dod--bare .dod__frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--rule); pointer-events: none; }
+
+</style>

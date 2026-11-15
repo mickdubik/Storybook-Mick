@@ -1,0 +1,261 @@
+{
+ "661867028444ce38e1184b79_DataRobot%20Assets.webp": {
+  "file": "datarobot-assets.webp",
+  "w": 2052,
+  "h": 1503,
+  "alpha": true,
+  "original": [
+   2114,
+   1533
+  ],
+  "trimmed": true,
+  "corners": []
+ },
+ "661867028444ce38e1184b7f_Doc%20Portal%20_%20Code%20Sample.webp": {
+  "file": "doc-portal-code-sample.webp",
+  "w": 2600,
+  "h": 1625,
+  "alpha": false,
+  "original": [
+   3072,
+   1920
+  ],
+  "trimmed": false,
+  "corners": []
+ },
+ "661867028444ce38e1184b80_Doc%20Portal%20_%20Search.webp": {
+  "file": "doc-portal-search.webp",
+  "w": 2600,
+  "h": 1788,
+  "alpha": false,
+  "original": [
+   3072,
+   2114
+  ],
+  "trimmed": false,
+  "corners": []
+ },
+ "6724f7f0c55742cdb3238f9d_Web%20Screens.avif": {
+  "file": "web-screens.webp",
+  "w": 2600,
+  "h": 1290,
+  "alpha": true,
+  "original": [
+   3840,
+   1905
+  ],
+  "trimmed": false,
+  "corners": [],
+  "fade": "x"
+ },
+ "672537a9bd626ca5f8f5952f_CEM.avif": {
+  "file": "cem.webp",
+  "w": 2600,
+  "h": 1286,
+  "alpha": true,
+  "original": [
+   3304,
+   1618
+  ],
+  "trimmed": true,
+  "corners": []
+ },
+ "678c23f519ea651d96819468_cc7ca262c6c93443226fc48fecd908c8_Unbounce%20_%20Before.avif": {
+  "file": "unbounce-before.webp",
+  "w": 1143,
+  "h": 715,
+  "alpha": true,
+  "original": [
+   1157,
+   730
+  ],
+  "trimmed": true,
+  "corners": []
+ },
+ "678c23f5a272db14db6495d1_1c65762f3dcc36b199e871954fe8ae88_Unbounce%20_%20After.avif": {
+  "file": "unbounce-after.webp",
+  "w": 1143,
+  "h": 715,
+  "alpha": true,
+  "original": [
+   1157,
+   730
+  ],
+  "trimmed": true,
+  "corners": []
+ },
+ "679c0dfd6623ee3c1d89e28a_7656006668a11082d9709dda30b8442a_UB%20%7C%20Wire%20%7C%20Main.avif": {
+  "file": "ub-wire-main.webp",
+  "w": 2600,
+  "h": 1295,
+  "alpha": true,
+  "original": [
+   3066,
+   1537
+  ],
+  "trimmed": true,
+  "corners": []
+ },
+ "679c0f26182e4e103deb7158_9c5a0bd5f20dd298369158547a8d78aa_UB%20_%20Wire%20_%20Campaign.avif": {
+  "file": "ub-wire-campaign.webp",
+  "w": 2600,
+  "h": 1287,
+  "alpha": true,
+  "original": [
+   3054,
+   1536
+  ],
+  "trimmed": true,
+  "corners": []
+ },
+ "679c0fafdb64f2ed53dc7e1b_60be63704d2dfac49d5610662c86184a_UB%20_%20Wire%20_%20Page.avif": {
+  "file": "ub-wire-page.webp",
+  "w": 2600,
+  "h": 1292,
+  "alpha": true,
+  "original": [
+   3054,
+   1536
+  ],
+  "trimmed": true,
+  "corners": []
+ },
+ "679d1569238ea17a52d53d2e_DO%20_%20Wire%20_%20Doc%20Workspace.avif": {
+  "file": "do-wire-doc-workspace.webp",
+  "w": 2600,
+  "h": 1651,
+  "alpha": true,
+  "original": [
+   2712,
+   1716
+  ],
+  "trimmed": true,
+  "corners": []
+ },
+ "698b1ddcdf07b4ad70fda889_Architecture.avif": {
+  "file": "architecture.webp",
+  "w": 2440,
+  "h": 708,
+  "alpha": true,
+  "original": [
+   2440,
+   708
+  ],
+  "trimmed": false,
+  "corners": []
+ },
+ "698b226166e47df2ce814750_3b068c48c7bf5835b9d76e24822d4dfd_Unbounce-main.avif": {
+  "file": "unbounce-main.webp",
+  "w": 2600,
+  "h": 1625,
+  "alpha": false,
+  "original": [
+   2880,
+   1800
+  ],
+  "trimmed": false,
+  "corners": []
+ },
+ "698e775ce5806b4da9ef5231_9fda76739ed2eb4ef87921c6cd7076cd_UB%20%7C%20Case%20study%20%7C%20Main.avif": {
+  "file": "ub-case-study-main.webp",
+  "w": 2600,
+  "h": 1541,
+  "alpha": false,
+  "original": [
+   3240,
+   1920
+  ],
+  "trimmed": false,
+  "corners": [
+   "top-left",
+   "top-right",
+   "bottom-left"
+  ]
+ },
+ "698e775d80f611baf0219951_b2d2280e122c2037544c651f6e7151f5_DR%20%7C%20Case%20study%20%7C%20Main.avif": {
+  "file": "dr-case-study-main.webp",
+  "w": 2160,
+  "h": 1280,
+  "alpha": false,
+  "original": [
+   2160,
+   1280
+  ],
+  "trimmed": false,
+  "corners": []
+ },
+ "698e775da72d32fd11a4f995_071c6f33ec9baa317cdbfa4347c93869_DO%20%7C%20Case%20study%20%7C%20Main.avif": {
+  "file": "do-case-study-main.webp",
+  "w": 2160,
+  "h": 1280,
+  "alpha": false,
+  "original": [
+   2160,
+   1280
+  ],
+  "trimmed": false,
+  "corners": []
+ },
+ "6995c9da923e98f49b36d28e_22cb8470e99d6e3e41b01cd98e089299_Semantic.avif": {
+  "file": "semantic.webp",
+  "w": 2034,
+  "h": 742,
+  "alpha": true,
+  "original": [
+   2880,
+   1620
+  ],
+  "trimmed": true,
+  "corners": []
+ },
+ "6995caf4e5ad372fd5f351f2_045a1751d40a33b69eaf72b1470b8097_Buttons.avif": {
+  "file": "buttons.webp",
+  "w": 1920,
+  "h": 1516,
+  "alpha": false,
+  "original": [
+   1920,
+   1516
+  ],
+  "trimmed": false,
+  "corners": []
+ },
+ "6995cc9c7dccba72dbe9c451_14c0e092b6d0a9dfe1ab707080680c6b_Doc%20%7C%20Usage.avif": {
+  "file": "doc-usage.webp",
+  "w": 2600,
+  "h": 2348,
+  "alpha": false,
+  "original": [
+   2880,
+   2601
+  ],
+  "trimmed": false,
+  "corners": []
+ },
+ "ds-cover.png": {
+  "file": "ds-cover-v2.webp",
+  "w": 1792,
+  "h": 1388,
+  "alpha": true,
+  "original": [
+   1792,
+   1388
+  ],
+  "trimmed": false,
+  "corners": [],
+  "local": true
+ },
+ "buttons-overview.png": {
+  "file": "buttons-overview-v2.webp",
+  "w": 2400,
+  "h": 2180,
+  "alpha": false,
+  "original": [
+   2400,
+   2180
+  ],
+  "trimmed": false,
+  "corners": [],
+  "local": true
+ }
+}

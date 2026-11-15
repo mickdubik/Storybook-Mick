@@ -1,0 +1,13 @@
+---
+// Blueprint marks (owner, 2026-11-10): construction lines that frame a section's content and leave the inside empty,
+// with a registration cross at each corner. Place it as the first child of a section that has the `bp-host` class and
+// sets --bp-t / --bp-b to its own top / bottom padding (styles in global.css). `ticks` adds ruler ticks on the 12
+// layout columns; use it only where the content really sits on a 12-column grid (the AI workflow section).
+// `top={false}`: no top line, for a block that sits directly under another ruled edge (the case header under the site header).
+interface Props { ticks?: boolean; top?: boolean }
+const { ticks = false, top = true } = Astro.props;
+---
+<div class={`bp${top ? "" : " bp--open-top"}`} aria-hidden="true">
+  <i class="bp__x bp__x--tl"></i><i class="bp__x bp__x--tr"></i><i class="bp__x bp__x--bl"></i><i class="bp__x bp__x--br"></i>
+  {ticks && <div class="bp__ticks">{Array.from({ length: 12 }, () => <i></i>)}</div>}
+</div>

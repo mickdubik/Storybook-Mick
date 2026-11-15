@@ -1,0 +1,668 @@
+---
+// The design system, as a living reference. Everything here is rendered from the real tokens and components, so
+// it cannot drift from the site: colours are read from global.css at build time (and their contrast computed),
+// and the component samples are the components themselves. Not linked from the navigation, and noindex.
+import css from "../styles/global.css?raw";
+import { Picture } from "astro:assets";
+import portrait from "../assets/home/portrait-hero.png";
+import { availability, role, contact } from "../data/site";
+import Base from "../layouts/Base.astro";
+import Button from "../components/Button.astro";
+import ButtonStates from "../components/ButtonStates.astro";
+import Glyph from "../components/Glyph.astro";
+import Plate from "../components/Plate.astro";
+import Shot from "../components/Shot.astro";
+import Avail from "../components/Avail.astro";
+import { caseStudies } from "../data/work";
+import type { Metric } from "../data/work";
+
+// ---- Tokens, parsed from the stylesheet ----
+const cardYear = availability.match(/\d{4}/)?.[0] ?? "";
+const grab = (re: RegExp) => {
+  const m = css.match(re);
+  const out: Record<string, string> = {};
+  if (m) for (const t of m[1].matchAll(/--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)) out[t[1]] = t[2].toLowerCase();
+  return out;
+};
+const light = grab(/:root\s*\{([\s\S]*?)\n\}/);
+const dark = grab(/:root\[data-theme="dark"\]\s*\{([\s\S]*?)\n\}/);
+
+const lum = (hex: string) => {
+  const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+};
+const ratio = (a: string, b: string) => {
+  const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+  return (x + 0.05) / (y + 0.05);
+};
+const grade = (r: number) => (r >= 7 ? "AAA" : r >= 4.5 ? "AA" : r >= 3 ? "AA large" : "Decoration only");
+
+const colors = [
+  { name: "paper", role: "Page background" },
+  { name: "paper-2", role: "Inset panels: frames, plates, cards" },
+  { name: "paper-3", role: "Glyph tracks, wireframe fills" },
+  { name: "raised", role: "Raised surfaces: the current-role card (lighter than the page in both themes)" },
+  { name: "card", role: "Hero photo card (lighter than the page in light, darker in dark)" },
+  { name: "ink", role: "Primary text, primary button" },
+  { name: "ink-2", role: "Body and secondary copy" },
+  { name: "ink-3", role: "Meta labels" },
+  { name: "rule", role: "Hairlines" },
+  { name: "signal", role: "Results and interactive states only" },
+].filter((c) => light[c.name]);
+const textTokens = new Set(["ink", "ink-2", "ink-3", "signal"]);
+const rows = colors.map((c) => ({
+  ...c,
+  text: textTokens.has(c.name),
+  l: light[c.name],
+  d: dark[c.name] ?? light[c.name],
+  lr: ratio(light[c.name], light.paper),
+  dr: ratio(dark[c.name] ?? light[c.name], dark.paper ?? light.paper),
+}));
+
+// ---- Samples ----
+const m = (value: string, unit: string, label: string, kind: Metric["kind"], magnitude: number, direction?: "up" | "down"): Metric => ({ value, unit, label, kind, magnitude, direction });
+const glyphs: Metric[] = [
+  m("+40", "%", "Courier route efficiency", "percent", 40, "up"),
+  m("−60", "%", "Design-to-development handoff", "percent", 60, "down"),
+  m("85", "%", "Design system adoption", "share", 85),
+  m("2", "×", "Features shipped per sprint", "multiple", 2),
+];
+const sampleShot = caseStudies[0].cover;
+
+const type = [
+  { cls: "display", label: "Display", spec: "Geist, 700, −0.04em", text: "Outcomes first" },
+  { cls: "h2", label: "Heading 2", spec: "Geist, 600, −0.035em", text: "The result first. Then how I got there." },
+  { cls: "h3", label: "Heading 3", spec: "Geist, 600, −0.02em", text: "Prioritise common use cases" },
+];
+const scale = [
+  ["Hero name", "245 × --u (about 245px at 1440), Geist 700, −0.04em, uppercase"],
+  ["--t-display", "2.4 → 6.6rem"],
+  ["--t-h1", "2.2 → 4.8rem"],
+  ["--t-h2", "1.9 → 3.6rem"],
+  ["--t-h3", "1.4 → 1.75rem (22 to 28px)"],
+  ["--t-figure", "3 → 6.6rem"],
+  ["--t-figure-sm", "2.2 → 4rem"],
+  ["--t-lede", "1.3125rem (21px)"],
+  ["--t-body", "1.0625rem (17px)"],
+  ["--t-small", "0.875rem (14px)"],
+  ["--t-label", "0.8125rem (13px): legends, captions, units"],
+  ["--t-micro", "0.75rem (12px): floor, index marks and tags only"],
+];
+const spacing = [
+  ["--gutter", "clamp(16px, 4vw, 56px)", "Page side padding"],
+  ["--col-gap", "clamp(16px, 2.2vw, 36px)", "Grid column gap"],
+  ["--section", "clamp(36px, 4.5vw, 64px)", "Section padding: half the gap between unrelated sections (72 to 128px)"],
+  ["--space-block / --space-group", "80–96px · 24px", "Between blocks in a chapter · heading to content"],
+  ["--space-tile", "8–12px", "Gap between tiles of one grid (persona cards, metric tiles)"],
+  ["--measure", "31em", "Reading line length (about 66 characters)"],
+  ["--max", "1920px", "Content width cap; the page uses the hero’s margins on every page"],
+  ["--uw", "min(100vw, 1920px) / 1440", "Width unit: 1px at a 1440 wide screen"],
+  ["--u", "min(--uw, 100svh / 900)", "Hero unit: also capped by the window height so the hero fits one screen"],
+  ["--edge / --pad-x", "72 × --uw (centred beyond 1920)", "Page margin: header, hero, sections and footer share it"],
+  ["--radius", "2px", "Base corner radius"],
+];
+const motion = [
+  ["--ease-out", "cubic-bezier(0.22, 1, 0.36, 1)", "Entrances, reveals, counts"],
+  ["--dur", "420ms", "Standard transition"],
+  ["--btn-dur / --btn-ease", "380ms · cubic-bezier(0.25, 0.8, 0.25, 1)", "Button hover sequence"],
+  ["Button press", "scale(0.97) · 160ms", "Active state"],
+  ["Hero parallax", "name + background 0.1×, card 1.35×, ZiiP result 1.2×, what-I-do 1.1× the page speed", "Scroll, CSS scroll-driven (no JavaScript); pointer drifts only the name (5px, eased 160ms)"],
+  ["Hero name fade", "100% → 20% over the first 140u of scroll (when the card reaches the name), then holds", "Opacity, scroll-driven"],
+  ["Hero light", "520u soft light, eased 120ms", "Pointer, desktop and fine pointers only"],
+];
+const rules = [
+  ["The Signal Rule", "The accent marks a measured result or an interactive state, and nothing else. It never fills a large area."],
+  ["Outcome first", "Every case leads with its reported figure, then the story behind it. Figures come only from the owner’s confirmed facts."],
+  ["Hairlines, not boxes", "Sections divide by ruled lines. Surfaces step one tone off the page, never a card shadow."],
+  ["Concentric corners", "An inner radius equals the outer radius minus the space between them, so nested shapes look cut from one piece. The hero photo card is the one square exception, by design."],
+  ["One family", "Geist carries the message and the work; Geist Mono labels the facts. Emphasis is a second tone, never an italic."],
+  ["Transform and opacity only", "Nothing animates width, height, padding or margin. Reduced motion shows the same end states, instantly."],
+  ["Honest drawings", "Glyphs and diagrams draw real values only. Illustrative diagrams are titled and say they are illustrative."],
+];
+---
+
+<Base title="Design system — Mick Dubik" description="The design tokens and components behind this portfolio." noindex>
+  <section class="sys">
+    <div class="wrap">
+      <p class="mono sys__kicker">Design system · reference</p>
+      <h1 class="display sys__title">The Outcome <em>Ledger.</em></h1>
+      <p class="lede">The tokens, type and components behind this site. Every sample on this page is the live component, and the colours are read from the stylesheet, so it cannot drift from what ships.</p>
+      <nav class="sys__toc mono" aria-label="On this page">
+        <a href="#principles">Principles</a><a href="#color">Colour</a><a href="#type">Type</a><a href="#space">Space</a><a href="#components">Components</a><a href="#motion">Motion</a><a href="#proposal">Proposal</a><a href="#white">White theme</a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="section sys__sec" id="principles" aria-labelledby="p-t">
+    <div class="wrap sheet">
+      <div class="rail"><p class="rail-label"><b>01</b> Principles</p></div>
+      <div class="body">
+        <h2 id="p-t" class="h2">Seven rules <em>that decide the rest.</em></h2>
+        <dl class="sys__rules">
+          {rules.map(([t, d]) => (<div><dt>{t}</dt><dd>{d}</dd></div>))}
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="section sys__sec" id="color" aria-labelledby="c-t">
+    <div class="wrap sheet">
+      <div class="rail"><p class="rail-label"><b>02</b> Colour</p></div>
+      <div class="body">
+        <h2 id="c-t" class="h2">Warm paper, black ink, <em>one signal.</em></h2>
+        <p class="prose sys__lead">Text and signal colours show their contrast against that theme’s page background. Body text needs 4.5:1 (AA); large text 3:1.</p>
+        <div class="sys__table" role="table" aria-label="Colour tokens">
+          <div class="sys__tr sys__tr--head mono" role="row"><span role="columnheader">Token</span><span role="columnheader">Light</span><span role="columnheader">Dark</span><span role="columnheader">Use</span></div>
+          {rows.map((r) => (
+            <div class="sys__tr" role="row">
+              <span role="cell" class="sys__tok"><code>--{r.name}</code></span>
+              <span role="cell" class="sys__sw"><i style={`background:${r.l}`}></i><b>{r.l}</b><small>{r.text ? `${r.lr.toFixed(1)}:1 on paper · ${grade(r.lr)}` : r.name === "rule" ? "Hairline" : "Surface"}</small></span>
+              <span role="cell" class="sys__sw"><i style={`background:${r.d}`}></i><b>{r.d}</b><small>{r.text ? `${r.dr.toFixed(1)}:1 on paper · ${grade(r.dr)}` : r.name === "rule" ? "Hairline" : "Surface"}</small></span>
+              <span role="cell" class="sys__use">{r.role}</span>
+            </div>
+          ))}
+        </div>
+        <p class="sys__note">Surfaces and hairlines are never used for text, so they carry no contrast requirement. Dark theme follows the system setting unless the visitor picks one with the header toggle.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section sys__sec" id="type" aria-labelledby="t-t">
+    <div class="wrap sheet">
+      <div class="rail"><p class="rail-label"><b>03</b> Type</p></div>
+      <div class="body">
+        <h2 id="t-t" class="h2">One family for the message, <em>a mono for the labels.</em></h2>
+        <div class="sys__type">
+          {type.map((t) => (
+            <div class="sys__trow">
+              <p class="mono sys__meta">{t.label} · {t.spec}</p>
+              <p class={t.cls}>{t.text}</p>
+            </div>
+          ))}
+          <div class="sys__trow">
+            <p class="mono sys__meta">Figure · Geist, tabular numerals, 600</p>
+            <p class="figure-num sys__fig">+40<span>%</span></p>
+          </div>
+          <div class="sys__trow">
+            <p class="mono sys__meta">Body · Geist, 17px, measure 31em (about 66 characters)</p>
+            <p class="prose">Led the evolution of the design system across four product designers and twelve front-end engineers, with semantic tokens, reusable components and governance.</p>
+          </div>
+          <div class="sys__trow">
+            <p class="mono sys__meta">Label · Geist Mono, uppercase, +0.04em</p>
+            <p class="mono">Senior Product Designer · SaaS and AI</p>
+          </div>
+        </div>
+        <ul class="sys__scale">
+          {scale.map(([k, v]) => (<li><code>{k}</code><span>{v}</span></li>))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section sys__sec" id="space" aria-labelledby="s-t">
+    <div class="wrap sheet">
+      <div class="rail"><p class="rail-label"><b>04</b> Space</p></div>
+      <div class="body">
+        <h2 id="s-t" class="h2">A 12-column sheet, <em>a rail and a body.</em></h2>
+        <p class="prose sys__lead">At 960px and wider the page is 12 columns: the rail (1–3) holds section labels or a table of contents, the body (4–12) holds content. Below that it stacks.</p>
+        <div class="sys__grid" aria-hidden="true">
+          <span class="sys__rail">Rail · 1–3</span><span class="sys__body">Body · 4–12</span>
+        </div>
+        <ul class="sys__scale sys__scale--3">
+          {spacing.map(([k, v, d]) => (<li><code>{k}</code><span>{v}</span><em>{d}</em></li>))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section sys__sec" id="components" aria-labelledby="k-t">
+    <div class="wrap sheet">
+      <div class="rail"><p class="rail-label"><b>05</b> Components</p></div>
+      <div class="body">
+        <h2 id="k-t" class="h2">Small parts, <em>used everywhere.</em></h2>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Button</h3>
+          <p class="sys__d">Three variants, each in medium (52px tall) and small (44px). Radii are concentric: tile radius = button radius − inset. Size follows the container: small inside cards, logo cells and rows; medium for sections and groups of related actions. Never mix sizes in one row.</p>
+
+          <div class="sys__bgroup">
+            <p class="sys__bname mono">Primary</p>
+            <p class="sys__d">Solid ink with a paper tile. On hover the tile expands to fill the whole button, so the face turns paper and the label and arrow turn ink. No accent colour.</p>
+            <div class="sys__demo btn-row">
+              <Button href="#components">Discuss project</Button>
+              <Button href="#components" size="sm">Small primary</Button>
+            </div>
+          </div>
+
+          <div class="sys__bgroup">
+            <p class="sys__bname mono">Primary, inverted (header)</p>
+            <p class="sys__d">The same behaviour with the colours swapped: paper face, ink tile, 1px ring.</p>
+            <div class="sys__demo btn-row">
+              <Button href="#components" size="sm" class="btn--inv">Inverted (header)</Button>
+            </div>
+          </div>
+
+          <div class="sys__bgroup">
+            <p class="sys__bname mono">Secondary</p>
+            <p class="sys__d">An ink face with the arrow at the end. The face never changes on hover; the arrow takes the other theme’s signal colour (hero card, footer).</p>
+            <div class="sys__demo btn-row">
+              <Button href="#components" variant="secondary" icon="external">Book a 15-min call</Button>
+              <Button href="#components" variant="secondary" size="sm" icon="external">Book a 15-min call</Button>
+            </div>
+          </div>
+
+          <div class="sys__bgroup">
+            <p class="sys__bname mono">Ghost</p>
+            <p class="sys__d">A hairline that tints on hover; the arrow takes the signal colour.</p>
+            <div class="sys__demo btn-row">
+              <Button href="#components" variant="ghost" icon="external">LinkedIn</Button>
+              <Button href="#components" variant="ghost" size="sm" icon="down">Small ghost</Button>
+            </div>
+          </div>
+
+          <div class="sys__bgroup">
+            <p class="sys__bname mono">All variants, side by side</p>
+            <div class="sys__table sys__table--btn" role="table" aria-label="Button variants and sizes">
+              <div class="sys__tr sys__tr--head mono" role="row"><span role="columnheader">Variant</span><span role="columnheader">Medium · 52px</span><span role="columnheader">Small · 44px</span></div>
+              <div class="sys__tr" role="row">
+                <span role="cell" class="sys__tok"><code>primary</code></span>
+                <span role="cell"><Button href="#components">Discuss project</Button></span>
+                <span role="cell"><Button href="#components" size="sm">Discuss project</Button></span>
+                <span role="cell" class="sys__use">Tile expands, face turns paper. 404 page.</span>
+              </div>
+              <div class="sys__tr" role="row">
+                <span role="cell" class="sys__tok"><code>primary + btn--inv</code></span>
+                <span role="cell"><Button href="#components" class="btn--inv">Discuss project</Button></span>
+                <span role="cell"><Button href="#components" size="sm" class="btn--inv">Discuss project</Button></span>
+                <span role="cell" class="sys__use">Same, colours swapped. Header.</span>
+              </div>
+              <div class="sys__tr" role="row">
+                <span role="cell" class="sys__tok"><code>secondary</code></span>
+                <span role="cell"><Button href="#components" variant="secondary" icon="external">Book a 15-min call</Button></span>
+                <span role="cell"><Button href="#components" variant="secondary" size="sm" icon="external">Book a 15-min call</Button></span>
+                <span role="cell" class="sys__use">Face stays, arrow takes the signal colour. Footer (medium), hero card (small).</span>
+              </div>
+              <div class="sys__tr" role="row">
+                <span role="cell" class="sys__tok"><code>ghost</code></span>
+                <span role="cell"><Button href="#components" variant="ghost" icon="external">LinkedIn</Button></span>
+                <span role="cell"><Button href="#components" variant="ghost" size="sm" icon="external">LinkedIn</Button></span>
+                <span role="cell" class="sys__use">Hairline tints, arrow takes the signal colour. Footer, "Ask me about ZiiP" (medium); logo-cell links, hero card (small).</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Hero (home)</h3>
+          <p class="sys__d">The first screen is the person. Two lines of the name at headline scale (Geist 700, one size, the D of the second line under the K of the first), a role caption level with the second line, one photo card, one result, and the three working words. Everything is in --u units and centred between the header and the next section, so it fits one screen from 1440 × 900 down to 1280 × 650 and has equal space above and below. The card is 236px wide, square, hairline, no shadow: darker than the hero in dark, lighter in light; its left edge is the header tabs’ left edge, and it covers about 12% of the name’s letter height. Card rows: a ghost "See case studies" with a down arrow and a secondary "Book a 15-min call". Parallax and the pointer light are listed under Motion.</p>
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Hero card</h3>
+          <p class="sys__d">The photo card in the home hero: 236px wide, square, hairline, no shadow. Portrait on a square, an availability badge pinned bottom left, name and role, then two full-width rows. The rows are the real small buttons, made flat for the card: square corners, full width, label left and arrow right, a hairline above each. The ghost row keeps its colour on hover (the arrow takes the signal colour); the secondary row keeps its face. Colours, hover, height (44px) and the label roll still come from the button, so a change to the secondary button's colours reaches this row; its radius, padding and ring are the card's own. This sample mirrors the card's styles in <code>index.astro</code> (<code>.hero__card</code>): change both together.</p>
+          <div class="sys__demo">
+            <aside class="sys__hcard" aria-label="Hero card sample">
+              <div class="sys__hphoto">
+                <Picture src={portrait} alt="" widths={[284, 568]} sizes="236px" formats={["avif", "webp"]} fallbackFormat="webp" quality={85} loading="lazy" />
+                <span class="sys__hbadge"><span>Open to new projects <b>•</b> {cardYear}</span></span>
+              </div>
+              <div class="sys__hwho"><b>Mick Dubik</b><span>{role}</span></div>
+              <Button href="#components" variant="ghost" size="sm" icon="down" class="sys__hask">See case studies</Button>
+              <Button href="#components" variant="secondary" size="sm" icon="external" class="sys__hgo">Book a 15-min call</Button>
+            </aside>
+          </div>
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Current-role card</h3>
+          <p class="sys__d">A raised surface (lighter than the page in both themes), a "Now" tag whose dot pings twice when it enters view and again on hover, the ZiiP mark flush with the text edge, and four figures with their drawings. Section title: "Shaping the ZiiP product." at weight 800.</p>
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Button states</h3>
+          <p class="sys__d">The Unbounce design system’s primary button, taken from its Figma component sheet. Default, hover, pressed, loading, done. The size never changes between states.</p>
+          <ButtonStates title="One button, every state" caption="The primary button moving through default, hover, pressed and loading. The confirmation is added for the demo." />
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Figure and glyph</h3>
+          <p class="sys__d">A reported number in large Geist numerals, with a small honest drawing beside it. Gains extend past a 100% baseline; reductions show the removed share dashed; shares fill a track; multiples are blocks.</p>
+          <div class="sys__glyphs">
+            {glyphs.map((g) => (
+              <div class="sys__g">
+                <p class="figure-num sys__gn">{g.value}<span>{g.unit}</span></p>
+                <p class="sys__gl">{g.label}</p>
+                <Glyph metric={g} />
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Tags, links and status</h3>
+          <p class="sys__d">Tags are mono pills. Links underline with a hairline that turns signal on hover. The live dot pings while the owner is available.</p>
+          <div class="sys__demo sys__demo--row">
+            <span class="tags"><span class="tag">SaaS</span><span class="tag">Design Systems</span><span class="tag">AI</span></span>
+            <a class="link" href="#components">An inline link</a>
+            <span class="mono"><span class="live-dot" aria-hidden="true"></span> <Avail /></span>
+          </div>
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Frame</h3>
+          <p class="sys__d">One frame for every product image: a theme-aware canvas one step off the page, padding that scales with width, and a 10px inner radius. Frame radius = inner radius + padding.</p>
+          <Shot img={sampleShot} sizes="(min-width: 1440px) 900px, 92vw" />
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Plate</h3>
+          <p class="sys__d">Explanatory diagrams are drawn in SVG from the case’s own facts, titled, captioned, and marked as illustrative. Text never falls below 12px.</p>
+          <Plate variant="tokens" title="How the tokens are layered" caption="Global values feed purpose-driven semantic tokens, with component-level overrides only where needed." />
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section sys__sec" id="motion" aria-labelledby="m-t">
+    <div class="wrap sheet">
+      <div class="rail"><p class="rail-label"><b>06</b> Motion</p></div>
+      <div class="body">
+        <h2 id="m-t" class="h2">Quiet, eased, <em>and optional.</em></h2>
+        <p class="prose sys__lead">Only <code>transform</code> and <code>opacity</code> animate. Scroll-driven effects sit behind <code>@supports</code> and show their final state without it. Everything moving is inside <code>prefers-reduced-motion: no-preference</code>.</p>
+        <ul class="sys__scale sys__scale--3">
+          {motion.map(([k, v, d]) => (<li><code>{k}</code><span>{v}</span><em>{d}</em></li>))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section sys__sec" id="proposal" aria-labelledby="pr-t">
+    <div class="wrap sheet">
+      <div class="rail"><p class="rail-label"><b>07</b> Proposal</p></div>
+      <div class="body">
+        <h2 id="pr-t" class="h2">A tighter scale, <em>now live.</em></h2>
+        <p class="prose sys__lead">The 22 Oct 2026 audit. All of it is live on the site now: the emphasis grey, the 31em reading measure, the 13px sans legends, the type scale and the spacing tiers. The left side of each pair keeps the earlier values for comparison. Each pair renders the same content with the current values on the left and the proposed ones on the right, scoped to this page. Type specimens are scaled to 80% so the real ratios fit side by side. The proposal: a nine-step type scale (12 · 14 · 17 · 21 · 28 · 40 · 56 · 72 · 160px) with weights 400, 500, 600 and 700, a darker light-mode emphasis grey, 13px sans-serif legends, and three spacing tiers (128 · 64 · 40) on a 4px base.</p>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Case-page opening</h3>
+          <p class="sys__d">Display 56, lede and statement 21, chapter heading 28, body 17, label 13. Each job gets its own step, so the heading and the sentence under it no longer compete.</p>
+          <div class="proto__pair">
+            {(["now", "next"] as const).map((v) => (
+              <div class={`proto proto--${v}`}>
+                <p class="proto__tag mono">{v === "now" ? "Before" : "Now live"}</p>
+                <div class="proto__col">
+                  <h4 class="proto__title">More adoption, weekly use, fewer support tickets</h4>
+                  <p class="proto__lede">Led design across two squads to make performance legible to small-business owners.</p>
+                  <h5 class="proto__h"><span class="mono">04</span>Problem</h5>
+                  <p class="proto__statement">Small and medium-sized businesses were spending too much time trying to understand how their landing pages were performing.</p>
+                  <p class="proto__body">Unbounce helps businesses build landing pages that convert. A page can have variants: versions with a promo offer, a new headline or a different hero image.</p>
+                  <p class="proto__label mono">In brief · Quantitative</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Emphasis grey</h3>
+          <p class="sys__d">Light: #7d7a73 (3.4:1 on paper) becomes #66635d (4.8:1). Dark: the neutral #b8b8b8 becomes the warm #b9b6ae, so the second tone matches the rest of the greys. Follows the theme switch in the header.</p>
+          <div class="proto__pair">
+            {(["now", "next"] as const).map((v) => (
+              <div class={`proto proto--${v}`}>
+                <p class="proto__tag mono">{v === "now" ? "Before: emphasis grey" : "Now live: emphasis grey"}</p>
+                <div class="sys__demo">
+                  <p class="proto__big">Adoption up. <em>All on the record.</em></p>
+                  <p class="proto__small"><em>Support requests, down 64%</em></p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Figure legend</h3>
+          <p class="sys__d">Legends and units are things a visitor reads to understand a bar, so they move from 12px mono capitals to 13px sans in sentence case. Mono capitals stay for kickers and index numbers.</p>
+          <div class="proto__pair">
+            {(["now", "next"] as const).map((v) => (
+              <div class={`proto proto--${v}`}>
+                <p class="proto__tag mono">{v === "now" ? "Before: 12px mono legend" : "Now live: 13px sans legend"}</p>
+                <div class="sys__g">
+                  <p class="figure-num sys__gn">{glyphs[0].value}<span>{glyphs[0].unit}</span></p>
+                  <p class="sys__gl">{glyphs[0].label}</p>
+                  <Glyph metric={glyphs[0]} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article class="sys__c">
+          <h3 class="sys__h">Vertical rhythm</h3>
+          <p class="sys__d">Today the gap between sections is whatever the padding of the two neighbours adds up to (40, 96, 192, 192). The proposal sets the gap by relationship: 128 between unrelated sections, 64 between a strip and the section it introduces, 40 between blocks, 24 inside a group. Gaps shown at half size.</p>
+          <div class="proto__pair">
+            {([["now", "Before: one padding value", [["Hero", "40"], ["Four figures", "96"], ["Current role", "192"], ["Selected work", "192"], ["Next section", ""]]], ["next", "Now live: three tiers", [["Hero", "48"], ["Four figures", "64"], ["Current role", "128"], ["Selected work", "128"], ["Next section", ""]]]] as const).map(([v, tag, rows]) => (
+              <div class={`proto proto--${v}`}>
+                <p class="proto__tag mono">{tag}</p>
+                <div class="proto__rhythm">
+                  {rows.map(([n, g]) => (<><div class="proto__block mono">{n}</div>{g && <div class="proto__gap mono" style={`height:${Number(g) / 2}px`}>{g} px</div>}</>))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section sys__sec" id="white" aria-labelledby="wt-t">
+    <div class="wrap sheet">
+      <div class="rail"><p class="rail-label"><span><span aria-hidden="true">[</span>White theme<span aria-hidden="true">]</span></span></p></div>
+      <div class="body">
+        <h2 id="wt-t" class="h2">White page, <em>cool panel.</em></h2>
+        <p class="prose sys__lead">The white light theme is live (2026-10-23): <code>#ffffff</code> as the page, <code>#f3f3f6</code> for panels, and cooler greys and rules to match. The warm paper it replaced is on the left for comparison. Both sides are forced light, whatever your system theme is.</p>
+        <div class="wt__pair">
+          {(["warm", "white"] as const).map((v) => (
+              <div class={`wt wt--${v}`}>
+                <p class="wt__tag mono">{v === "warm" ? "Before: warm paper" : "Now live: white + cool grey"}</p>
+                <div class="wt__page">
+                  <p class="wt__kick mono"><span aria-hidden="true">[</span>01<span aria-hidden="true">]</span> Selected work</p>
+                  <h4 class="wt__h">The result first. <em>Then how I got there.</em></h4>
+                  <p class="wt__p">Led the evolution of Unbounce’s design system across 4 product designers and 12 front-end engineers, with semantic tokens and reusable components.</p>
+                  <div class="wt__figs">
+                    <div><b class="figure-num">50+</b><span>Projects completed</span></div>
+                    <div><b class="figure-num">30</b><span>Global clients</span></div>
+                  </div>
+                  <div class="wt__card">
+                    <p class="wt__k mono">Now · Nov 2023 – present</p>
+                    <p class="wt__hook">Logistics SaaS, from strategy to delivery.</p>
+                    <p class="wt__line"><b class="figure-num">+40%</b><span>Courier route efficiency</span></p>
+                    <Glyph metric={glyphs[0]} />
+                    <ul class="tags"><li class="tag">AI</li><li class="tag">SaaS</li><li class="tag">B2B</li></ul>
+                  </div>
+                  <div class="wt__btns">
+                    <Button href="#white" size="sm">Book a 15-min call</Button>
+                    <Button href="#white" variant="ghost" size="sm">LinkedIn</Button>
+                  </div>
+                  <hr class="wt__rule" />
+                  <p class="wt__small">Rules, panels and labels on this surface. <a class="link" href="#white">A link</a>.</p>
+                </div>
+              </div>
+          ))}
+        </div>
+        <div class="tbl wt__tbl">
+          <table>
+            <thead><tr><th>Token</th><th>Warm (before)</th><th>White (now live)</th></tr></thead>
+            <tbody>
+              <tr><td>page <code>--paper</code></td><td>#e9e6de</td><td>#ffffff</td></tr>
+              <tr><td>panel <code>--paper-2</code></td><td>#e0dcd2</td><td>#f3f3f6</td></tr>
+              <tr><td>tracks <code>--paper-3</code></td><td>#d6d1c5</td><td>#e7e7ed</td></tr>
+              <tr><td>text <code>--ink-2</code> / labels <code>--ink-3</code></td><td>#45433f / #4f4c48</td><td>#44444c / #565660 (9.7 / 7.3 on white)</td></tr>
+              <tr><td>grey headline tone <code>--hero-grey</code></td><td>#66635d</td><td>#666670 (5.7 on white)</td></tr>
+              <tr><td>rules <code>--rule</code></td><td>#cbc6ba</td><td>#dcdce3</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .sys { padding-block: clamp(56px, 9vw, 140px) clamp(40px, 6vw, 88px); }
+  .sys__kicker { color: var(--ink-3); margin-bottom: 20px; }
+  .sys__title em { color: var(--hero-grey); }
+  .sys .lede { margin-top: 24px; }
+  .sys__toc { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 36px; }
+  .sys__toc a { padding-block: 10px; color: var(--ink-2); }
+  .sys__toc a:hover { color: var(--signal); }
+
+  .sys__sec .h2 { margin-bottom: 28px; max-width: 18ch; }
+  .sys__lead { margin-bottom: 32px; }
+  .sys__note { margin-top: 20px; max-width: var(--measure); color: var(--ink-3); font-size: var(--t-small); }
+
+  .sys__rules { display: grid; gap: 0; border-top: 1px solid var(--rule-strong); }
+  .sys__rules > div { display: grid; gap: 6px 32px; padding-block: 20px; border-bottom: 1px solid var(--rule); }
+  @media (min-width: 760px) { .sys__rules > div { grid-template-columns: 14rem 1fr; } }
+  .sys__rules dt { font-family: var(--font-sans); font-weight: 600; font-size: var(--t-h3); line-height: 1.15; }
+  .sys__rules dd { color: var(--ink-2); max-width: 56ch; }
+
+  .sys__table { border-top: 1px solid var(--rule-strong); }
+  .sys__tr { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px 20px; padding-block: 16px; border-bottom: 1px solid var(--rule); align-items: center; }
+  @media (min-width: 900px) { .sys__tr { grid-template-columns: 8rem minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr); } }
+  .sys__tr--head { display: none; color: var(--ink-3); padding-block: 12px; }
+  @media (min-width: 900px) { .sys__tr--head { display: grid; } }
+  .sys__tok code { font-family: var(--font-mono); font-size: var(--t-small); }
+  .sys__sw { display: grid; grid-template-columns: 40px auto; gap: 2px 12px; align-items: center; }
+  .sys__sw i { grid-row: span 2; width: 40px; height: 40px; border-radius: 6px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent); }
+  .sys__sw b { font-family: var(--font-mono); font-size: var(--t-small); font-weight: 500; }
+  .sys__sw small { color: var(--ink-3); font-size: var(--t-micro); }
+  .sys__use { color: var(--ink-2); font-size: var(--t-small); }
+
+  .sys__type { display: grid; border-top: 1px solid var(--rule-strong); }
+  .sys__trow { padding-block: 24px; border-bottom: 1px solid var(--rule); }
+  .sys__meta { color: var(--ink-3); margin-bottom: 14px; }
+  .sys__fig { font-size: var(--t-figure-sm); }
+  .sys__fig span, .sys__gn span { font-size: 0.55em; margin-left: 0.04em; }
+
+  .sys__scale { display: grid; gap: 0; margin-top: 32px; border-top: 1px solid var(--rule); list-style: none; padding: 0; }
+  .sys__scale li { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px 20px; padding-block: 12px; border-bottom: 1px solid var(--rule); }
+  @media (min-width: 640px) { .sys__scale li { grid-template-columns: 12rem 1fr; } .sys__scale--3 li { grid-template-columns: 12rem minmax(0, 1fr) minmax(0, 1fr); } }
+  .sys__scale code { font-family: var(--font-mono); font-size: var(--t-small); }
+  .sys__scale span { color: var(--ink-2); font-size: var(--t-small); }
+  .sys__scale em { color: var(--ink-3); font-style: normal; font-size: var(--t-small); }
+
+  .sys__grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; height: 88px; }
+  .sys__grid span { display: grid; place-items: center; border-radius: 4px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule); font-family: var(--font-mono); font-size: var(--t-micro); text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-2); }
+  .sys__rail { grid-column: 1 / span 3; }
+  .sys__body { grid-column: 4 / -1; }
+
+  .sys__c { padding-block: 36px; border-top: 1px solid var(--rule); }
+  .sys__c:first-of-type { margin-top: 12px; }
+  .sys__h { font-family: var(--font-sans); font-size: var(--t-h3); font-weight: 600; margin-bottom: 8px; }
+  .sys__d { max-width: 60ch; color: var(--ink-2); margin-bottom: 24px; }
+  .sys__demo { padding: clamp(20px, 3vw, 32px); border-radius: 10px; background: var(--paper-2); }
+  .sys__demo.btn-row { align-items: center; }
+  .sys__demo--row { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 28px; }
+  .sys__glyphs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+  .sys__g { display: grid; gap: 0; align-content: start; padding: 20px; border-radius: 10px; background: var(--paper-2); }
+  .sys__gn { font-size: var(--t-figure-sm); }
+  .sys__gl { margin-top: 6px; color: var(--ink-2); font-size: var(--t-small); } /* figure + label: one unit */
+  .sys__g :global(.glyph) { margin-top: 20px; }                                  /* the drawing: clearly apart */
+
+  /* ---- Proposal prototype (2026-10-22): scoped to this page, nothing here changes the site ---- */
+  .proto__pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 760px) { .proto__pair { grid-template-columns: minmax(0, 1fr); } }
+  .proto { min-width: 0; padding: 20px; border-radius: 10px; background: var(--paper-2); display: grid; gap: 16px; align-content: start; }
+  .proto--next { box-shadow: inset 0 0 0 1px var(--signal); }
+  .proto__tag { color: var(--ink-3); }
+  .proto--next .proto__tag { color: var(--signal); }
+  .proto__col { display: grid; align-content: start; }
+  .proto__title, .proto__h { margin-bottom: 0; }
+  .proto__title { font-weight: 700; letter-spacing: -0.035em; color: var(--ink); }
+  .proto__lede, .proto__statement { color: var(--ink-2); }
+  .proto__h { display: flex; align-items: baseline; gap: 12px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+  .proto__h .mono { color: var(--ink-3); font-size: var(--t-micro); }
+  .proto__body { color: var(--ink-2); }
+  .proto__label { text-transform: uppercase; color: var(--ink-3); letter-spacing: 0.06em; }
+  /* current values, as measured on the live site (scaled by 0.8 to fit the pair) */
+  .proto--now .proto__title { font-size: 41.8px; line-height: 1; }
+  .proto--now .proto__lede { font-size: 17px; line-height: 1.4; margin-top: 14px; }
+  .proto--now .proto__h { font-size: 18.3px; margin-top: 22px; }
+  .proto--now .proto__statement { font-size: 16.3px; line-height: 1.45; font-weight: 450; margin-top: 10px; }
+  .proto--now .proto__body { font-size: 13.7px; line-height: 1.55; margin-top: 10px; }
+  .proto--now .proto__label { font-size: 9.6px; margin-top: 18px; }
+  /* proposed values */
+  .proto--next .proto__title { font-size: 44.8px; line-height: 1.04; }
+  .proto--next .proto__lede { font-size: 16.8px; line-height: 1.45; margin-top: 14px; }
+  .proto--next .proto__h { font-size: 22.4px; margin-top: 26px; }
+  .proto--next .proto__statement { font-size: 16.8px; line-height: 1.45; font-weight: 400; margin-top: 12px; }
+  .proto--next .proto__body { font-size: 13.6px; line-height: 1.6; margin-top: 12px; }
+  .proto--next .proto__label { font-size: 10.4px; margin-top: 20px; }
+
+  .proto__big { font-size: 1.9rem; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em; color: var(--ink); }
+  .proto__small { margin-top: 14px; font-size: 0.95rem; }
+  .proto__big em, .proto__small em { font-style: normal; color: var(--hero-grey); }
+  /* the "current" side keeps the values from before 2026-10-22 so the pair still shows a difference */
+  .proto--now { --hero-grey: #7d7a73; }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme="light"])) .proto--now { --hero-grey: #b8b8b8; } }
+  :global(:root[data-theme="dark"]) .proto--now { --hero-grey: #b8b8b8; }
+  .proto--now .sys__g :global(.glyph__legend) { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 400; letter-spacing: 0.02em; color: var(--ink-3); }
+  .proto .sys__g { background: var(--raised); }
+
+  .proto__rhythm { display: grid; }
+  .proto__block { padding: 8px 10px; border-radius: 6px; background: var(--paper-3); box-shadow: inset 0 0 0 1px var(--rule); font-size: var(--t-micro); color: var(--ink-2); }
+  .proto__gap { display: grid; place-items: center; min-height: 14px; font-size: var(--t-micro); color: var(--ink-3); background: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--ink-3) 22%, transparent) 6px 7px); }
+  .proto--next .proto__gap { color: var(--signal); background: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--signal) 28%, transparent) 6px 7px); }
+
+  /* ---- White theme trial (2026-10-23): both sides force the light tokens, so the comparison is the same in a dark system theme ---- */
+  .wt__pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+  @media (max-width: 900px) { .wt__pair { grid-template-columns: minmax(0, 1fr); } }
+  .wt { min-width: 0; display: grid; gap: 12px; align-content: start; }
+  .wt__tag { color: var(--ink-3); }
+  .wt--warm { --wt-paper: #e9e6de; --wt-paper2: #e0dcd2; --wt-paper3: #d6d1c5; --wt-raised: #f4f2ed; --wt-card: #f4f2ed; --wt-ink: #131312; --wt-ink2: #45433f; --wt-ink3: #4f4c48; --wt-rule: #cbc6ba; --wt-grey: #66635d; }
+  .wt--white { --wt-paper: #ffffff; --wt-paper2: #f3f3f6; --wt-paper3: #e7e7ed; --wt-raised: #f3f3f6; --wt-card: #f3f3f6; --wt-ink: #121216; --wt-ink2: #44444c; --wt-ink3: #565660; --wt-rule: #dcdce3; --wt-grey: #666670; }
+  .wt__page {
+    --paper: var(--wt-paper); --paper-2: var(--wt-paper2); --paper-3: var(--wt-paper3); --raised: var(--wt-raised); --card: var(--wt-card);
+    --ink: var(--wt-ink); --ink-2: var(--wt-ink2); --ink-3: var(--wt-ink3); --rule: var(--wt-rule); --rule-strong: var(--wt-ink); --hero-grey: var(--wt-grey);
+    --signal: #1848cc; --signal-ink: #fff; color-scheme: light;
+    background: var(--paper); color: var(--ink); border-radius: 12px; padding: 24px; display: grid; gap: 18px; box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 8%, transparent);
+  }
+  .wt__kick { color: var(--ink-3); }
+  .wt__h { font-size: 1.9rem; line-height: 1.08; font-weight: 600; letter-spacing: -0.035em; margin: 0; }
+  .wt__h em { font-style: normal; color: var(--hero-grey); }
+  .wt__p { color: var(--ink-2); max-width: 46ch; }
+  .wt__figs { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .wt__figs div { display: grid; gap: 4px; padding: 16px 14px 14px 0; }
+  .wt__figs div + div { padding-left: 16px; border-left: 1px solid var(--rule); }
+  .wt__figs b { font-size: 2.4rem; line-height: 1; }
+  .wt__figs span { color: var(--ink-2); font-size: var(--t-label); font-weight: 500; }
+  .wt__card { background: var(--raised); border-radius: 18px; padding: 18px; display: grid; gap: 12px; box-shadow: inset 0 0 0 1px var(--rule); }
+  .wt__k { color: var(--ink); }
+  .wt__hook { font-size: 1.35rem; font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; margin: 0; max-width: 18ch; }
+  .wt__line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin: 0; }
+  .wt__line b { font-size: 1.9rem; line-height: 1; }
+  .wt__line span { color: var(--ink-2); }
+  @media (min-width: 900px) {
+    .sys__table--btn .sys__tr { grid-template-columns: 9rem 14rem 14rem; gap: 8px 24px; }
+    .sys__table--btn .sys__use { grid-column: 2 / -1; }
+  }
+  .sys__hcard { width: 236px; background: var(--card); box-shadow: 0 0 0 1px var(--rule); }
+  .sys__hphoto { position: relative; aspect-ratio: 1 / 1; background: var(--card-photo); overflow: hidden; }
+  .sys__hphoto :global(picture) { display: contents; }
+  .sys__hphoto :global(img) { position: absolute; left: 50%; bottom: -9.2%; height: 120.3%; width: auto; max-width: none; transform: translateX(-50%); filter: grayscale(1) contrast(1.04); }
+  .sys__hbadge { position: absolute; left: 8px; bottom: 8px; display: flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 24px; white-space: nowrap; background: color-mix(in srgb, var(--paper) 92%, transparent); color: var(--ink); box-shadow: 0 0 0 1px var(--rule); font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+  .sys__hbadge b { color: var(--signal); font-weight: 700; }
+  .sys__hwho { padding: 10px 14px 12px; }
+  .sys__hwho b { display: block; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; line-height: 26px; }
+  .sys__hwho span { display: block; color: var(--ink-3); font-size: var(--t-small); font-weight: 500; letter-spacing: -0.01em; line-height: 20px; }
+  .sys__hcard :global(.btn) { --btn-r: 0px; display: flex; width: 100%; white-space: normal; padding-inline: 14px; }
+  .sys__hcard :global(.sys__hask) { box-shadow: inset 0 1px 0 var(--rule); justify-content: space-between; text-align: left; --btn-fg: var(--ink-2); --btn-fg-hover: var(--btn-fg); --btn-bg-hover: transparent; }
+  .sys__hcard :global(.sys__hgo) { justify-content: space-between; box-shadow: inset 0 1px 0 var(--rule); }
+  .sys__bgroup { margin-top: 32px; }
+  .sys__bname { color: var(--ink-3); margin-bottom: 8px; }
+  .sys__bgroup .sys__d { margin-bottom: 16px; }
+  .wt__btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  .wt__rule { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+  .wt__small { color: var(--ink-3); font-size: var(--t-small); }
+  .wt__tbl { margin-top: 20px; }
+</style>

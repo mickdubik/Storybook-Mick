@@ -1,0 +1,241 @@
+---
+// A very fast flick through the DataRobot documentation portal for the Doc portal case: the owner's six Figma screens
+// (mickdubik.webflow 2025, Assets page: Mock 13438:64575, Search 13438:65035, Article 13438:66640, API docs 13439:12032,
+// Glossary 13438:66129, 404 page 13438:66515) replacing each other. The screens are used as exported from Figma; the only
+// processing is that the Article's drop-shadow margin is cut off to the frame's own bounds. No text, no captions, nothing
+// moves inside a screen, and each change is a hard cut (a blink): no slide, no fade.
+//
+// `backdrop` (case-page hero, 2026-10-23): decorative and frameless; it flicks through the six screens once (3 s, home first, the
+// search overlay last) and rests on the search overlay, so it stops by itself (WCAG 2.2.2).
+//
+// `backdrop` + `stack` (case-page hero, 2026-10-24): three of the screens (home, search overlay, API docs with code) drop in from the top one after another, each
+// fitted to the full width and overlapping the one above it a little, then rest as a stack. Pure CSS, runs once (about 2 s), still under reduced motion.
+//
+// Order is random: every pass is a fresh shuffle of all six, a pass never starts with the screen the last one ended on,
+// and the first pass starts at the home screen. Half a second per screen. The clock stops off screen and while the figure or
+// card is hovered or focused. There is no pause button (owner, 2026-10-20). Reduced motion: a still of the search overlay.
+import { Picture } from "astro:assets";
+import Replay from "../Replay.astro";
+import home from "../../assets/work/datarobot-self-service-docs/dr-docs-home.webp";
+import search from "../../assets/work/datarobot-self-service-docs/dr-docs-search.webp";
+import article from "../../assets/work/datarobot-self-service-docs/dr-docs-article.webp";
+import api from "../../assets/work/datarobot-self-service-docs/dr-docs-api.webp";
+import glossary from "../../assets/work/datarobot-self-service-docs/dr-docs-glossary.webp";
+import notFound from "../../assets/work/datarobot-self-service-docs/dr-docs-404.webp";
+
+interface Props {
+  bare?: boolean;
+  sizes?: string;
+  backdrop?: boolean;
+  stack?: boolean;
+}
+const { bare = false, backdrop = false, stack = false, sizes = backdrop ? "1500px" : "(min-width: 1920px) 1728px, (min-width: 1440px) 1296px, 92vw" } = Astro.props;
+const screens = [home, search, article, api, glossary, notFound];
+// Three screens that look nothing alike: the dark home page, the search overlay, and the API docs page with its code samples at the bottom.
+const stackScreens = [home, search, api];
+const framed = !bare && !backdrop;
+const label =
+  "Quick preview of the DataRobot documentation portal, one screen after another in random order: the home page with four pathways and search, the search overlay with filters and result previews, a UI docs article, an API docs page with code samples, the glossary, and the 404 page.";
+---
+
+{backdrop && stack ? (
+  <figure class="dpd dpd--stack" aria-hidden="true">
+    <div class="dpd__stack">
+      {stackScreens.map((sc, i) => (
+        <div class="dpd__card" style={`--i:${i}`}>
+          <Picture src={sc} alt="" widths={[720, 1080, 1440]} sizes="44vw" formats={["avif", "webp"]} fallbackFormat="webp" quality={82} loading="eager" decoding="async" />
+        </div>
+      ))}
+    </div>
+  </figure>
+) : (
+<figure class={`dpd${bare || backdrop ? " dpd--bare" : ""}${backdrop ? " dpd--backdrop" : ""}${framed ? " dpd--framed" : ""}`} data-dpd data-backdrop={backdrop ? "" : undefined} aria-hidden={backdrop ? "true" : undefined}>
+  <div class="dpd__frame">
+    <div class="dpd__stage" role={backdrop ? undefined : "img"} aria-label={backdrop ? undefined : label}>
+      <div class="dpd__track" data-track>
+        {screens.map((s, i) => (
+          <div class="dpd__slide">
+            <Picture
+              src={s}
+              alt=""
+              widths={[720, 1080, 1440, 1728]}
+              sizes={sizes}
+              formats={["avif", "webp"]}
+              fallbackFormat="webp"
+              quality={82}
+              loading={i === 0 ? "eager" : "lazy"}
+              decoding="async"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+    {framed && <Replay label="the Doc portal screens" pausable />}
+  </div>
+</figure>
+)}
+
+<script>
+  import { bindCtl } from "../../scripts/anim-control";
+  const HOLD = 500; // ms per screen
+  const shuffle = <T,>(a: T[]) => {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+
+  document.querySelectorAll<HTMLElement>("[data-dpd]").forEach((root) => {
+    const track = root.querySelector<HTMLElement>("[data-track]")!;
+    const N = track.children.length;
+    const show = (i: number) => { track.style.transform = `translateX(${-i * 100}%)`; };
+
+    if (reduce.matches) {
+      show(1); // the search overlay
+      return;
+    }
+
+    if (root.hasAttribute("data-backdrop")) {
+      // Home first, the search overlay last, the other four shuffled in between: one pass, then it rests.
+      const seq = [0, ...shuffle([2, 3, 4, 5].filter((k) => k < N)), 1];
+      let at = 0, acc = 0, seen = false, lastT = performance.now();
+      show(seq[0]);
+      new IntersectionObserver((es) => { seen = es[0].isIntersecting; }, { threshold: 0.2 }).observe(root);
+      const tick = (now: number) => {
+        const dt = now - lastT; lastT = now;
+        if (seen) {
+          acc += dt;
+          while (acc >= HOLD && at < seq.length - 1) { acc -= HOLD; show(seq[++at]); }
+        }
+        if (at < seq.length - 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      return;
+    }
+    // Case page (owner, 2026-11-12): one pass (home first, the search overlay last, the others shuffled between), then it rests on the last screen.
+    // One control pauses, resumes and replays it; the old "hold while hovered" is gone.
+    const ctlBtn = root.querySelector<HTMLElement>(".replay");
+    if (ctlBtn) {
+      const mk = () => [0, ...shuffle([2, 3, 4, 5].filter((k) => k < N)), 1];
+      let seq = mk(), at = 0, acc = 0, visible = false, userPaused = false, done = false, last = performance.now();
+      show(seq[0]);
+      const tick = (now: number) => {
+        const dt = Math.min(now - last, 100); last = now;
+        if (visible && !userPaused && !done) {
+          acc += dt;
+          while (acc >= HOLD && !done) {
+            if (at < seq.length - 1) { acc -= HOLD; show(seq[++at]); }
+            else { done = true; ctl.set("done"); }
+          }
+        }
+        if (!done) requestAnimationFrame(tick);
+      };
+      const ctl = bindCtl(ctlBtn, {
+        pause: () => { userPaused = true; },
+        resume: () => { userPaused = false; },
+        restart: () => { seq = mk(); at = 0; acc = 0; done = false; userPaused = false; show(seq[0]); last = performance.now(); requestAnimationFrame(tick); },
+      });
+      new IntersectionObserver((es) => { visible = es[0].isIntersecting; }, { threshold: 0.2 }).observe(root);
+      requestAnimationFrame(tick);
+      return;
+    }
+    // A "bag": each pass shows every screen once in a fresh random order, never starting on the screen the last pass ended on.
+    let bag: number[] = [], last = -1, first = true;
+    const next = () => {
+      if (!bag.length) {
+        bag = shuffle([...Array(N).keys()]);
+        if (first) { bag.splice(bag.indexOf(0), 1); bag.unshift(0); first = false; }
+        else if (bag[0] === last) { const k = 1 + Math.floor(Math.random() * (N - 1)); [bag[0], bag[k]] = [bag[k], bag[0]]; }
+      }
+      last = bag.shift()!;
+      return last;
+    };
+    show(next());
+    // The Replay button starts the flick over: home first, then a fresh shuffle.
+    root.querySelector(".replay")?.addEventListener("click", () => { bag = []; first = true; elapsed = 0; show(next()); });
+
+    const onCard = !!root.closest("a") && matchMedia("(hover: hover)").matches; // home cards on hover-capable screens play only while hovered or focused (owner, 2026-10-22)
+    let visible = false, holding = false, active = false, elapsed = 0, prev = performance.now();
+    const frame = (now: number) => {
+      const dt = now - prev; prev = now;
+      if (onCard ? active && visible : !holding && visible) {
+        elapsed += dt;
+        if (elapsed >= HOLD) { elapsed -= HOLD; if (elapsed > HOLD) elapsed = 0; show(next()); }
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+    new IntersectionObserver((es) => { visible = es[0].isIntersecting; }, { threshold: 0.35 }).observe(root);
+
+    // No pause button: the animation holds still while the figure (or the home card, which is a link) is hovered or has keyboard focus.
+    const host = root.closest("a") ?? root;
+    host.addEventListener("pointerenter", () => { holding = active = true; });
+    host.addEventListener("pointerleave", () => { holding = active = false; });
+    host.addEventListener("focusin", () => { holding = active = true; });
+    host.addEventListener("focusout", () => { holding = active = false; });
+  });
+</script>
+
+<style>
+  .dpd { margin: 0; min-width: 0; position: relative; }
+  /* Same frame family as Shot: screen radius 10px, frame radius = 10px + padding, theme-aware canvas, hairline. */
+  .dpd__frame {
+    --dpd-inner: 10px;
+    --dpd-pad: var(--frame-pad);
+    padding: var(--dpd-pad);
+    border-radius: var(--frame-radius);
+    background: var(--paper-2);
+  }
+  .dpd__stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--dpd-inner);
+    background: var(--paper-2);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent);
+  }
+  .dpd__track { position: absolute; inset: 0; display: flex; will-change: transform; }
+  .dpd__slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; }
+  .dpd__slide :global(picture), .dpd__slide :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .dpd__slide :global(img) { object-fit: cover; object-position: 50% 0; user-select: none; -webkit-user-drag: none; }
+
+  .dpd--backdrop .dpd__frame::after { display: none; }
+
+  /* Framed (case page): a 16:9 frame like Shot's wide frames. The screen sits dead centre (roomier at the sides) and the Replay
+     button in the frame's top left corner. */
+  .dpd--framed { container-type: inline-size; }
+  .dpd--framed .dpd__frame { display: flex; flex-direction: column; align-items: center; aspect-ratio: 16 / 9; position: relative; padding-block: calc(var(--dpd-pad) * 2); }
+  .dpd--framed .dpd__stage { flex: 1 1 0; min-height: 0; max-width: 100%; width: auto; }
+  .dpd--framed .dpd__frame > :global(.replay) { top: 12px; left: 12px; }
+  @container (max-width: 559px) { .dpd--framed .dpd__frame > :global(.replay) { display: none; } }
+
+  /* Hero stack: cards fitted to the width, each 6% of the width over the one above, dropping in one by one (transform and opacity only). */
+  .dpd--stack { width: 100%; }
+  .dpd__stack { position: relative; container-type: inline-size; width: 100%; aspect-ratio: 16 / 10; }
+  .dpd__card {
+    --step: calc(62.5cqw - 6cqw);
+    position: absolute;
+    left: 0;
+    top: calc(var(--i) * var(--step));
+    z-index: var(--i);
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--paper-2);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent), 0 14px 36px rgba(0, 0, 0, 0.28);
+  }
+  .dpd__card :global(picture), .dpd__card :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; object-position: 50% 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .dpd--stack .dpd__card { animation: dpd-drop 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(250ms + var(--i) * 550ms); }
+  }
+  @keyframes dpd-drop { from { opacity: 0; transform: translateY(-32px); } to { opacity: 1; transform: none; } }
+
+  /* Home card: the image carries the one radius and hairline, no canvas (same as Shot's bare mode). */
+  .dpd--bare .dpd__frame { padding: 0; background: transparent; border-radius: clamp(3px, 1.5cqi, 8px); position: relative; overflow: hidden; }
+  .dpd--bare .dpd__stage { border-radius: 0; box-shadow: none; }
+  .dpd--bare .dpd__frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--rule); pointer-events: none; }
+
+</style>

@@ -1,0 +1,35 @@
+{
+  "name": "mick-dubik-portfolio",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@amplitude/unified": "^1.2.2",
+    "@fontsource-variable/geist": "^5.2.5",
+    "@fontsource-variable/geist-mono": "^5.2.5",
+    "@fontsource-variable/newsreader": "^5.2.5",
+    "astro": "^7.3.3",
+    "mixpanel-browser": "^2.85.0"
+  },
+  "allowScripts": {
+    "esbuild": true
+  },
+  "devDependencies": {
+    "@storybook-astro/framework": "^1.16.0",
+    "@storybook/addon-a11y": "^10.6.7",
+    "@storybook/addon-docs": "^10.6.7",
+    "@storybook/builder-vite": "^10.6.7",
+    "storybook": "^10.6.7"
+  }
+}

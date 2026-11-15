@@ -1,0 +1,177 @@
+---
+// A real product image from the owner's published case studies.
+// Round 7: every still is self-hosted (src/assets/work/, prepared by scripts/prepare-case-images.py:
+// baked transparent padding and drop shadows trimmed) and served by astro:assets as AVIF/WebP at
+// responsive widths. `img.src` stays the owner's original CDN URL: it is the key into the manifest.
+//
+// ONE frame for every image: the same radius, a hairline border and a neutral canvas with padding.
+// Opaque screenshots get a small inner radius and hairline, so crops that bleed (white UI running off an
+// edge) read as a deliberate specimen on the canvas. Transparent compositions sit directly on the canvas.
+// The canvas stays light in both themes because several images carry dark annotation text.
+//
+// Animated GIFs stay remote (owner CDN) and loop on their own, lazy-loaded when they near the screen (owner, 2026-10-20: no Play or Stop
+// button). The poster is the GIF's own first frame (self-hosted): it sits under the GIF and is all that shows for visitors who prefer
+// reduced motion.
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import type { Img } from "../data/work";
+import manifest from "../assets/work/manifest.json";
+import Replay from "./Replay.astro";
+
+const globbed = import.meta.glob<{ default: ImageMetadata }>("../assets/work/*/*.webp", { eager: true });
+// Images live in one folder per case (src/assets/work/<case-slug>/); look them up by file name.
+const files = Object.fromEntries(Object.entries(globbed).map(([path, m]) => [path.split("/").pop()!, m]));
+
+interface Props {
+  img: Img;
+  sizes?: string;
+  eager?: boolean;
+  /** Round 10: no canvas, just the image with one radius and a hairline (home previews). */
+  bare?: boolean;
+}
+const { img, sizes = "(min-width: 960px) 66vw, 100vw", eager = false, bare = false } = Astro.props;
+const isGif = img.src.endsWith(".gif");
+const key = img.src.split("/").pop()!;
+const entry = (manifest as Record<string, { file: string; alpha: boolean; fade?: string }>)[key];
+const asset = entry ? files[entry.file]?.default : undefined;
+if (!isGif && !asset) throw new Error(`Shot: no self-hosted asset for ${key}; run scripts/prepare-case-images.py`);
+// Transparent images whose annotation text is dark straight on transparency, so their inner panel stays light
+// (checked by compositing each on the dark surface; the others read fine on dark).
+const LIGHT_CANVAS = new Set(["cem.webp", "ub-wire-main.webp", "ub-wire-campaign.webp", "ub-wire-page.webp"]);
+const light = !!entry && LIGHT_CANVAS.has(entry.file);
+const w = asset?.width ?? img.w;
+const h = asset?.height ?? img.h;
+// First-frame posters for the GIFs (extracted from the owner's GIFs; opaque screenshots).
+const POSTERS: Record<string, string> = {
+  "66df045af3b7fa626d522a73_Unbounce_Pages_Low.gif": "gif-pages-poster.webp",
+  "66df0c0eb2d7178b297450d8_Unbounce_Chart_Low.gif": "gif-chart-poster.webp",
+};
+const poster = isGif && POSTERS[key] ? files[POSTERS[key]]?.default : undefined;
+// Landscape screens (1.4:1 and wider, strips and diagrams included) sit in a 16:9 frame (the shape of Chrome's "What's new" previews): the screen is centred, inset more at the
+// sides than at the top and bottom, and the caption sits inside the frame under it.
+const wide = !bare && w / h >= 1.4;
+const widths = asset ? [400, 640, 960, 1320, 1800, 2600].filter((x) => x < asset.width).concat(asset.width) : [];
+---
+
+<figure class={`shot${bare ? "" : " shot--framed"}`}>
+  <div class={`shot__frame${entry?.alpha || (isGif && !poster) ? " shot__frame--alpha" : ""}${bare ? " shot__frame--bare" : ""}${light ? " shot__frame--light" : ""}${wide ? " shot__frame--wide" : ""}${wide && entry?.fade === "x" ? " shot__frame--bleed" : ""}`} style={wide ? `--ar: ${(w / h).toFixed(4)}` : undefined}>
+    <div class="shot__media" style={`aspect-ratio: ${w} / ${h}`}>
+      {isGif ? (
+        <>
+          {poster && (
+            <Picture src={poster} alt="" widths={[400, 640, 960, 1440]} sizes={sizes} formats={["avif", "webp"]} fallbackFormat="webp" quality={72} loading="lazy" decoding="async" class="shot__poster" />
+          )}
+          <img class="shot__gif" src={img.src} alt={img.alt} width={img.w} height={img.h} loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+        </>
+      ) : (
+        <Picture
+          src={asset!}
+          alt={img.alt}
+          widths={widths}
+          sizes={sizes}
+          formats={["avif", "webp"]}
+          fallbackFormat="webp"
+          quality={72}
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+        />
+      )}
+    </div>
+    {isGif && !bare && <Replay label={img.caption ?? img.alt ?? "animation"} pausable />}
+    {img.caption && !bare && <figcaption class="shot__cap shot__cap--in">{img.caption}</figcaption>}
+  </div>
+  {img.caption && bare && <figcaption class="shot__cap">{img.caption}</figcaption>}
+</figure>
+
+<script>
+  import { bindCtl } from "../scripts/anim-control";
+  // A GIF cannot tell the page when it ends, so it loops and the control only pauses and resumes it (owner, 2026-11-12).
+  // Pause freezes the frame that is showing: it is drawn onto a canvas that covers the GIF, and resume removes the canvas.
+  document.querySelectorAll<HTMLElement>(".shot__frame").forEach((frame) => {
+    const gif = frame.querySelector<HTMLImageElement>(".shot__gif");
+    const media = frame.querySelector<HTMLElement>(".shot__media");
+    const btn = frame.querySelector<HTMLElement>(".replay");
+    if (!gif || !media || !btn) return;
+    let frozen: HTMLCanvasElement | null = null;
+    bindCtl(btn, {
+      pause: () => {
+        if (!gif.naturalWidth || frozen) return;
+        const c = document.createElement("canvas");
+        c.width = gif.naturalWidth; c.height = gif.naturalHeight;
+        c.className = "shot__freeze";
+        c.getContext("2d")?.drawImage(gif, 0, 0);
+        media.append(c); frozen = c;
+      },
+      resume: () => { frozen?.remove(); frozen = null; },
+      restart: () => {},
+    });
+  });
+</script>
+
+
+<style>
+  .shot { margin: 0; min-width: 0; }
+  .shot--framed { container-type: inline-size; }
+  /* The one frame (round 11). Concentric, by the same rule as the buttons: frame radius = inner radius + padding
+     (10px screen radius + 10–18px padding = 20–28px). The canvas is theme-aware, one step off the page (paper-2:
+     slightly darker in light, slightly lighter in dark) with no border, so the screen is the focus.
+     Transparent images sit straight on this canvas: one box per image. */
+  .shot__frame {
+    --shot-inner: 10px;
+    --shot-pad: var(--frame-pad);
+    --shot-canvas: var(--paper-2);
+    position: relative;
+    padding: var(--shot-pad);
+    border-radius: var(--frame-radius);
+    background: var(--shot-canvas);
+    overflow: hidden;
+  }
+  .shot__media { position: relative; }
+  /* 16:9 frame (landscape screens): the screen fills the height left by the padding and is centred, so the sides get
+     the extra room; the caption sits inside the frame under the screen. */
+  .shot__frame--wide {
+    /* --ar is the image's aspect. The screen is as tall as the frame allows (height-limited) or as wide as it allows (width-limited). */
+    --shot-h: min(calc(56.25cqi - var(--shot-pad) * 4), calc((100cqi - var(--shot-pad) * 4) / var(--ar)));
+    display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 16 / 9; padding: calc(var(--shot-pad) * 2);
+  }
+  .shot__frame--wide .shot__media { flex: none; width: calc(var(--shot-h) * var(--ar)); max-width: 100%; }
+  /* The screen is the subject and sits dead centre; the caption is support, tucked into the bottom margin. */
+  .shot__cap.shot__cap--in { margin: 12px 0 0; text-align: center; } /* natural frames: under the screen, inside the frame */
+  /* The caption sits 12px under the screen wherever the screen ends: --ar is the image's aspect, the screen is as tall as the
+     frame allows (height-limited) or as wide (width-limited), and it is centred, so its bottom edge is computable. */
+  .shot__frame--wide .shot__cap.shot__cap--in {
+    position: absolute; left: 0; right: 0;
+    top: calc(28.125cqi + var(--shot-h) / 2 + min(12px, var(--shot-pad) * 0.45));
+    margin: 0; padding-inline: var(--shot-pad);
+  }
+  .shot__frame > :global(.replay) { top: 12px; left: 12px; }
+  @container (max-width: 559px) { .shot__frame > :global(.replay) { display: none; } }
+  /* One box per image. Transparent images sit straight on the frame's canvas (no inner panel). The few whose
+     annotation text is dark on transparency get a light canvas instead, in every theme. */
+  .shot__frame--alpha.shot__frame--light { --shot-canvas: #f3f3f6; }
+  /* Bare: the image itself carries the single radius and hairline; no canvas, no padding, no inner frame. */
+  .shot__frame--bare { padding: 0; background: var(--paper-2); border-radius: clamp(3px, 1.5cqi, 8px); /* scales with the thumbnail so small previews keep their corners */ }
+  .shot__frame--bare::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--rule); pointer-events: none; }
+  .shot__frame--bare .shot__media { border-radius: 0; box-shadow: none; }
+  .shot__media :global(img) { display: block; width: 100%; height: 100%; object-fit: contain; }
+  /* Compositions that deliberately bleed half-screens off their sides (flagged "fade": "x" by the prepare script) run edge to edge: the
+     image is as wide as the frame, so the half-screens at both ends meet the frame's left and right sides (owner, 2026-11-09: no blur).
+     The frame grows to the image's height and the caption sits in the flow under it. */
+  .shot__frame--bleed { --shot-h: calc(100cqi / var(--ar)); aspect-ratio: auto; padding: calc(var(--shot-pad) * 1.5) 0; }
+  .shot__frame--bleed .shot__media { width: 100%; max-width: none; }
+  .shot__frame--bleed .shot__cap.shot__cap--in { position: static; margin: 16px 0 0; padding-inline: calc(var(--shot-pad) * 2); }
+  /* Opaque screenshots: a small inner radius + hairline so a bleeding crop reads as a specimen. */
+  .shot__frame:not(.shot__frame--alpha) .shot__media { border-radius: var(--shot-inner); overflow: hidden; box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent); }
+  /* The GIF loops on top of its own first frame; with reduced motion only the still shows. */
+  .shot__poster, .shot__media :global(.shot__poster) { display: block; width: 100%; height: 100%; }
+  .shot__freeze { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+  .shot__gif { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+  @media (prefers-reduced-motion: reduce) { .shot__gif { display: none; } }
+  .shot__cap {
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    color: var(--ink-3);
+  }
+</style>

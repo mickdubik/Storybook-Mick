@@ -1,0 +1,204 @@
+---
+// A short looping walkthrough of the Unbounce All Pages list for the Smart Traffic case: the old list, a zoom to
+// the numbers, the rating and lightbulb columns extending out of each row, a cursor settling on a lightbulb, the
+// Page Performance popover rising in, then the zoom back out, when the cursor leaves to the right and the popover closes.
+// Built from the owner's three Figma frames (mickdubik.webflow 2025, 1440 x 900 each: old 13433:49512, new
+// 11669:72710, hover 13433:49849), exported at 3x (2026-10-23, from Figma via the bridge plugin; the full frames are served at 2880 px) and stacked as layers. Everything below is authored in those
+// frames' own pixels. Only transform and opacity animate (Web Animations); the animated layers are small cut-outs, not full frames, one camera for the whole loop:
+// one zoom in, one zoom out. The cursor is small and quiet on purpose: demo practice is that the target is the
+// story, not the pointer. It leaves first and the popover closes with it, so hover ends when the pointer does.
+//
+// `backdrop` (case-page hero, 2026-10-23): the same single animation, decorative and frameless, plays once up to the open popover
+// (no zoom out, no return) and then rests there, so it stops by itself (WCAG 2.2.2). No extra layers or variants.
+//
+// Plays only while on screen. `bare` (the home card): no frame padding and no caption. There is no pause button (owner, 2026-10-20): the loop
+// holds still while the figure or card is hovered or focused. Reduced motion: a still of
+// the final state (zoomed on the lightbulb with the popover open).
+import { Image } from "astro:assets";
+import oldShot from "../../assets/work/unbounce-smart-traffic/st-old-3x.webp";
+import newShot from "../../assets/work/unbounce-smart-traffic/st-new-3x.webp";
+import popoverShot from "../../assets/work/unbounce-smart-traffic/st-popover-3x.webp";
+import stripShot from "../../assets/work/unbounce-smart-traffic/st-strip-3x.webp";
+import Replay from "../Replay.astro";
+
+interface Props {
+  bare?: boolean;
+  caption?: string;
+  backdrop?: boolean;
+}
+const { bare = false, caption, backdrop = false } = Astro.props;
+const framed = !bare && !backdrop;
+const label =
+  "Animated walkthrough of the Unbounce All Pages list. The view zooms in on a page's visitors, conversions and conversion rate, new rating and lightbulb columns extend out of each row, a cursor rests on the lightbulb, and a Page Performance popover opens comparing the page's 2% conversion rate with the 5.2% industry average and a 17.1% estimate with Smart Traffic. The cursor leaves, the popover closes and the view zooms back out.";
+const common = { width: 2880, height: 1800, format: "webp" as const, quality: 90, alt: "", decoding: "async" as const };
+const piece = { format: "webp" as const, quality: 90, alt: "", decoding: "async" as const };
+---
+
+<figure class={`std${bare || backdrop ? " std--bare" : ""}${framed ? " std--framed" : ""}`} data-st data-backdrop={backdrop ? "" : undefined} aria-hidden={backdrop ? "true" : undefined}>
+  <div class="std__frame">
+    <div class="std__stage" role={backdrop ? undefined : "img"} aria-label={backdrop ? undefined : label}>
+      <div class="std__cam" data-l="cam">
+        <Image src={oldShot} {...common} loading="lazy" />
+        <Image src={newShot} {...common} loading="lazy" data-l="newL" style="opacity:0;clip-path:inset(0 16.111% 0 0)" />
+        <!-- Small pieces, not full frames: the rating/lightbulb strip (x 1208-1440) and the popover (x 960-1384, y 386-736 of the 1440 x 900
+             frame) are cut out of the Figma frames, so each animated layer is a fraction of the frame and only opacity and transform animate. -->
+        <div class="std__piece" data-l="newR" style="left:83.889%;top:0;width:16.111%;height:100%;opacity:0">
+          <Image src={stripShot} width={696} height={2700} {...piece} loading="lazy" />
+        </div>
+        <div class="std__piece" data-l="hover" style="left:66.667%;top:42.889%;width:29.444%;height:38.889%;opacity:0">
+          <Image src={popoverShot} width={1272} height={1050} {...piece} loading="lazy" />
+        </div>
+        <div class="std__mv" data-l="curX"><div class="std__mv" data-l="curY">
+          <svg class="std__cur" viewBox="0 0 24 30" aria-hidden="true"><path d="M2 2v22l5.6-5 4 8.6 3.6-1.7-4-8.4H20z" fill="#111" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" /></svg>
+        </div></div>
+      </div>
+    </div>
+    {framed && <Replay label="the Smart Traffic walkthrough" pausable />}
+    {framed && caption && <figcaption class="std__cap">{caption}</figcaption>}
+  </div>
+</figure>
+
+<script>
+  import { bindCtl } from "../../scripts/anim-control";
+  const W = 1440, H = 900, T = 10400;
+  // A camera is a scale plus the point it centres on, written as a transform in % of the stage.
+  const cam = (s: number, cx: number, cy: number) => {
+    const vx = Math.min(Math.max(cx - W / 2 / s, 0), W - W / s);
+    const vy = Math.min(Math.max(cy - H / 2 / s, 0), H - H / s);
+    return `translate(${((-s * vx) / W * 100).toFixed(3)}%, ${((-s * vy) / H * 100).toFixed(3)}%) scale(${s})`;
+  };
+  const at = (x: number, y: number) => `translate(${(x / 14.4).toFixed(3)}cqw, ${(y / 14.4).toFixed(3)}cqw)`;
+  const C0 = cam(1, 720, 450);
+  const C1 = cam(1.6, 1100, 450); // one close camera frames the numbers, the new columns and the popover
+  const CAM = "cubic-bezier(.45,.05,.2,1)"; // camera: gentle start, long soft landing
+  const SOFT = "cubic-bezier(.22,1,.36,1)"; // arrivals: quick start, long settle
+  const OUT = "cubic-bezier(.2,.8,.2,1)"; // the zoom out is a quick snap back, not a slow pull
+  type Key = [number, Record<string, string | number>, string?];
+  const track = (keys: Key[], total = T) => keys.map(([t, v, e]) => ({ offset: (t * 1000) / total, ...v, easing: e || "linear" }));
+  // The backdrop stops where the popover is open and the cursor rests on the lightbulb (9.0 s): nothing zooms out or returns.
+  const END = 9.0;
+  const upTo = (k: Key[]): Key[] => {
+    const kept = k.filter(([t]) => t <= END);
+    const last = kept[kept.length - 1];
+    return last[0] < END ? [...kept, [END, last[1]]] : kept; // end on an explicit frame so the resting state is the open popover
+  };
+
+  const STRIP0 = "translateX(-7%)", STRIP1 = "translateX(0)"; // the strip eases out of the row from its left edge
+  // The cursor is always visible at full strength (never faded in or out). It rests at the right edge of the screen and
+  // travels from there; X and Y ease differently, which gives it a natural arc.
+  const X = (x: number) => `translateX(${(x / 14.4).toFixed(3)}cqw)`;
+  const Y = (y: number) => `translateY(${(y / 14.4).toFixed(3)}cqw)`;
+  const REST = [1424, 374], EASE_Y = "cubic-bezier(.45,0,.25,1)";
+  const keys: Record<string, Key[]> = {
+    cam: [[0, { transform: C0 }], [0.9, { transform: C0 }, CAM], [2.5, { transform: C1 }], [9.0, { transform: C1 }, OUT], [9.35, { transform: C0 }], [10.4, { transform: C0 }]],
+    // the names and numbers cross-fade to their new places while the rating and lightbulb columns extend out of the row
+    newL: [[0, { opacity: 0 }], [3.0, { opacity: 0 }, "ease-in-out"], [3.6, { opacity: 1 }], [9.0, { opacity: 1 }, "ease-out"], [9.3, { opacity: 0 }], [10.4, { opacity: 0 }]],
+    newR: [[0, { opacity: 0, transform: STRIP0 }], [3.0, { opacity: 0, transform: STRIP0 }, SOFT], [4.1, { opacity: 1, transform: STRIP1 }], [9.0, { opacity: 1, transform: STRIP1 }, "ease-out"], [9.3, { opacity: 0, transform: STRIP1 }], [10.4, { opacity: 0, transform: STRIP0 }]],
+    // Hover just appears, as a real hover does: instantly, with no fade and no movement. It is tied to the cursor: it switches on at
+    // the frame the pointer tip crosses into the lightbulb's cell (x 1360 on the way in, 4.93s) and off the frame it leaves it
+    // (9.10s, as the cursor heads back to the edge). Times follow from the cursor's easing curves below.
+    hover: [[0, { opacity: 0 }], [4.92, { opacity: 0 }], [4.93, { opacity: 1 }], [9.09, { opacity: 1 }], [9.1, { opacity: 0 }], [10.4, { opacity: 0 }]],
+    // The cursor is visible all the time, never faded: it rests at the right edge of the screen, glides onto the lightbulb,
+    // stays there while the popover is open, and returns to its rest spot with the zoom out.
+    curX: [[0, { transform: X(REST[0]) }], [4.6, { transform: X(REST[0]) }, "cubic-bezier(.16,.8,.3,1)"], [6.1, { transform: X(1334) }], [9.0, { transform: X(1334) }, "cubic-bezier(.4,0,.2,1)"], [9.35, { transform: X(REST[0]) }], [10.4, { transform: X(REST[0]) }]],
+    curY: [[0, { transform: Y(REST[1]) }], [4.6, { transform: Y(REST[1]) }, EASE_Y], [6.1, { transform: Y(357) }], [9.0, { transform: Y(357) }, EASE_Y], [9.35, { transform: Y(REST[1]) }], [10.4, { transform: Y(REST[1]) }]],
+  };
+
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+  document.querySelectorAll<HTMLElement>("[data-st]").forEach((root) => {
+    const l = (n: string) => root.querySelector<HTMLElement>(`[data-l="${n}"]`)!;
+    if (reduce.matches) {
+      l("newL").style.opacity = "1";
+      l("newR").style.opacity = "1";
+      l("hover").style.opacity = "1";
+      l("cam").style.transform = C1;
+      root.dataset.live = "";
+      l("curX").style.transform = X(1334);
+      l("curY").style.transform = Y(357);
+      return; // the cursor sits on the lightbulb in the still
+    }
+    root.dataset.live = "";
+    const back = root.hasAttribute("data-backdrop");
+    const ctlBtn = root.querySelector<HTMLElement>(".replay");
+    if (ctlBtn && !back) {
+      // Case page (owner, 2026-11-12): plays once when it comes into view and rests on the open popover. One control pauses, resumes and replays it,
+      // so the old "hold while hovered" is gone (it would have frozen the animation while the pointer went to the control).
+      const once = Object.entries(keys).map(([n, k]) => l(n).animate(track(upTo(k), END * 1000), { duration: END * 1000, iterations: 1, fill: "forwards" }));
+      let visible = false, userPaused = false, done = false;
+      const sync = () => once.forEach((a) => (visible && !userPaused && !done ? a.play() : a.pause()));
+      sync();
+      const ctl = bindCtl(ctlBtn, {
+        pause: () => { userPaused = true; sync(); },
+        resume: () => { userPaused = false; sync(); },
+        restart: () => { userPaused = false; done = false; once.forEach((a) => { a.currentTime = 0; }); sync(); },
+      });
+      once[0].onfinish = () => { done = true; ctl.set("done"); };
+      new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }, { threshold: 0.35 }).observe(root);
+      return;
+    }
+    const anims = Object.entries(keys).map(([n, k]) =>
+      back
+        ? l(n).animate(track(upTo(k), END * 1000), { duration: END * 1000, iterations: 1, fill: "forwards" })
+        : l(n).animate(track(k), { duration: T, iterations: Infinity }),
+    );
+    // Home cards on hover-capable screens play only while hovered or focused (owner, 2026-10-22); everywhere else the loop plays while on screen and holds while hovered or focused.
+    const onCard = !back && !!root.closest("a") && matchMedia("(hover: hover)").matches;
+    let visible = false, holding = false, active = false;
+    const playing = () => (onCard ? active && visible : !holding && visible);
+    const sync = () => anims.forEach((a) => (playing() ? a.play() : a.pause()));
+    sync();
+    // The Replay button starts the loop over from the beginning.
+    root.querySelector(".replay")?.addEventListener("click", () => { anims.forEach((a) => { a.currentTime = 0; }); sync(); });
+    new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }, { threshold: 0.35 }).observe(root);
+    // No pause button: the animation holds still while the figure (or the home card, which is a link) is hovered or has keyboard focus.
+    const host = root.closest("a") ?? root;
+    if (back) return; // decorative: no hover or focus holding
+    host.addEventListener("pointerenter", () => { holding = active = true; sync(); });
+    host.addEventListener("pointerleave", () => { holding = active = false; sync(); });
+    host.addEventListener("focusin", () => { holding = active = true; sync(); });
+    host.addEventListener("focusout", () => { holding = active = false; sync(); });
+  });
+</script>
+
+<style>
+  .std { margin: 0; min-width: 0; }
+  /* Same frame family as Shot: screen radius 10px, frame radius = 10px + padding, theme-aware canvas, hairline. */
+  .std__frame {
+    --std-inner: 10px;
+    --std-pad: var(--frame-pad);
+    padding: var(--std-pad);
+    border-radius: var(--frame-radius);
+    background: var(--paper-2);
+  }
+  .std__stage {
+    position: relative;
+    aspect-ratio: 1440 / 900;
+    overflow: hidden;
+    container-type: inline-size;
+    border-radius: var(--std-inner);
+    background: #fff;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent);
+  }
+  /* No permanent will-change: the browser promotes a layer while it animates and releases it when paused or off screen. */
+  .std__cam { position: absolute; inset: 0; transform-origin: 0 0; }
+  .std__piece { position: absolute; }
+  .std__cam :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none; }
+  /* About 14px on screen at the working zoom (1.6x), never smaller than that on the small card. */
+  .std__mv { position: absolute; left: 0; top: 0; pointer-events: none; }
+  .std__cur { display: none; max-width: none; /* the global svg reset caps it at 100% of its zero-width wrapper */ width: max(1.06cqw, 8.8px); opacity: 0.92; filter: drop-shadow(0 0.5px 1px rgba(0, 0, 0, 0.25)); }
+  [data-live] .std__cur { display: block; }
+
+  /* Home card: the image carries the one radius and hairline, no canvas (same as Shot's bare mode). */
+  .std--bare .std__frame { padding: 0; background: transparent; border-radius: clamp(3px, 1.5cqi, 8px); position: relative; overflow: hidden; }
+  .std--bare .std__stage { border-radius: 0; box-shadow: none; }
+  .std--bare .std__frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--rule); pointer-events: none; }
+
+  /* Framed (case page): a 16:9 frame like Shot's wide frames. The screen is centred (roomier at the sides), the caption sits
+     inside the frame under it and the Replay button in its top left corner. */
+  .std--framed { container-type: inline-size; }
+  .std--framed .std__frame { display: flex; flex-direction: column; align-items: center; aspect-ratio: 16 / 9; position: relative; padding-block: calc(var(--std-pad) * 2); }
+  .std--framed .std__stage { flex: 1 1 0; min-height: 0; max-width: 100%; width: auto; }
+  .std--framed .std__frame > :global(.replay) { top: 12px; left: 12px; }
+  @container (max-width: 559px) { .std--framed .std__frame > :global(.replay) { display: none; } }
+  .std__cap { position: absolute; left: 0; right: 0; top: calc(100% - var(--std-pad) * 2 + min(12px, var(--std-pad) * 0.45)); margin: 0; padding-inline: var(--std-pad); text-align: center; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.03em; color: var(--ink-3); }
+</style>

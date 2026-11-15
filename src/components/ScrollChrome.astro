@@ -1,0 +1,128 @@
+---
+// Keeps the visitor on the content while they scroll.
+//
+// 1. The header leaves with the page: scrolling down, it moves out exactly as fast as the content (scroll-linked,
+//    1:1), and it stays wherever the scroll leaves it (no settling or snapping). On the first deliberate upward
+//    scroll (12px) it comes back in 160ms, ease-out. It also returns at the very top, within 260px of the
+//    footer, and whenever it holds keyboard focus (focus-visible only: a mouse click on the theme toggle leaves the button
+//    focused, and that must not pin the header open).
+// 2. On case pages, a 2px reading-progress line (with a faint track) sits directly under the header and rides with it; when the header
+//    has left, it rests at the very top of the window, so it is always visible. It is a child of the header (no script moves it).
+//    Scroll-driven (CSS scroll timeline), with a small scroll-listener fallback.
+// 3. Sticky elements that sit under the header (the case table of contents, the rail labels, the AI intro)
+//    follow it: each one reads `--head-off`, set on those few elements only, to close the gap the header leaves.
+//
+// One tween writes the header, the line and the followers together. Transform only, written directly, one
+// requestAnimationFrame per frame, passive listeners. Reduced motion: the scroll-linked movement stays (it is
+// the page moving); the return is instant.
+---
+
+<script>
+  const root = document.documentElement;
+  const head = document.querySelector<HTMLElement>(".masthead");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+  // Reading-progress line, case pages only. The wrapper carries the position; the bar carries the fill.
+  let wrap: HTMLElement | null = null;
+  if (document.querySelector(".study")) {
+    wrap = document.createElement("div");
+    wrap.className = "scroll-progress";
+    wrap.setAttribute("aria-hidden", "true");
+    const bar = document.createElement("div");
+    bar.className = "scroll-progress__bar";
+    wrap.append(bar);
+    // A child of the header, hanging 2px below its bottom edge: it is part of the header, so the browser moves them as one (no script keeps them in step).
+    (head ?? document.body).append(wrap);
+    if (!CSS.supports("animation-timeline: scroll()")) {
+      const set = () => {
+        const max = root.scrollHeight - innerHeight;
+        bar.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
+      };
+      addEventListener("scroll", () => requestAnimationFrame(set), { passive: true });
+      set();
+    }
+  }
+
+  if (head) {
+    const followers = [...document.querySelectorAll<HTMLElement>(".toc, .rail-label, .ai__intro")];
+    let H = head.getBoundingClientRect().height;
+    let off = 0;      // how far the header has moved up, 0..H
+    let last = scrollY;
+    let upRun = 0;    // consecutive upward distance, so a small wobble does not bring the header back
+    let queued = false;
+    let tween = 0;
+
+    // One writer for everything that follows the header, so they never drift apart.
+    const paint = () => {
+      head.style.transform = off > 0 ? `translateY(${-off}px)` : "";
+      const v = `${off}px`;
+      for (const el of followers) el.style.setProperty("--head-off", v);
+    };
+    // The return: a 160ms ease-out (quint) tween of `off`. Instant under reduced motion.
+    const returnToTop = () => {
+      if (off === 0) return;
+      cancelAnimationFrame(tween);
+      if (reduced.matches) { off = 0; paint(); return; }
+      const from = off;
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / 160);
+        off = from * (1 - (1 - Math.pow(1 - p, 5)));
+        paint();
+        if (p < 1) tween = requestAnimationFrame(step);
+      };
+      tween = requestAnimationFrame(step);
+    };
+
+    const update = () => {
+      queued = false;
+      const y = Math.max(0, scrollY);
+      head.classList.toggle("is-scrolled", y > 8); // home: the header is transparent over the hero until the page moves
+      const delta = y - last;
+      last = y;
+      const nearEnd = innerHeight + y > root.scrollHeight - 260;
+
+      if (y <= 0 || nearEnd || head.matches(":has(:focus-visible)")) {
+        returnToTop();
+      } else if (delta > 0) {
+        cancelAnimationFrame(tween);
+        upRun = 0;
+        off = Math.min(H, off + delta);          // down: follow the page exactly, and stay where it leaves it
+        paint();
+      } else if (delta < 0) {
+        upRun += -delta;
+        if (off > 0 && upRun >= 12) returnToTop(); // up: come back quickly, after a deliberate 12px
+      }
+    };
+
+    addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+    addEventListener("resize", () => { H = head.getBoundingClientRect().height; root.style.setProperty("--sp-head-h", `${H}px`); });
+    head.addEventListener("focusin", returnToTop);
+    root.style.setProperty("--sp-head-h", `${H}px`);
+    update();
+  }
+</script>
+
+<style is:global>
+  .masthead { will-change: transform; }
+
+  /* Part of the header (a child, hanging just under its bottom edge), so it is sticky to it by construction: it moves with the header and, once the
+     header has left, rests at the very top of the window, so it is always visible (owner, 2026-11-09). */
+  .scroll-progress {
+    position: absolute;
+    inset: calc(100% + 1px) 0 auto 0; /* 100% is the header's padding box; +1px clears its 1px bottom border */
+    height: 2px;
+    /* A faint track under the fill, so the line reads as a progress bar even at the start of the page. */
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+    pointer-events: none;
+  }
+  .scroll-progress__bar {
+    height: 100%;
+    background: var(--signal);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+  @supports (animation-timeline: scroll()) {
+    .scroll-progress__bar { animation-name: grow-x; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root); }
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+// The owner-approved portrait (round 6: self-hosted). Source: the owner's Webflow CDN file
+// 68cbc8ecf6323cd34bdef65c_Portrait.svg, whose embedded PNG was extracted, square-cropped and saved as
+// src/assets/home/portrait.png (800×800, transparent background). astro:assets serves AVIF/WebP at 1x/2x.
+import { Picture } from "astro:assets";
+import portrait from "../assets/home/portrait.png";
+
+interface Props {
+  widths: number[];
+  sizes: string;
+  eager?: boolean;
+  class?: string;
+}
+const { widths, sizes, eager = false, class: cls } = Astro.props;
+---
+
+<Picture
+  src={portrait}
+  alt="Mick Dubik, black-and-white portrait"
+  widths={widths}
+  width={Math.max(...widths)}
+  height={Math.max(...widths)}
+  sizes={sizes}
+  formats={["avif", "webp"]}
+  fallbackFormat="webp"
+  quality={62}
+  loading={eager ? "eager" : "lazy"}
+  decoding="async"
+  fetchpriority={eager ? "low" : undefined}
+  class={cls}
+/>

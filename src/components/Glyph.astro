@@ -1,0 +1,128 @@
+---
+// The "delta glyph": a small, honest drawing of a real metric.
+// The bars are SVG; all labels are HTML text (12px minimum) so they stay legible and scale with the user's font size.
+//  percent + up   → a 100% baseline with the gain extending past it
+//  percent + down → the remaining share solid, the removed share as a dashed outline
+//  share          → the share filled on an outlined 0–100 track
+//  score          → like share, with a benchmark tick
+//  multiple       → one block per ×
+//  months         → one segment per month, then launch
+//  plain          → no drawing (levels such as "Top 3" or "1M+")
+import type { Metric } from "../data/work";
+
+interface Props {
+  metric: Metric;
+}
+const { metric } = Astro.props;
+const m = metric.magnitude ?? 0;
+const H = 12;
+const W = 200;
+const base = 120;
+const u = base / 100;
+const draw = metric.kind !== "plain" && m > 0;
+const blockW = metric.kind === "multiple" ? Math.min(base / 2, (W - 4 * (m - 1)) / m) : 0;
+---
+
+{draw && (
+  <div class="glyph" aria-hidden="true">
+    <svg viewBox={`0 0 ${W} ${H + 8}`} preserveAspectRatio="xMinYMid meet">
+      {metric.kind === "percent" && metric.direction !== "down" && (
+        <>
+          <rect x="0" y="4" width={base} height={H} class="g-base" />
+          <rect x={base} y="4" width={m * u} height={H} class="g-signal g-grow" />
+          <line x1={base} x2={base} y1="0" y2={H + 8} class="g-tick" />
+        </>
+      )}
+      {metric.kind === "percent" && metric.direction === "down" && (
+        <>
+          <rect x="0" y="4" width={(100 - m) * u} height={H} class="g-base" />
+          <rect x={(100 - m) * u + 0.75} y="4.75" width={m * u - 1.5} height={H - 1.5} class="g-removed" />
+        </>
+      )}
+      {(metric.kind === "share" || metric.kind === "score") && (
+        <>
+          <rect x="0.5" y="4.5" width={base - 1} height={H - 1} class="g-track" />
+          <rect x="0" y="4" width={m * u} height={H} class="g-signal g-grow" />
+          {metric.benchmark && (
+            <line x1={metric.benchmark.value * u} x2={metric.benchmark.value * u} y1="0" y2={H + 8} class="g-tick g-tick--strong" />
+          )}
+        </>
+      )}
+      {metric.kind === "multiple" &&
+        Array.from({ length: m }).map((_, i) => (
+          <rect x={i * (blockW + 4)} y="4" width={blockW} height={H} class={i === 0 ? "g-base" : "g-signal g-grow"} />
+        ))}
+      {metric.kind === "months" &&
+        Array.from({ length: m }).map((_, i) => (
+          <rect x={i * 42} y="4" width="38" height={H} class="g-signal g-grow" />
+        ))}
+      {metric.kind === "months" && <line x1={m * 42 + 2} x2={m * 42 + 2} y1="0" y2={H + 8} class="g-tick g-tick--strong" />}
+    </svg>
+    <p class="glyph__legend">
+      {metric.kind === "percent" && metric.direction !== "down" && (
+        <>
+          <span><i class="sw sw--ink"></i>Baseline</span>
+          <span><i class="sw sw--signal"></i>{metric.value}{metric.unit}</span>
+        </>
+      )}
+      {metric.kind === "percent" && metric.direction === "down" && (
+        <>
+          <span><i class="sw sw--ink"></i>After</span>
+          <span><i class="sw sw--removed"></i>{metric.value}{metric.unit} removed</span>
+        </>
+      )}
+      {metric.kind === "share" && <span>{metric.value} of 100</span>}
+      {metric.kind === "score" && (
+        <>
+          <span>{metric.value} of 100</span>
+          {metric.benchmark && <span>| {metric.benchmark.label}</span>}
+        </>
+      )}
+      {metric.kind === "multiple" && (
+        <>
+          <span><i class="sw sw--ink"></i>Before</span>
+          <span><i class="sw sw--signal"></i>Added</span>
+        </>
+      )}
+      {metric.kind === "months" && <span>Months 1–{m}, then launch</span>}
+    </p>
+  </div>
+)}
+
+<style>
+  .glyph { width: 100%; max-width: 280px; }
+  .glyph svg { width: 100%; height: auto; overflow: visible; }
+  .g-base { fill: var(--ink); }
+  .g-track { fill: none; stroke: var(--ink-3); stroke-width: 1; }
+  .g-signal { fill: var(--signal); }
+  .g-removed { fill: none; stroke: var(--signal); stroke-width: 1.5; stroke-dasharray: 3 2.5; }
+  .g-tick { stroke: var(--ink-3); stroke-width: 1; }
+  .g-tick--strong { stroke: var(--ink); stroke-width: 1.5; }
+  .g-grow { transform-box: fill-box; transform-origin: left center; }
+
+  .glyph__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 6px;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem; /* 13px sans, sentence case: a legend is read to understand the bar */
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .glyph__legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { display: inline-block; width: 10px; height: 10px; }
+  .sw--ink { background: var(--ink); }
+  .sw--signal { background: var(--signal); }
+  .sw--removed { border: 1.5px dashed var(--signal); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .g-grow {
+        animation-name: grow-x; animation-timing-function: linear; animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 20% cover 45%;
+      }
+    }
+  }
+</style>

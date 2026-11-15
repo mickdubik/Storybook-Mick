@@ -1,0 +1,26 @@
+---
+import Base from "../layouts/Base.astro";
+import { mailto } from "../data/site";
+import Button from "../components/Button.astro";
+---
+
+<Base title="Page not found — Mick Dubik">
+  <section class="nf">
+    <div class="wrap">
+      <p class="mono nf__code">Error 404</p>
+      <h1 class="display nf__title">This page isn’t <em>on the record.</em></h1>
+      <p class="lede nf__lede">The link may be old or mistyped. The work and the contact details are one click away.</p>
+      <div class="btn-row">
+        <Button href="/#work">See the work</Button>
+        <Button href={mailto()} variant="ghost">Discuss project</Button>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { padding-block: clamp(64px, 12vw, 180px); }
+  .nf__code { color: var(--ink-3); margin-bottom: 24px; }
+  .nf__title em { color: var(--signal); }
+  .nf__lede { margin-block: 28px 32px; }
+</style>
