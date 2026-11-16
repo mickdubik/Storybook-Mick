@@ -1,5 +1,5 @@
 // Contrast check for the colour tokens in src/styles/global.css (WCAG 2 ratios).
-// Rules (rules/visual.md): body and label text needs 4.5:1 (AA); --hero-grey is only used for large heading text, so 3:1 (AA large).
+// Rules (rules/visual.md): body and label text needs 4.5:1 (AA);
 // Run: npm run check:contrast   (exit code 1 if any pair fails, so CI can block a change)
 import { readFileSync } from "node:fs";
 
@@ -24,7 +24,6 @@ const pairs = [
   ["ink-2", "paper", 4.5], ["ink-2", "paper-2", 4.5],
   ["ink-3", "paper", 4.5], ["ink-3", "paper-2", 4.5],
   ["signal", "paper", 4.5],
-  ["hero-grey", "paper", 3],
 ];
 
 let failed = 0;

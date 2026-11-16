@@ -1,0 +1,78 @@
+---
+import { declared, light, dark } from "./tokens";
+
+// Every custom property the system defines, by tier: global (raw scales), semantic (colour roles), component (one component's own).
+const semantic = ["paper", "paper-2", "paper-3", "ink", "ink-2", "ink-3", "rule", "rule-strong", "signal", "signal-ink", "signal-inv", "signal-wash", "hero-bg", "hero-glow", "hero-lite-a", "hero-lite-b", "card", "card-photo", "raised"];
+const global = ["font-sans", "font-mono", "t-display", "t-h1", "t-h2", "t-h3", "t-figure", "t-figure-sm", "t-lede", "t-body", "t-small", "t-label", "t-micro", "gutter", "col-gap", "section", "space-tile", "space-block", "space-group", "measure", "measure-prose", "max", "radius", "dur", "ease-out", "uw", "u", "edge", "pad-x"];
+const component = ["btn-r", "btn-inset", "tile", "btn-dur", "btn-ease", "btn-bg", "btn-bg-hover", "btn-fg", "btn-fg-hover", "btn-tile", "btn-tile-hover", "btn-glyph", "btn-glyph-hover", "frame-pad", "frame-radius"];
+
+const group = (n: string) =>
+  /^t-|^font-/.test(n) ? "Type"
+  : /^(paper|ink|rule|signal|hero|card|raised)/.test(n) ? "Colour"
+  : /^(dur|ease|btn-dur|btn-ease)/.test(n) ? "Motion"
+  : /^btn-|^tile$/.test(n) ? "Button"
+  : /^frame/.test(n) ? "Frame"
+  : "Space and layout";
+
+const find = (n: string) => declared("").find((d) => d.name === n);
+const tiers = [
+  {
+    title: "Global",
+    desc: "Raw scales with no role. Components may use these directly.",
+    rows: global,
+  },
+  {
+    title: "Semantic",
+    desc: "Colour roles that say what a colour is for. Components use these and only these for colour. Dark mode redefines the same names.",
+    rows: semantic,
+  },
+  {
+    title: "Component",
+    desc: "Tokens that belong to one component. Where they take a colour they point back at a semantic token.",
+    rows: component,
+  },
+].map((t) => ({
+  ...t,
+  rows: t.rows.map((n) => ({ n, group: group(n), value: light[n] ?? find(n)?.value ?? "", dk: dark[n] })).filter((r) => r.value),
+}));
+const total = tiers.reduce((sum, t) => sum + t.rows.length, 0);
+---
+
+<div class="tok">
+  <h1 class="title">Tokens</h1>
+  <p class="intro">Every token in <code>src/styles/global.css</code>, {total} in all, by tier. Change a value there, never in a page or a component. A token's name stays fixed; its value may change with the theme or the window width.</p>
+  {tiers.map((t) => (
+    <section>
+      <h3>{t.title} <span class="count">{t.rows.length}</span></h3>
+      <p class="why">{t.desc}</p>
+      <table>
+        <thead><tr><th>Token</th><th>Group</th><th>Value</th>{t.title === "Semantic" && <th>Dark</th>}</tr></thead>
+        <tbody>
+          {t.rows.map((r) => (
+            <tr>
+              <td><code>--{r.n}</code></td>
+              <td>{r.group}</td>
+              <td>{/^#/.test(r.value) && <span class="sw" style={`background:${r.value}`}></span>}<code>{r.value}</code></td>
+              {t.title === "Semantic" && <td>{r.dk ? <><span class="sw" style={`background:${r.dk}`}></span><code>{r.dk}</code></> : <span class="same">same</span>}</td>}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  ))}
+</div>
+
+<style>
+  .tok { color: var(--ink); display: grid; gap: 40px; }
+  .title { margin: 0 0 -24px; font-size: var(--t-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .intro { margin: 0; max-width: var(--measure); font-size: var(--t-body); color: var(--ink-2); }
+  h3 { margin: 0 0 4px; font-size: var(--t-lede); font-weight: 600; }
+  .count { color: var(--ink-3); font-weight: 400; font-size: var(--t-small); margin-left: 6px; }
+  .why { margin: 0 0 8px; max-width: var(--measure); color: var(--ink-2); font-size: var(--t-small); }
+  table { width: 100%; border-collapse: collapse; font-size: var(--t-small); }
+  th { text-align: left; font-weight: 500; color: var(--ink-3); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--rule); }
+  td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--rule); vertical-align: middle; overflow-wrap: anywhere; }
+  code { font-family: var(--font-mono); font-size: var(--t-small); }
+  .sw { display: inline-block; width: 20px; height: 20px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--rule-strong, var(--rule)); vertical-align: middle; margin-right: 8px; }
+  .same { color: var(--ink-3); }
+</style>

@@ -22,7 +22,7 @@ Read in this order. Each step builds on the one before.
 
 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px", margin: "24px 0 48px" }}>
   {[
-    { n: "01", t: "Foundations", d: "Colour, type, space, motion and layout: the decisions everything else inherits. Flip the theme in the toolbar while you read.", l: "Colour", h: "?path=/story/foundations-colour--tokens" },
+    { n: "01", t: "Foundations", d: "Colour, type, space, motion and layout: the decisions everything else inherits. Flip the theme in the toolbar while you read.", l: "Colour", h: "?path=/story/foundations-colour--semantic" },
     { n: "02", t: "Components", d: "Each has a docs page with a story per variant and state. Change props in Controls, check the Accessibility panel.", l: "Button", h: "?path=/docs/components-button--docs" },
     { n: "03", t: "Demos", d: "The animated case covers, made from the same tokens and components. Where you see whether the system holds together.", l: "Smart Traffic", h: "?path=/story/demos-smarttraffic--framed" },
     { n: "04", t: "Build with it", d: "Colour from the semantic tokens, size and space from the global ones, and reuse a component before drawing a new one.", l: "Run it", h: "#run-it" },
@@ -61,10 +61,11 @@ Two gaps, so the tiers are not oversold. Colour has no separate raw ramp: the he
 
 All tokens live in `src/styles/global.css`. Never hard-code a colour. Light and dark are both defined: the site follows the system preference unless the header toggle sets `data-theme`. Use the **Theme** switch in the Storybook toolbar to flip it here.
 
-- [Colour](?path=/story/foundations-colour--tokens): paper, ink, rule and signal, with light and dark values and contrast.
-- [Typography](?path=/story/foundations-typography--tokens): one family, Geist Variable, plus Geist Mono for meta labels. No serif, no italics.
-- [Space and shape](?path=/story/foundations-space-and-shape--tokens): gutters, section and block spacing, frame padding and radii.
-- [Motion](?path=/story/foundations-motion--tokens): duration and easing tokens.
+- [Tokens](?path=/story/foundations-tokens--reference): every token in one list, by tier: global, semantic and component.
+- [Colour](?path=/story/foundations-colour--semantic): the semantic roles (surfaces, text, lines, signal) with light and dark values and contrast, plus the [primitives](?path=/story/foundations-colour--primitives) behind them.
+- [Typography](?path=/story/foundations-typography--scales): one family, Geist Variable, plus Geist Mono for meta labels. No serif, no italics.
+- [Space and shape](?path=/story/foundations-space-and-shape--space-and-shape): gutters, section and block spacing, frame padding and radii.
+- [Motion](?path=/story/foundations-motion--durations): duration and easing tokens.
 - [Layout](?path=/story/foundations-layout--sheet): the page wrapper and the 12-column sheet with its rail and body.
 
 ## Components
@@ -87,7 +88,7 @@ npm run build-storybook  # static build into storybook-static/
 npm run build            # the site build, the only automated check
 ```
 
-Every command and check is listed on the [Toolkit](?path=/docs/toolkit--docs) page.
+Every command and check is listed on the [Toolkit](?path=/docs/guides-toolkit--docs) page.
 
 Stories use the community Astro framework (`@storybook-astro/framework`), because Storybook has no official Astro support.
 
@@ -97,4 +98,4 @@ Stories use the community Astro framework (`@storybook-astro/framework`), becaus
 - **Sync status** is not built yet. It needs a Figma library of these components first.
 - **Automated checks** stop at the contrast check and the build: no lint, type or accessibility check.
 
-[See everything in What's next](?path=/docs/what-s-next--docs)
+[See everything in What's next](?path=/docs/guides-what-s-next--docs)

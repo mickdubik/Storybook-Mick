@@ -58,7 +58,7 @@ export function createTechText({ host, container, target, pad, onCursor, options
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let width = 1, height = 1, dpr = 1, raf = 0, last = performance.now();
-  let visible = false, alive = true, layoutKey = "", sizeDirty = true, word = null, glyphs = [];
+  let themeUntil = 0, lastInk = "", visible = false, alive = true, layoutKey = "", sizeDirty = true, word = null, glyphs = [];
   let pulse = 0, introClock = 0, introducing = false, fontsReady = !document.fonts, guideAlpha = 0;
   let introDone = s.intro === "none" || reducedMotion;
   const kicks = [];
@@ -348,6 +348,8 @@ export function createTechText({ host, container, target, pad, onCursor, options
     const dt = Math.min(0.05, Math.max(0.001, realDt));
     last = now;
     const t = typo();
+    // While the colour is still changing (a theme fade), keep drawing until it has held still for 150 ms.
+    if (t.ink !== lastInk) { lastInk = t.ink; themeUntil = performance.now() + 150; }
     const accent = t.ink;
     const view = ensureLayout(t);
     const damping = 2 * Math.sqrt(SPRING) * (1 - clamp01(s.bounce) * 0.96);
@@ -444,7 +446,7 @@ export function createTechText({ host, container, target, pad, onCursor, options
     });
     drawFrame(accent);
 
-    const settling = moving || introducing || !introDone || kicks.length > 0 || (guideAlpha > 0.005 && guideAlpha < 0.995) || (frame.alpha > 0.01 && frame.alpha < 0.99);
+    const settling = moving || introducing || !introDone || kicks.length > 0 || (guideAlpha > 0.005 && guideAlpha < 0.995) || (frame.alpha > 0.01 && frame.alpha < 0.99) || performance.now() < themeUntil;
     if ((active || settling) && visible && alive) raf = requestAnimationFrame(tick);
   };
 
@@ -487,7 +489,15 @@ export function createTechText({ host, container, target, pad, onCursor, options
   const resize = () => { sizeDirty = true; wake(); };
   new ResizeObserver(resize).observe(container);
   new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; wake(); }).observe(container);
-  const themeObserver = new MutationObserver(wake);
+  // The theme toggle fades colours for about 200 ms. Keep drawing for 320 ms so the canvas reads the same fading colour
+  // as the page, frame by frame, instead of drawing the old colour and then jumping. One last draw at 340 ms makes sure
+  // the final colour lands even if frames were dropped.
+  const themeObserver = new MutationObserver(() => { themeUntil = performance.now() + 320; wake(); window.setTimeout(wake, 340); });
+  // The fade can start late on a busy page, so also follow the host's own colour transition: draw while it runs, and
+  // once more when it ends, which is the moment the final colour can be read.
+  const onFade = (e) => { if (e.propertyName === "color" || e.propertyName === "-webkit-text-fill-color") { themeUntil = performance.now() + 320; wake(); } };
+  host.addEventListener("transitionrun", onFade);
+  host.addEventListener("transitionend", onFade);
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style", "data-theme"] });
   matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", wake);
   document.fonts?.ready.then(() => { fontsReady = true; layoutKey = ""; wake(); });

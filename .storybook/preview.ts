@@ -30,7 +30,16 @@ const preview: Preview = {
   parameters: {
     layout: "padded",
     backgrounds: { disabled: true },
-    options: { storySort: { order: ["Getting started", "Foundations", "Components", "Demos", "Toolkit", "What's next"] } },
+    options: { storySort: {
+        order: [
+          "Getting started",
+          "Foundations", ["Tokens", "Colour", ["Semantic", "Primitives"], "Typography", "Space and shape", "Layout", "Motion"],
+          "Components", ["Button", "ButtonStates", "Shot", "Glyph", "Plate", "Availability", "Portrait", "Blueprint"],
+          "Demos", ["SmartTraffic", "DocPortal", "DoctorOnline"],
+          "Guides", ["Toolkit", "What's next"],
+        ],
+      },
+    },
   },
 };
 export default preview;

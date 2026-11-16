@@ -497,7 +497,7 @@ const rules = [
               <tr><td>panel <code>--paper-2</code></td><td>#e0dcd2</td><td>#f3f3f6</td></tr>
               <tr><td>tracks <code>--paper-3</code></td><td>#d6d1c5</td><td>#e7e7ed</td></tr>
               <tr><td>text <code>--ink-2</code> / labels <code>--ink-3</code></td><td>#45433f / #4f4c48</td><td>#44444c / #565660 (9.7 / 7.3 on white)</td></tr>
-              <tr><td>grey headline tone <code>--hero-grey</code></td><td>#66635d</td><td>#666670 (5.7 on white)</td></tr>
+              <tr><td>second tone in headings <code>--ink-2</code></td><td>#66635d</td><td>#44444c (9.7 on white)</td></tr>
               <tr><td>rules <code>--rule</code></td><td>#cbc6ba</td><td>#dcdce3</td></tr>
             </tbody>
           </table>
@@ -510,7 +510,7 @@ const rules = [
 <style>
   .sys { padding-block: clamp(56px, 9vw, 140px) clamp(40px, 6vw, 88px); }
   .sys__kicker { color: var(--ink-3); margin-bottom: 20px; }
-  .sys__title em { color: var(--hero-grey); }
+  .sys__title em { color: var(--ink-2); }
   .sys .lede { margin-top: 24px; }
   .sys__toc { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 36px; }
   .sys__toc a { padding-block: 10px; color: var(--ink-2); }
@@ -601,7 +601,7 @@ const rules = [
 
   .proto__big { font-size: 1.9rem; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em; color: var(--ink); }
   .proto__small { margin-top: 14px; font-size: 0.95rem; }
-  .proto__big em, .proto__small em { font-style: normal; color: var(--hero-grey); }
+  .proto__big em, .proto__small em { font-style: normal; color: var(--hero-grey, var(--ink-2)); }
   /* the "current" side keeps the values from before 2026-10-22 so the pair still shows a difference */
   .proto--now { --hero-grey: #7d7a73; }
   @media (prefers-color-scheme: dark) { :global(:root:not([data-theme="light"])) .proto--now { --hero-grey: #b8b8b8; } }
@@ -629,7 +629,7 @@ const rules = [
   }
   .wt__kick { color: var(--ink-3); }
   .wt__h { font-size: 1.9rem; line-height: 1.08; font-weight: 600; letter-spacing: -0.035em; margin: 0; }
-  .wt__h em { font-style: normal; color: var(--hero-grey); }
+  .wt__h em { font-style: normal; color: var(--hero-grey, var(--ink-2)); }
   .wt__p { color: var(--ink-2); max-width: 46ch; }
   .wt__figs { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
   .wt__figs div { display: grid; gap: 4px; padding: 16px 14px 14px 0; }

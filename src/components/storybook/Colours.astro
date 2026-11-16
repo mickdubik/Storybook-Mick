@@ -1,7 +1,10 @@
 ---
-import { light, dark, ratio, grade } from "./tokens";
+import { light, dark, ratio, grade, declared, lum } from "./tokens";
 
-// Roles are the owner's, copied from src/pages/system.astro.
+// "semantic" shows the roles, grouped by what they are for. "primitives" shows the raw values behind them.
+const { view = "semantic" } = Astro.props as { view?: "semantic" | "primitives" };
+
+// Roles are the owner's, copied from src/pages/system.astro. Other notes come from the comments in global.css.
 const roles: Record<string, string> = {
   paper: "Page background",
   "paper-2": "Inset panels: frames, plates, cards",
@@ -14,42 +17,147 @@ const roles: Record<string, string> = {
   rule: "Hairlines",
   signal: "Results and interactive states only",
 };
+const noteOf = (n: string) => declared(n).find((d) => d.name === n)?.note ?? "";
 const text = new Set(["ink", "ink-2", "ink-3", "signal"]);
-const names = Object.keys(light);
-const rows = names.map((n) => {
-  const d = dark[n] ?? light[n];
-  return {
+const darkOf = (n: string) => dark[n] ?? light[n];
+
+const groupBlurb: Record<string, string> = {
+  Surfaces: "Backgrounds, from the page to the panels that sit on it. Each step is one tone off the page. There are no shadows.",
+  Text: "Ink for copy, from primary to meta labels, with the second tone in headings set in the secondary ink.",
+  Lines: "Hairlines that divide sections. The soft one separates rows, the strong one opens a section.",
+  Signal: "The one accent. It marks a result or an interactive state, never a large fill. The ink token sits on it; the inverse is the other theme's signal.",
+};
+const groups = [
+  { title: "Surfaces", names: ["paper", "paper-2", "paper-3", "raised", "card", "card-photo"] },
+  { title: "Text", names: ["ink", "ink-2", "ink-3"] },
+  { title: "Lines", names: ["rule", "rule-strong"] },
+  { title: "Signal", names: ["signal", "signal-ink", "signal-inv"] },
+].map((g) => ({
+  title: g.title,
+  rows: g.names.filter((n) => light[n]).map((n) => ({
     n,
-    role: roles[n] ?? "",
+    role: roles[n] ?? noteOf(n).replace(/^[a-z]/, (c) => c.toUpperCase()),
     l: light[n],
-    d,
+    d: darkOf(n),
     lr: text.has(n) ? ratio(light[n], light.paper) : null,
-    dr: text.has(n) ? ratio(d, dark.paper ?? light.paper) : null,
-  };
-});
+    dr: text.has(n) ? ratio(darkOf(n), darkOf("paper")) : null,
+  })),
+}));
+
+const states = ["btn-bg", "btn-bg-hover", "btn-fg", "btn-fg-hover", "btn-tile", "btn-tile-hover", "btn-glyph", "btn-glyph-hover"]
+  .map((n) => declared("btn-").find((d) => d.name === n))
+  .filter((t): t is NonNullable<typeof t> => !!t);
+
+// Primitives: every distinct hex value in the two themes, lightest first, with the roles that use it.
+const used = new Map<string, { light: string[]; dark: string[] }>();
+const add = (hex: string, theme: "light" | "dark", n: string) => {
+  const e = used.get(hex) ?? { light: [], dark: [] };
+  e[theme].push(n);
+  used.set(hex, e);
+};
+for (const n of Object.keys(light)) add(light[n], "light", n);
+for (const n of Object.keys(light)) add(darkOf(n), "dark", n);
+const rgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const family = (h: string) => {
+  const [r, g, b] = rgb(h);
+  return b - Math.max(r, g) > 60 ? "Cobalt" : "Neutral";
+};
+const order = ["Neutral", "Cobalt"];
+const blurb: Record<string, string> = {
+  Neutral: "Every grey in both themes, from white to near black. Some lean slightly cool and some slightly warm.",
+  Cobalt: "The one blue, in a light and a deep value.",
+};
+const ramps = order
+  .map((name) => ({
+    name,
+    blurb: blurb[name],
+    values: [...used.keys()].filter((h) => family(h) === name).sort((x, y) => lum(y) - lum(x)),
+  }))
+  .filter((r) => r.values.length > 0);
 ---
 
-<table class="tok">
-  <thead>
-    <tr><th>Token</th><th>Light</th><th>Dark</th><th>Contrast on paper (light / dark)</th><th>Use</th></tr>
-  </thead>
-  <tbody>
-    {rows.map((r) => (
-      <tr>
-        <td><code>--{r.n}</code></td>
-        <td><span class="sw" style={`background:${r.l}`}></span><code>{r.l}</code></td>
-        <td><span class="sw" style={`background:${r.d}`}></span><code>{r.d}</code></td>
-        <td>{r.lr && r.dr ? `${r.lr.toFixed(1)} (${grade(r.lr)}) / ${r.dr.toFixed(1)} (${grade(r.dr)})` : "—"}</td>
-        <td>{r.role}</td>
-      </tr>
+{view === "semantic" ? (
+  <div class="col">
+    <h1 class="title">Semantic colour</h1>
+    <p class="intro">Semantic tokens name a role, not a value. Components use these and only these for colour. Flip the theme in the toolbar: every name stays the same while its value changes. That stability is what lets a token survive a re-skin.</p>
+    <section>
+      <h3>How to read it</h3>
+      <ul class="legend">
+        <li><b>Token</b>: the CSS variable. Use it as <code>color: var(--ink)</code>. Never type the hex.</li>
+        <li><b>Light and Dark</b>: the HEX value the token resolves to in each theme. The name never changes; the value does.</li>
+        <li><b>Contrast</b>: the WCAG ratio of a text token on <code>--paper</code>, light and dark. AA needs 4.5, large text 3.</li>
+        <li><b>Use</b>: the job of the token. Pick by job, not by how the colour looks.</li>
+      </ul>
+    </section>
+    {groups.map((g) => (
+      <section>
+        <h3>{g.title}</h3>
+        <p class="why">{groupBlurb[g.title]}</p>
+        <table class="tok">
+          <thead>
+            <tr><th>Token</th><th>Light</th><th>Dark</th><th>Contrast on paper (light / dark)</th><th>Use</th></tr>
+          </thead>
+          <tbody>
+            {g.rows.map((r) => (
+              <tr>
+                <td><code>--{r.n}</code></td>
+                <td><span class="sw" style={`background:${r.l}`}></span><code>{r.l}</code></td>
+                <td><span class="sw" style={`background:${r.d}`}></span><code>{r.d}</code></td>
+                <td>{r.lr && r.dr ? `${r.lr.toFixed(1)} (${grade(r.lr)}) / ${r.dr.toFixed(1)} (${grade(r.dr)})` : "—"}</td>
+                <td>{r.role}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     ))}
-  </tbody>
-</table>
+    <section>
+      <h3>State</h3>
+      <p class="why">Interactive states are not colours of their own. The button's states are component tokens that point back at the roles above, so a theme change carries them along. Only <code>--signal</code> marks an interactive state or a result.</p>
+      <table class="tok">
+        <thead><tr><th>Token</th><th>Resting value</th></tr></thead>
+        <tbody>
+          {states.map((t) => (<tr><td><code>--{t.name}</code></td><td><code>{t.value}</code></td></tr>))}
+        </tbody>
+      </table>
+    </section>
+  </div>
+) : (
+  <div class="col">
+    <h1 class="title">Primitive colour</h1>
+    <p class="intro">The raw colour values behind the semantic tokens, in the light and dark themes. A value is only a value here: it has no name and no role. They are grouped by colour family, each from light to dark.</p>
+    {ramps.map((r) => (
+      <section>
+        <h3>{r.name} <span class="count">{r.values.length}</span></h3>
+        <p class="why">{r.blurb} Lightest to darkest.</p>
+        <div class="ramp">
+          {r.values.map((hex) => (
+            <div class="step">
+              <span class="chip" style={`background:${hex}`}></span>
+              <code class="hex">{hex}</code>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+)}
 
 <style>
-  .tok { width: 100%; border-collapse: collapse; font-size: var(--t-small); color: var(--ink); }
+  .col { display: grid; gap: 32px; color: var(--ink); }
+  .title { margin: 0 0 -24px; font-size: var(--t-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .intro { margin: 0; max-width: var(--measure); font-size: var(--t-body); color: var(--ink-2); }
+  .why { margin: 0 0 8px; max-width: var(--measure); color: var(--ink-2); font-size: var(--t-small); }
+  .legend { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; max-width: var(--measure); font-size: var(--t-small); color: var(--ink-2); }
+  .legend b { color: var(--ink); font-weight: 600; }
+  h3 { margin: 0 0 8px; font-size: var(--t-lede); font-weight: 600; }
+  .tok { width: 100%; border-collapse: collapse; font-size: var(--t-small); }
   .tok th { text-align: left; font-weight: 500; color: var(--ink-3); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--rule); }
   .tok td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--rule); vertical-align: middle; }
-  .tok code { font-family: var(--font-mono); font-size: var(--t-small); }
+  .tok code, .hex { font-family: var(--font-mono); font-size: var(--t-small); }
   .sw { display: inline-block; width: 28px; height: 28px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--rule-strong, var(--rule)); vertical-align: middle; margin-right: 10px; }
+  .count { color: var(--ink-3); font-weight: 400; font-size: var(--t-small); margin-left: 6px; }
+  .ramp { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; margin-top: 12px; }
+  .step { display: grid; gap: 6px; }
+  .chip { display: block; height: 64px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--rule); }
 </style>
