@@ -99,7 +99,8 @@
   const stored = readChoice();
   if (stored === "granted") startAll();
   // Nothing to ask about when no tool is configured (local dev without keys).
-  else if (!stored && (import.meta.env.PROD || !!mpToken || !!amplitudeKey)) showBar();
+  // "?og" is used by scripts/make-og.sh so the social preview screenshots do not show the banner. Nothing loads either way.
+  else if (!stored && !location.search.includes("og") && (import.meta.env.PROD || !!mpToken || !!amplitudeKey)) showBar();
 
   const send = (name: string, data?: Record<string, string>) => {
     if (gaReady) { try { (window as any).gtag("event", name, data || {}); } catch { /* analytics must never break the page */ } }
