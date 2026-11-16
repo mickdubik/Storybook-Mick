@@ -2,6 +2,7 @@ import type { Preview } from "@storybook-astro/framework";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
 import "../src/styles/global.css";
+import "./docs.css";
 
 // Same switch the site uses: data-theme="dark" on <html> (see src/layouts/Base.astro).
 const preview: Preview = {
@@ -29,7 +30,7 @@ const preview: Preview = {
   parameters: {
     layout: "padded",
     backgrounds: { disabled: true },
-    options: { storySort: { order: ["Getting started", "Foundations", "Components", "Demos"] } },
+    options: { storySort: { order: ["Getting started", "Foundations", "Components", "Demos", "Toolkit", "What's next"] } },
   },
 };
 export default preview;

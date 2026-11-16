@@ -1,0 +1,24 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="What's next" />
+
+# What's next
+
+What is not done yet, and what to know before relying on it. Each item says why it matters.
+
+## Documentation
+
+- **Portrait and Blueprint have no usage note.** `docs/DESIGN.md` does not say when to use them, so their stories show only what they render. Without that note, a newcomer cannot tell where each one belongs.
+- **Components are shown alone.** Page context is not part of Storybook: the header, the 12-column sheet and the case template. A component can look right here and still need a check on the live page.
+- **Story content is real case-study copy.** Glyph, Plate, Shot and ButtonStates read from `src/data/work.ts`, and Button uses the booking link and label from `src/data/site.ts`. The Foundations sample words and the Availability, Portrait and Blueprint stories are not case copy.
+
+## Checks
+
+- **No lint or type check.** `npm run build` is the only automated check on the pages, so a mistake in a story or a component shows up only when you look at it.
+- **No accessibility check in the build.** The Accessibility panel runs by hand, one story at a time. Contrast of the colour tokens is the one accessibility check that runs automatically.
+
+## Design tokens and Figma
+
+- **Colour has no raw ramp.** Hex values sit directly on the semantic names, so the global tier holds scales but no palette.
+- **Tokens are CSS only.** There is no JSON source that maps to Figma variables.
+- **Sync status is not built.** It would check that each component in code matches its Figma component. It needs a Figma library of these components first. When it exists it also becomes a check on the [Toolkit](?path=/docs/toolkit--docs) page.

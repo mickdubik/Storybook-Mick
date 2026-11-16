@@ -1,0 +1,12 @@
+/* Navigation links on every docs page: one style (rules/storybook.md). Card links (.ds-card) style themselves. */
+.sbdocs a[href^="?path"]:not(.ds-card),
+.sbdocs a[href="#run-it"]:not(.ds-card) {
+  color: #1848cc;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.sbdocs a[href^="?path"]:not(.ds-card):hover,
+.sbdocs a[href="#run-it"]:not(.ds-card):hover { text-decoration-thickness: 2px; }
+.sbdocs a.ds-card:hover { border-color: #1848cc !important; }

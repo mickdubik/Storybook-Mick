@@ -3,18 +3,36 @@ import { stats } from "../components/storybook/stats";
 
 <Meta title="Getting started" />
 
-# The Outcome Ledger
+# Mick Dubik Design System
 
-The design system behind Mick Dubik's portfolio, a static Astro site. The site is set like an annual report: outcomes are the headline, the design work is the supporting story. Every case leads with its reported figure in large Geist numerals before any process.
+The design system behind Mick Dubik's portfolio, a static Astro site. It is set like an annual report, outcome first (the concept is called "The Outcome Ledger"). Everything here reads from the site's own source, so it cannot drift from the live pages.
 
-This Storybook shows the tokens and the real components. Both read from the site's own source (`src/styles/global.css` and `src/components/`), so they cannot drift from the live pages. The site also has an unlinked reference page at `/system`.
-
-<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "12px", margin: "24px 0" }}>
+<div style={{ display: "flex", flexWrap: "wrap", gap: "8px", margin: "20px 0 40px" }}>
   {stats.map((s) => (
-    <div key={s.label} style={{ border: "1px solid #dcdce3", borderRadius: "12px", padding: "14px 16px" }}>
-      <div style={{ fontSize: "2rem", fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.1 }}>{s.n}</div>
-      <div style={{ fontSize: "0.8125rem", opacity: 0.7, marginTop: "4px" }}>{s.label}</div>
-    </div>
+    <p key={s.label} style={{ margin: 0, display: "inline-flex", alignItems: "baseline", gap: "6px", border: "1px solid rgba(128,128,128,0.4)", borderRadius: "999px", padding: "6px 14px", fontSize: "0.9375rem" }}>
+      <strong style={{ fontWeight: 600 }}>{s.n}</strong>
+      <span style={{ opacity: 0.85 }}>{s.label.toLowerCase()}</span>
+    </p>
+  ))}
+</div>
+
+## Start here
+
+Read in this order. Each step builds on the one before.
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px", margin: "24px 0 48px" }}>
+  {[
+    { n: "01", t: "Foundations", d: "Colour, type, space, motion and layout: the decisions everything else inherits. Flip the theme in the toolbar while you read.", l: "Colour", h: "?path=/story/foundations-colour--tokens" },
+    { n: "02", t: "Components", d: "Each has a docs page with a story per variant and state. Change props in Controls, check the Accessibility panel.", l: "Button", h: "?path=/docs/components-button--docs" },
+    { n: "03", t: "Demos", d: "The animated case covers, made from the same tokens and components. Where you see whether the system holds together.", l: "Smart Traffic", h: "?path=/story/demos-smarttraffic--framed" },
+    { n: "04", t: "Build with it", d: "Colour from the semantic tokens, size and space from the global ones, and reuse a component before drawing a new one.", l: "Run it", h: "#run-it" },
+  ].map((c) => (
+    <a key={c.n} className="ds-card" href={c.h} onClick={(e) => { if (c.h.startsWith("?")) { e.preventDefault(); window.__STORYBOOK_ADDONS_CHANNEL__?.emit("navigateUrl", c.h, { target: "_self" }); } }} style={{ display: "flex", flexDirection: "column", gap: "10px", border: "1px solid rgba(128,128,128,0.4)", borderRadius: "12px", padding: "24px", textDecoration: "none", color: "inherit" }}>
+      <p style={{ margin: 0, opacity: 0.7, fontSize: "0.875rem", fontFamily: "var(--font-mono)" }}>{c.n}</p>
+      <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.15 }}>{c.t}</p>
+      <p style={{ margin: 0, opacity: 0.85, fontSize: "1rem", lineHeight: 1.5, flex: 1 }}>{c.d}</p>
+      <span style={{ color: "#1848cc", fontWeight: 600, marginTop: "6px" }}>{c.l} →</span>
+    </a>
   ))}
 </div>
 
@@ -26,6 +44,18 @@ This Storybook shows the tokens and the real components. Both read from the site
 4. **Concentric corners.** Inner radius = outer radius minus the gap between them.
 5. **Transform and opacity only.** Nothing animates width, height, padding or margin. Reduced motion shows the same end states instantly.
 6. **Honest drawings.** Glyphs draw real values. Diagrams are titled and say they are illustrative.
+
+## The three token tiers
+
+Tokens are written as CSS custom properties in `src/styles/global.css`. Edit them there, never the pages. Three tiers, from raw to specific:
+
+1. **Global.** Raw scales with no role: the fluid type steps (`--t-h1`, `--t-body`, `--t-label`), the spacing scale (`--gutter`, `--section`, `--space-block`, `--space-group`), the radius, the duration and easing (`--dur`, `--ease-out`) and the two font families. Components may use these directly.
+2. **Semantic.** Roles that say what a colour is for: `--paper` and `--paper-2` for surfaces, `--ink`, `--ink-2` and `--ink-3` for text, `--rule` for hairlines, `--signal` for a result or an interactive state. Components use these and only these for colour. Theming means redefining this tier: light is the default, dark overrides the same names, so a component never knows which theme it is in.
+3. **Component.** Tokens that belong to one component. Where they take a colour they point back to the semantic tier (`--btn-bg: var(--ink)`): the button's `--btn-r`, `--btn-inset`, `--tile`, `--btn-bg`, `--btn-fg` and `--btn-glyph`, and the media frame's `--frame-pad` and `--frame-radius`. A variant sets these on one class instead of restyling the parts.
+
+Why layers? `--paper` tells you what a surface is for, so it survives a re-skin. `#ffffff` tells you only what it looks like.
+
+Two gaps, so the tiers are not oversold. Colour has no separate raw ramp: the hex values sit directly on the semantic names, so tier 1 holds scales but no palette. And the tokens are CSS only, with no JSON source that maps to Figma variables.
 
 ## Tokens
 
@@ -39,13 +69,13 @@ All tokens live in `src/styles/global.css`. Never hard-code a colour. Light and 
 
 ## Components
 
-- **Button**: Primary, secondary and ghost links in medium (52px) and small (44px). Pick the size from the container, not the importance of the action. Add an icon only when it carries meaning: arrow = go to, ↗ = leaves the site, ↓ = scrolls down.
-- **ButtonStates**: A looping demo of the Unbounce design system's primary button states.
-- **Glyph**: A small honest drawing of one metric: gain, reduction, share, score or multiple. Labels are HTML, never SVG text.
-- **Shot**: The one frame for every product image. Transparent images sit on the canvas as a single frame, never a frame inside a frame.
-- **Plate**: An illustrative SVG diagram, at most one per case: traffic, tokens, portal or care.
-- **Avail**: The availability line, with the year rolling in like an odometer.
-- **Demos**: Animated case covers: Smart Traffic, DocPortal and Doctor Online. They play on screen only, and reduced motion shows a still.
+- [**Button**](?path=/docs/components-button--docs): Primary, secondary and ghost links in medium (52px) and small (44px). Pick the size from the container, not the importance of the action. Add an icon only when it carries meaning: arrow = go to, ↗ = leaves the site, ↓ = scrolls down.
+- [**ButtonStates**](?path=/docs/components-buttonstates--docs): A looping demo of the Unbounce design system's primary button states.
+- [**Glyph**](?path=/docs/components-glyph--docs): A small honest drawing of one metric: gain, reduction, share, score or multiple. Labels are HTML, never SVG text.
+- [**Shot**](?path=/docs/components-shot--docs): The one frame for every product image. Transparent images sit on the canvas as a single frame, never a frame inside a frame.
+- [**Plate**](?path=/docs/components-plate--docs): An illustrative SVG diagram, at most one per case: traffic, tokens, portal or care.
+- [**Availability**](?path=/docs/components-availability--docs): The line that says Mick is open to new projects ("Open to new projects in 2027"). The year ticks over like an odometer the first time it scrolls into view. The text comes from `availability` in `src/data/site.ts`.
+- **Demos**: Animated case covers: [Smart Traffic](?path=/story/demos-smarttraffic--framed), [DocPortal](?path=/story/demos-docportal--framed) and [Doctor Online](?path=/story/demos-doctoronline--framed). They play on screen only, and reduced motion shows a still.
 
 ## Run it
 
@@ -57,10 +87,14 @@ npm run build-storybook  # static build into storybook-static/
 npm run build            # the site build, the only automated check
 ```
 
+Every command and check is listed on the [Toolkit](?path=/docs/toolkit--docs) page.
+
 Stories use the community Astro framework (`@storybook-astro/framework`), because Storybook has no official Astro support.
 
-## Known gaps
+## What's next
 
-- **Portrait and Blueprint** have no usage note in `docs/DESIGN.md` yet. Their stories show what they render, not when to use them.
-- **Story content** for Glyph, Plate, Shot and ButtonStates is read from `src/data/work.ts`, so it is the real case-study copy and figures. The Button story uses the real booking link and label from `src/data/site.ts`. Foundations sample words ("Outcome first", "Meta label") and the Avail, Portrait and Blueprint stories are not case copy.
-- **Components are shown alone.** Page context such as the header, the 12-column sheet and the case template is not part of Storybook.
+- **Portrait and Blueprint** have no usage note yet, so their stories show what they render, not when to use them.
+- **Sync status** is not built yet. It needs a Figma library of these components first.
+- **Automated checks** stop at the contrast check and the build: no lint, type or accessibility check.
+
+[See everything in What's next](?path=/docs/what-s-next--docs)

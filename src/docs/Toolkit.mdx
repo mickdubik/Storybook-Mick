@@ -1,0 +1,48 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Toolkit" />
+
+# Toolkit
+
+What to run, what each command checks, and how a change reaches the live Storybook. Run everything from the `Core/` folder, with Node 22.
+
+## Checks
+
+The site has no test suite or linter. These are the checks there are.
+
+- **Site build.** `npm run build` builds the whole site into `dist/` in about a second. It is the only automated check on the pages themselves, so run it before you say a change is done.
+- **Contrast.** `npm run check:contrast` reads the colour tokens in `src/styles/global.css` and checks the text pairs in light and dark: ink, ink-2 and ink-3 on both surfaces and the signal on paper at 4.5:1, the hero grey at 3:1 for large text. It fails below WCAG AA. It also runs before every publish.
+- **Storybook build.** `npm run build-storybook` builds the static Storybook into `storybook-static/`. A story that fails to render is dropped from the build, so look for "Dropped story" in the log.
+- **Accessibility panel.** Open it on any component story to check that story in the browser.
+
+## Commands
+
+- `npm run dev`: the site on port 4322.
+- `npm run storybook`: this Storybook on port 6006. Restart it after you add a new docs page, story or addon.
+- `npm run build-storybook`: the static Storybook build.
+- `npm run build`: the site build.
+- `npm run preview`: serves the built site.
+- `npm run check:contrast`: the contrast check.
+
+## Publishing
+
+A push to `main` of the Storybook repo runs a GitHub Actions workflow: install, contrast check, Storybook build, then deploy to GitHub Pages. A pull request runs the same checks and never replaces the live site. The live Storybook changes only when the owner says "Publish it".
+
+## Where the rules live
+
+The `rules/` folder holds the detail: `rules/storybook.md` for stories and docs pages, `rules/visual.md` for colour, type and layout, `rules/motion.md` for animation. `docs/DESIGN.md` is the long-form rationale.
+
+## A five-minute tour
+
+1. Run `npm run storybook`.
+2. Open [Colour](?path=/story/foundations-colour--tokens) and flip the Theme switch in the toolbar.
+3. Open [Button](?path=/docs/components-button--docs) and change a prop in Controls.
+4. Run `npm run check:contrast` and read the pairs it checks.
+
+## What's next
+
+- **Sync status** is not built yet. Once the components exist in Figma, it becomes a check here.
+- **No lint or type check.** `npm run build` is the only automated check on the pages.
+- **No accessibility check in the build.** The Accessibility panel runs by hand.
+
+[See everything in What's next](?path=/docs/what-s-next--docs)
