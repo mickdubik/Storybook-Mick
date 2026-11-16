@@ -20,10 +20,10 @@ const ratio = (a, b) => {
 
 // [text token, background token, minimum ratio]
 const pairs = [
-  ["ink", "paper", 4.5], ["ink", "paper-2", 4.5],
-  ["ink-2", "paper", 4.5], ["ink-2", "paper-2", 4.5],
-  ["ink-3", "paper", 4.5], ["ink-3", "paper-2", 4.5],
-  ["signal", "paper", 4.5],
+  ["color-text-default", "color-background-default", 4.5], ["color-text-default", "color-background-subtle", 4.5],
+  ["color-text-secondary", "color-background-default", 4.5], ["color-text-secondary", "color-background-subtle", 4.5],
+  ["color-text-muted", "color-background-default", 4.5], ["color-text-muted", "color-background-subtle", 4.5],
+  ["color-accent", "color-background-default", 4.5],
 ];
 
 let failed = 0;

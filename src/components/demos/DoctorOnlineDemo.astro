@@ -190,10 +190,10 @@ const label =
   /* Same frame family as Shot: screen radius 10px, frame radius = 10px + padding, theme-aware outer canvas, hairline. */
   .dod__frame {
     --dod-inner: 10px;
-    --dod-pad: var(--frame-pad);
+    --dod-pad: var(--frame-padding);
     padding: var(--dod-pad);
     border-radius: var(--frame-radius);
-    background: var(--paper-2);
+    background: var(--color-background-subtle);
   }
   /* A light canvas in both themes (the app screens are light): a very pale blue taken from the app's own blue, so the white screens separate
      from it without a hard contrast. */
@@ -206,7 +206,7 @@ const label =
     container-type: inline-size;
     border-radius: var(--dod-inner);
     background: var(--dod-bg);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text-default) 14%, transparent);
   }
   /* No margin at all: the first and last columns bleed past the left and right edges, so a screen is cut by the frame and no screen corner ever sits
      beside the frame's own corner (two nested corners read as a double corner). The gap between columns is the same 1.3% as between rows. */
@@ -248,6 +248,6 @@ const label =
   /* Home card: the image carries the one radius and hairline, no canvas (same as Shot's bare mode). */
   .dod--bare .dod__frame { padding: 0; background: transparent; border-radius: clamp(3px, 1.5cqi, 8px); position: relative; overflow: hidden; }
   .dod--bare .dod__stage { border-radius: 0; box-shadow: none; }
-  .dod--bare .dod__frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--rule); pointer-events: none; }
+  .dod--bare .dod__frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--color-border-default); pointer-events: none; }
 
 </style>

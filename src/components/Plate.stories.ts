@@ -4,7 +4,7 @@ import { plate } from "./storybook/data";
 
 // Titles, captions and notes are the real ones from the case studies in src/data/work.ts.
 const meta = {
-  title: "Components/Plate",
+  title: "Components/Graphics/Plate",
   component: Plate,
   tags: ["autodocs"],
   args: plate("traffic"),

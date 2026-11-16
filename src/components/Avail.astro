@@ -50,12 +50,12 @@ const prev = String((Number(last) + 9) % 10);
     [data-avail][data-on] .avail__d {
       transform: none;
       opacity: 1;
-      transition: transform 600ms var(--ease-out) calc(var(--i) * 70ms), opacity 300ms ease calc(var(--i) * 70ms);
+      transition: transform 600ms var(--easing-out) calc(var(--i) * 70ms), opacity 300ms ease calc(var(--i) * 70ms);
     }
     /* The last digit shows the current year's digit first, then ticks over to the next year. */
     [data-avail][data-on] .avail__d--tick {
       transform: translateY(-50%);
-      transition: transform 700ms var(--ease-out) calc(var(--i) * 70ms + 450ms), opacity 300ms ease calc(var(--i) * 70ms);
+      transition: transform 700ms var(--easing-out) calc(var(--i) * 70ms + 450ms), opacity 300ms ease calc(var(--i) * 70ms);
     }
   }
 </style>

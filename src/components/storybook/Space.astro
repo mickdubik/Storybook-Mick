@@ -3,77 +3,129 @@ import { declared } from "./tokens";
 const all = declared("");
 const pick = (names: string[]) => names.map((n) => all.find((t) => t.name === n)).filter((t): t is NonNullable<typeof t> => !!t);
 const job: Record<string, string> = {
-  gutter: "Page gutter",
-  "col-gap": "Gap between columns",
-  section: "Padding of a section",
   "space-tile": "Gap between tiles of one grid",
-  "space-block": "Between blocks inside a section or chapter",
   "space-group": "Heading to content, label to value",
-  "frame-pad": "Inset of the screen inside a media frame",
-  measure: "Reading line length, about 66 characters",
+  "frame-padding": "Inset of the screen inside a media frame",
+  "space-column-gap": "Gap between columns",
+  "space-gutter": "Page gutter",
+  "space-section": "Padding of a section",
+  "space-block": "Between blocks inside a section or chapter",
+  "size-measure": "Reading line length, about 66 characters",
+  "size-measure-prose": "Case-study paragraph width",
+  "radius-default": "Small corners across the page",
+  "btn-radius": "Outer corner of a button",
+  "frame-radius": "Media frames: screenshots, demos, plates",
 };
-const spacing = pick(["gutter", "col-gap", "section", "space-tile", "space-block", "space-group", "frame-pad", "measure"]);
-const radii = pick(["radius", "btn-r", "frame-radius"]);
+// Smallest first, so the bars grow down the page. A fluid token is ranked by the top of its clamp().
+const top = (v: string) => parseFloat(v.startsWith("clamp(") ? v.slice(v.lastIndexOf(",") + 1) : v);
+const bySize = (list: ReturnType<typeof pick>) => [...list].sort((x, y) => top(x.value) - top(y.value));
+const groups = [
+  { title: "Inside a component", why: "Small steps for the gaps and insets inside one piece of UI.", rows: bySize(pick(["space-tile", "space-group", "frame-padding"])) },
+  { title: "Between blocks and across the page", why: "Larger steps for layout: columns, the page edge, sections and the blocks inside them.", rows: bySize(pick(["space-column-gap", "space-gutter", "space-section", "space-block"])) },
+];
+const widths = pick(["size-measure", "size-measure-prose"]);
+const radii = pick(["radius-default", "btn-radius", "frame-radius"]);
 ---
 
 <div class="space">
   <h1 class="title">Space and shape</h1>
   <p class="intro">Spacing steps are named for the job they do, not for a number. Pick the step that matches the gap you are making, so two designers never choose values one pixel apart.</p>
 
+  {groups.map((g, i) => (
+    <section>
+      <h3>{g.title}</h3>
+      <p class="why">{g.why}{i === 0 && <> The bar is as wide as the token. Fluid tokens use <code>clamp()</code>, so the bar shows the value at this window width.</>}</p>
+      <table class="tok">
+        <thead><tr><th>Token</th><th>Value</th><th>Size</th><th>Use</th></tr></thead>
+        <tbody>
+          {g.rows.map((t) => (
+            <tr>
+              <td><code>--{t.name}</code></td>
+              <td><code>{t.value}</code></td>
+              <td><div class="bar" style={`width:var(--${t.name})`}></div></td>
+              <td>{job[t.name]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  ))}
+
   <section>
-    <h3>Spacing</h3>
-    <p class="why">A bar is as wide as the token. Fluid tokens use <code>clamp()</code>, so the bar shown is the value at this window width.</p>
-    {spacing.map((t) => (
-      <div class="row">
-        <div class="meta"><code>--{t.name}</code><span>{t.value}</span></div>
-        <div class="bar" style={`width:var(--${t.name})`}></div>
-        {job[t.name] && <p class="note">{job[t.name]}</p>}
-      </div>
-    ))}
+    <h3>Line length</h3>
+    <p class="why">The widest a line of text may run. This is a width, not a gap between things, and the bar stops at the edge of its column.</p>
+    <table class="tok">
+      <thead><tr><th>Token</th><th>Value</th><th>Size</th><th>Use</th></tr></thead>
+      <tbody>
+        {widths.map((t) => (
+          <tr>
+            <td><code>--{t.name}</code></td>
+            <td><code>{t.value}</code></td>
+            <td><div class="bar" style={`width:var(--${t.name})`}></div></td>
+            <td>{job[t.name]}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   </section>
 
   <section>
     <h3>Radius</h3>
     <p class="why">Small corners on the page, rounder ones on the frames that hold media. An inner corner is the outer radius minus the gap between them.</p>
-    <div class="radii">
-      {radii.map((t) => (
-        <div class="r">
-          <div class="shape" style={`border-radius:var(--${t.name})`}></div>
-          <code>--{t.name}</code>
-          <span>{t.value}</span>
-        </div>
-      ))}
-    </div>
+    <table class="tok">
+      <thead><tr><th>Token</th><th>Value</th><th>Shape</th><th>Use</th></tr></thead>
+      <tbody>
+        {radii.map((t) => (
+          <tr>
+            <td><code>--{t.name}</code></td>
+            <td><code>{t.value}</code></td>
+            <td><div class="shape" style={`border-radius:var(--${t.name})`}></div></td>
+            <td>{job[t.name]}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   </section>
 
   <section>
     <h3>Elevation</h3>
-    <p class="why">None. There are no card shadows. Sections divide by hairlines, and an inset surface steps one tone off the page with <code>--paper-2</code>.</p>
-    <div class="elev">
-      <div class="page"><div class="inset">--paper-2</div><span>--paper</span></div>
-    </div>
+    <p class="why">Two levels. Surfaces that rest on the page have no shadow: sections divide by hairlines, and an inset surface steps one tone off the page with <code>--color-background-subtle</code>. The one floating surface, the consent banner, has a soft shadow. This is the owner's single exception to "no card shadows", and shadows are not tokens yet: the banner writes its own.</p>
+    <table class="tok">
+      <thead><tr><th>Level</th><th>Value</th><th>Example</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Resting</td>
+          <td><code>no shadow</code></td>
+          <td><div class="demo demo--rest">Hairline</div></td>
+          <td>Cards, panels, frames, tiles</td>
+        </tr>
+        <tr>
+          <td>Floating</td>
+          <td><code>0 1px 2px 6%, 0 10px 32px 12%</code></td>
+          <td><div class="demo demo--float">Banner</div></td>
+          <td>The consent banner only</td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 </div>
 
 <style>
-  .space { color: var(--ink); display: grid; gap: 40px; }
-  .title { margin: 0 0 -24px; font-size: var(--t-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
-  .intro { margin: 0; max-width: var(--measure); font-size: var(--t-body); color: var(--ink-2); }
-  h3 { margin: 0 0 4px; font-size: var(--t-lede); font-weight: 600; }
-  .why { margin: 0 0 8px; max-width: var(--measure); color: var(--ink-2); font-size: var(--t-small); }
-  .row { display: grid; grid-template-columns: 240px 1fr; gap: 8px 24px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--rule); }
-  .meta { display: grid; gap: 2px; }
-  code { font-family: var(--font-mono); font-size: var(--t-small); }
-  .meta span { color: var(--ink-3); font-size: var(--t-micro); word-break: break-word; }
-  .bar { height: 12px; max-width: 100%; background: var(--paper-3); box-shadow: inset 0 0 0 1px var(--rule); }
-  .note { grid-column: 2; margin: 0; color: var(--ink-3); font-size: var(--t-small); }
-  .radii { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 12px; }
-  .r { display: grid; gap: 4px; justify-items: start; }
-  .r span { color: var(--ink-3); font-size: var(--t-micro); }
-  .shape { width: 120px; height: 80px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule); }
-  .elev { margin-top: 12px; }
-  .page { display: grid; gap: 8px; padding: 24px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); max-width: 360px; }
-  .page span { font-family: var(--font-mono); font-size: var(--t-micro); color: var(--ink-3); }
-  .inset { padding: 24px; background: var(--paper-2); font-family: var(--font-mono); font-size: var(--t-micro); color: var(--ink-3); }
-  @media (max-width: 640px) { .row { grid-template-columns: 1fr; } .note { grid-column: 1; } }
+  .space { color: var(--color-text-default); display: grid; gap: 40px; }
+  .title { margin: 0 0 -24px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .intro { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
+  h3 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
+  .why { margin: 0 0 8px; max-width: var(--size-measure); color: var(--color-text-secondary); font-size: var(--font-size-small); }
+  .tok { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--font-size-small); }
+  .tok th { text-align: left; font-weight: 500; color: var(--color-text-muted); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--color-border-default); }
+  .tok td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--color-border-default); vertical-align: middle; overflow-wrap: anywhere; }
+  .tok th:nth-child(1) { width: 27%; }
+  .tok th:nth-child(2) { width: 29%; }
+  .tok th:nth-child(3) { width: 18%; }
+  .tok th:nth-child(4) { width: 26%; }
+  code { font-family: var(--font-family-mono); font-size: var(--font-size-small); }
+  .bar { height: 12px; max-width: 100%; background: var(--color-background-muted); box-shadow: inset 0 0 0 1px var(--color-border-default); }
+  .shape { width: 64px; height: 40px; background: var(--color-background-subtle); box-shadow: inset 0 0 0 1px var(--color-border-default); }
+  .demo { display: grid; place-items: center; width: 96px; height: 48px; border-radius: 12px; background: var(--color-background-default); border: 1px solid var(--color-border-default); font-family: var(--font-family-mono); font-size: var(--font-size-micro); color: var(--color-text-muted); }
+  .demo--float { box-shadow: 0 1px 2px color-mix(in srgb, var(--color-text-default) 6%, transparent), 0 10px 32px color-mix(in srgb, var(--color-text-default) 12%, transparent); }
 </style>

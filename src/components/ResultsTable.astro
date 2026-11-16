@@ -1,0 +1,52 @@
+---
+// The reported results of a case: a ruled two-column table, label on the left and the figure on the right. The row under the pointer
+// gets a soft highlight and its figure steps up to full strength; a row is not a link, so there is no colour change or movement.
+// The table is 12px wider than its column on each side, and its cells have 12px of padding, so the text stays on the column's edge
+// while a row has room for its highlight.
+interface Item { label: string; value: string; unit: string; qualifier?: string }
+interface Props {
+  items: Item[];
+  /** Read by screen readers. */
+  caption: string;
+  heads?: [string, string];
+}
+const { items, caption, heads = ["Metrics", "Results"] } = Astro.props;
+---
+
+<table class="results">
+  <caption class="sr-only">{caption}</caption>
+  <thead>
+    <tr><th scope="col" class="mono">{heads[0]}</th><th scope="col" class="mono">{heads[1]}</th></tr>
+  </thead>
+  <tbody>
+    {items.map((m) => (
+      <tr>
+        <th scope="row"><span class="results__label">{m.label}</span></th>
+        <td class="figure-num">
+          {m.qualifier && <span class="mono results__q">{m.qualifier} </span>}
+          {m.value}{m.unit}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+<style>
+  .results { width: calc(100% + 24px); max-width: 784px; margin-inline: -12px; border-collapse: collapse; }
+  .results th, .results td { text-align: left; padding: 16px 0; border-bottom: 1px solid var(--color-border-default); vertical-align: baseline; }
+  .results thead th { color: var(--color-text-muted); font-weight: 400; border-bottom-color: var(--color-border-strong); padding-block: 10px; }
+  .results th:first-child { padding-left: 12px; }
+  .results td, .results thead th:last-child { padding-right: 12px; }
+  .results tbody th { font-weight: 450; padding-right: 16px; }
+  .results td { text-align: right; font-size: clamp(1.6rem, 1.3rem + 1vw, 2.2rem); white-space: nowrap; color: var(--color-text-secondary); }
+  .results tbody th, .results tbody td { transition: background-color 200ms ease, color 200ms ease; }
+  @media (hover: hover) {
+    .results tbody tr:hover > th, .results tbody tr:hover > td { background: color-mix(in srgb, var(--color-text-default) 6%, transparent); }
+    .results tbody tr:hover > td { color: var(--color-text-default); }
+  }
+  @media (prefers-reduced-motion: reduce) { .results tbody th, .results tbody td { transition: none; } }
+  .results thead th:last-child { text-align: right; }
+  .results__q { color: var(--color-text-muted); font-size: 0.75rem; vertical-align: middle; }
+  /* The last row has no closing line (owner, 2026-11-06): the next block's rule closes it. */
+  .results tbody tr:last-child > * { border-bottom: 0; }
+</style>

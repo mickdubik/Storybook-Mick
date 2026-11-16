@@ -92,12 +92,12 @@ const blockW = metric.kind === "multiple" ? Math.min(base / 2, (W - 4 * (m - 1))
 <style>
   .glyph { width: 100%; max-width: 280px; }
   .glyph svg { width: 100%; height: auto; overflow: visible; }
-  .g-base { fill: var(--ink); }
-  .g-track { fill: none; stroke: var(--ink-3); stroke-width: 1; }
-  .g-signal { fill: var(--signal); }
-  .g-removed { fill: none; stroke: var(--signal); stroke-width: 1.5; stroke-dasharray: 3 2.5; }
-  .g-tick { stroke: var(--ink-3); stroke-width: 1; }
-  .g-tick--strong { stroke: var(--ink); stroke-width: 1.5; }
+  .g-base { fill: var(--color-text-default); }
+  .g-track { fill: none; stroke: var(--color-text-muted); stroke-width: 1; }
+  .g-signal { fill: var(--color-accent); }
+  .g-removed { fill: none; stroke: var(--color-accent); stroke-width: 1.5; stroke-dasharray: 3 2.5; }
+  .g-tick { stroke: var(--color-text-muted); stroke-width: 1; }
+  .g-tick--strong { stroke: var(--color-text-default); stroke-width: 1.5; }
   .g-grow { transform-box: fill-box; transform-origin: left center; }
 
   .glyph__legend {
@@ -105,16 +105,16 @@ const blockW = metric.kind === "multiple" ? Math.min(base / 2, (W - 4 * (m - 1))
     flex-wrap: wrap;
     gap: 4px 14px;
     margin-top: 6px;
-    font-family: var(--font-sans);
+    font-family: var(--font-family-sans);
     font-size: 0.8125rem; /* 13px sans, sentence case: a legend is read to understand the bar */
     font-weight: 500;
-    color: var(--ink-2);
+    color: var(--color-text-secondary);
   }
   .glyph__legend span { display: inline-flex; align-items: center; gap: 6px; }
   .sw { display: inline-block; width: 10px; height: 10px; }
-  .sw--ink { background: var(--ink); }
-  .sw--signal { background: var(--signal); }
-  .sw--removed { border: 1.5px dashed var(--signal); }
+  .sw--ink { background: var(--color-text-default); }
+  .sw--signal { background: var(--color-accent); }
+  .sw--removed { border: 1.5px dashed var(--color-accent); }
 
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {

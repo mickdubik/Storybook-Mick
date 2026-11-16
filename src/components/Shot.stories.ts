@@ -4,7 +4,7 @@ import { image } from "./storybook/data";
 
 // A real case image, self-hosted through assets/work/manifest.json.
 const meta = {
-  title: "Components/Shot",
+  title: "Components/Media/Shot",
   component: Shot,
   tags: ["autodocs"],
   args: { img: image("Doc%20Portal%20_%20Search.webp"), bare: false, eager: true },

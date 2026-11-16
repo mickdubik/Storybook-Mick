@@ -4,7 +4,7 @@ import { metric, metricAny } from "./storybook/data";
 
 // Every metric below is a real one from src/data/work.ts.
 const meta = {
-  title: "Components/Glyph",
+  title: "Components/Graphics/Glyph",
   component: Glyph,
   tags: ["autodocs"],
   args: { metric: metric("Duplicated components, 167 to 53") },

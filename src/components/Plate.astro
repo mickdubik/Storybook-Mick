@@ -217,7 +217,7 @@ const steps = [
   .plate-wrap { container-type: inline-size; margin-top: 28px; }
   .plate {
     --plate-inner: 10px;
-    --plate-pad: var(--frame-pad);
+    --plate-pad: var(--frame-padding);
     /* --ar is the diagram's aspect, --mw its minimum width (it scrolls sideways below that): its height is known, so the caption can follow it. */
     --dh: calc(max(100cqi - var(--plate-pad) * 4, var(--mw)) / var(--ar));
     position: relative;
@@ -231,11 +231,11 @@ const steps = [
     max-width: 100%;
     min-width: 0;
     border-radius: var(--frame-radius);
-    background: var(--paper-2);
+    background: var(--color-background-subtle);
   }
   /* Support text: at most two lines, 12px under the diagram, which sits dead centre (same as the animated frames). Anything longer goes in the note below the frame. */
   .plate__caption { position: absolute; left: 0; right: 0; top: calc(50% + var(--dh) / 2 + min(12px, var(--plate-pad) * 0.45)); margin: 0; padding-inline: calc(var(--plate-pad) * 2); text-align: center; }
-  .plate__note { margin: 16px 0 0; padding-inline: var(--frame-radius); color: var(--ink-2); font-size: var(--t-small); }
+  .plate__note { margin: 16px 0 0; padding-inline: var(--frame-radius); color: var(--color-text-secondary); font-size: var(--font-size-small); }
   .plate__bar { position: absolute; top: 12px; right: 12px; z-index: 2; }
   /* Narrow frames (phones): no fixed ratio; diagram, caption and buttons stack. */
   @container (max-width: 559px) {
@@ -247,7 +247,7 @@ const steps = [
   @container (min-width: 560px) and (max-width: 899px) {
     .plate { --dh: calc(max(100cqi - var(--plate-pad) * 3, var(--mw)) / var(--ar)); padding-inline: calc(var(--plate-pad) * 1.5); }
   }
-  .plate__title { color: var(--ink); font-weight: 500; }
+  .plate__title { color: var(--color-text-default); font-weight: 500; }
   /* Scroll buttons (top right corner of the frame): "Scroll sideways" while there is more to the right, "Scroll back" (to its
      left) once scrolled. Pill buttons in the same style as the Replay hint. */
   .plate__bar { display: none; justify-content: flex-end; gap: 8px; }
@@ -260,17 +260,17 @@ const steps = [
     padding: 0 16px;
     border: 0;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--ink) 10%, transparent);
-    color: var(--ink);
-    font-size: var(--t-micro);
+    background: color-mix(in srgb, var(--color-text-default) 10%, transparent);
+    color: var(--color-text-default);
+    font-size: var(--font-size-micro);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     white-space: nowrap;
     cursor: pointer;
     transition: color 200ms ease, background-color 200ms ease;
   }
-  .plate__nav:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
-  @media (hover: hover) { .plate__nav:hover { color: var(--signal); } }
+  .plate__nav:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  @media (hover: hover) { .plate__nav:hover { color: var(--color-accent); } }
   .plate[data-at-start="true"] .plate__nav--prev, .plate[data-at-end="true"] .plate__nav--next { display: none; }
   /* Edge fade on the scrolling canvas: a cue that the diagram continues to the right. */
   .plate[data-scrollable="true"]:not([data-at-end="true"]) .plate__scroll {
@@ -281,38 +281,38 @@ const steps = [
   .plate__scroll { overflow-x: auto; scrollbar-width: none; } /* the Scroll buttons replace the scrollbar; touch, trackpad and keyboard still scroll */
   .plate__scroll::-webkit-scrollbar { display: none; }
   .plate__scroll svg { width: 100%; height: auto; } /* min-width is set per diagram (80% of its viewBox width) */
-  .plate__caption { color: var(--ink-2); font-size: var(--t-small); }
+  .plate__caption { color: var(--color-text-secondary); font-size: var(--font-size-small); }
 
-  .plate :global(.p-fill-ink) { fill: var(--ink); }
-  .plate :global(.p-fill-paper) { fill: var(--paper); }
-  .plate :global(.p-outline-paper) { fill: none; stroke: var(--paper); stroke-width: 1.5; opacity: 0.8; }
-  .plate :global(.p-stroke-ink) { fill: none; stroke: var(--ink); stroke-width: 1.8; }
-  .plate :global(.p-fill-muted) { fill: var(--ink-3); opacity: 0.45; }
-  .plate :global(.p-fill-signal) { fill: var(--signal); }
-  .plate :global(.p-card) { fill: var(--paper); stroke: var(--ink); stroke-width: 1.25; }
-  .plate :global(.p-card--signal) { stroke: var(--signal); stroke-width: 2.5; }
-  .plate :global(.p-chip) { fill: var(--paper-2); stroke: var(--ink-3); stroke-width: 1; }
-  .plate :global(.p-chip--signal) { stroke: var(--signal); stroke-width: 2; }
-  .plate :global(.p-node) { fill: var(--ink); }
-  .plate :global(.p-node-title) { fill: var(--paper); font-family: var(--font-sans); font-weight: 600; font-size: 19px; letter-spacing: -0.02em; }
-  .plate :global(.p-title) { fill: var(--ink); font-family: var(--font-sans); font-weight: 600; font-size: 18px; letter-spacing: -0.02em; }
-  .plate :global(.p-title--inv) { fill: var(--paper); }
-  .plate :global(.p-small) { fill: var(--ink-2); font-family: var(--font-sans); font-size: 15px; }
-  .plate :global(.p-small--inv) { fill: var(--paper); opacity: 0.85; }
-  .plate :global(.p-small--strong) { fill: var(--ink); font-weight: 500; }
-  .plate :global(.p-line) { fill: none; stroke: var(--ink-3); stroke-width: 1; }
-  .plate :global(.p-line--ink) { stroke: var(--ink-2); stroke-width: 1.5; }
-  .plate :global(.p-line--signal) { stroke: var(--signal); }
+  .plate :global(.p-fill-ink) { fill: var(--color-text-default); }
+  .plate :global(.p-fill-paper) { fill: var(--color-background-default); }
+  .plate :global(.p-outline-paper) { fill: none; stroke: var(--color-background-default); stroke-width: 1.5; opacity: 0.8; }
+  .plate :global(.p-stroke-ink) { fill: none; stroke: var(--color-text-default); stroke-width: 1.8; }
+  .plate :global(.p-fill-muted) { fill: var(--color-text-muted); opacity: 0.45; }
+  .plate :global(.p-fill-signal) { fill: var(--color-accent); }
+  .plate :global(.p-card) { fill: var(--color-background-default); stroke: var(--color-text-default); stroke-width: 1.25; }
+  .plate :global(.p-card--signal) { stroke: var(--color-accent); stroke-width: 2.5; }
+  .plate :global(.p-chip) { fill: var(--color-background-subtle); stroke: var(--color-text-muted); stroke-width: 1; }
+  .plate :global(.p-chip--signal) { stroke: var(--color-accent); stroke-width: 2; }
+  .plate :global(.p-node) { fill: var(--color-text-default); }
+  .plate :global(.p-node-title) { fill: var(--color-background-default); font-family: var(--font-family-sans); font-weight: 600; font-size: 19px; letter-spacing: -0.02em; }
+  .plate :global(.p-title) { fill: var(--color-text-default); font-family: var(--font-family-sans); font-weight: 600; font-size: 18px; letter-spacing: -0.02em; }
+  .plate :global(.p-title--inv) { fill: var(--color-background-default); }
+  .plate :global(.p-small) { fill: var(--color-text-secondary); font-family: var(--font-family-sans); font-size: 15px; }
+  .plate :global(.p-small--inv) { fill: var(--color-background-default); opacity: 0.85; }
+  .plate :global(.p-small--strong) { fill: var(--color-text-default); font-weight: 500; }
+  .plate :global(.p-line) { fill: none; stroke: var(--color-text-muted); stroke-width: 1; }
+  .plate :global(.p-line--ink) { stroke: var(--color-text-secondary); stroke-width: 1.5; }
+  .plate :global(.p-line--signal) { stroke: var(--color-accent); }
   .plate :global(.p-label) {
-    fill: var(--ink-2);
-    font-family: var(--font-mono);
+    fill: var(--color-text-secondary);
+    font-family: var(--font-family-mono);
     font-size: 15px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
-  .plate :global(.p-label--signal) { fill: var(--signal); }
+  .plate :global(.p-label--signal) { fill: var(--color-accent); }
   /* The example headline of each variant card: what makes the variants different (a promo, a headline, a hero image). */
-  .plate :global(.p-card-text) { fill: var(--ink); font-family: var(--font-sans); font-size: 13px; font-weight: 500; letter-spacing: 0; }
-  .plate :global(.p-label--sub) { fill: var(--ink-3); font-size: 12.5px; letter-spacing: 0.02em; text-transform: none; }
-  .plate :global(.p-label--inv) { fill: var(--paper); opacity: 0.8; }
+  .plate :global(.p-card-text) { fill: var(--color-text-default); font-family: var(--font-family-sans); font-size: 13px; font-weight: 500; letter-spacing: 0; }
+  .plate :global(.p-label--sub) { fill: var(--color-text-muted); font-size: 12.5px; letter-spacing: 0.02em; text-transform: none; }
+  .plate :global(.p-label--inv) { fill: var(--color-background-default); opacity: 0.8; }
 </style>

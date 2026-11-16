@@ -1,0 +1,62 @@
+---
+// Before and after: the label, the old figure in muted ink, the new figure in the accent, and two bars drawn to the same scale, so the
+// change is visible as well as written. The bars are decoration (the figures carry the meaning) and are hidden on phones.
+interface Row { label: string; before: number; after: number; unit: string }
+interface Props {
+  rows: Row[];
+  /** Read by screen readers. */
+  caption: string;
+  heads?: [string, string, string];
+}
+const { rows, caption, heads = ["Metrics", "Before", "After"] } = Astro.props;
+const fmt = (n: number, unit: string) => `${n}${unit}`;
+---
+
+<table class="ba">
+  <caption class="sr-only">{caption}</caption>
+  <thead>
+    <tr>
+      <th scope="col" class="mono">{heads[0]}</th>
+      <th scope="col" class="mono">{heads[1]}</th>
+      <th scope="col" class="mono">{heads[2]}</th>
+      <th scope="col" class="mono ba__barcol"><span class="sr-only">Comparison</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows.map((r) => {
+      const max = Math.max(r.before, r.after);
+      return (
+        <tr>
+          <th scope="row">{r.label}</th>
+          <td class="ba__before figure-num">{fmt(r.before, r.unit)}</td>
+          <td class="ba__after figure-num">{fmt(r.after, r.unit)}</td>
+          <td class="ba__barcol" aria-hidden="true">
+            <span class="ba__bar ba__bar--before" style={`--w:${(r.before / max) * 100}%`}></span>
+            <span class="ba__bar ba__bar--after" style={`--w:${(r.after / max) * 100}%`}></span>
+          </td>
+        </tr>
+      );
+    })}
+  </tbody>
+</table>
+
+<style>
+  .ba { width: 100%; border-collapse: collapse; }
+  .ba th, .ba td { text-align: left; padding: 16px 12px 16px 0; border-bottom: 1px solid var(--color-border-default); vertical-align: middle; }
+  .ba thead th { color: var(--color-text-muted); font-weight: 400; border-bottom-color: var(--color-border-strong); padding-block: 10px; }
+  .ba tbody th { font-weight: 450; }
+  .ba__before, .ba__after { font-size: 1.7rem; white-space: nowrap; }
+  .ba__before { color: var(--color-text-muted); }
+  .ba__after { color: var(--color-accent); }
+  .ba__barcol { width: 30%; }
+  .ba__bar { display: block; height: 8px; width: var(--w); }
+  .ba__bar + .ba__bar { margin-top: 4px; }
+  .ba__bar--before { border: 1px solid var(--color-text-muted); }
+  .ba__bar--after { background: var(--color-accent); }
+  @media (max-width: 640px) {
+    .ba__barcol { display: none; }
+    .ba__before, .ba__after { font-size: 1.3rem; }
+  }
+  /* The last row has no closing line (owner, 2026-11-06). */
+  .ba tbody tr:last-child > * { border-bottom: 0; }
+</style>

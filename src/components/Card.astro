@@ -1,0 +1,24 @@
+---
+// A card: one tone off the page, a hairline, a 12px corner and no shadow. It is only a surface; the content is yours.
+// Slot in a kicker, a figure, a label or a note (the `card__*` classes below style them), or nothing but a sentence. A card never carries interaction, so make the
+// thing inside it a link or a button if it should be clickable. Use `as="li"` inside a list.
+interface Props {
+  as?: "div" | "li" | "article" | "section";
+  class?: string;
+}
+const { as: Tag = "div", class: cls, ...rest } = Astro.props;
+---
+
+<Tag class:list={["card", cls]} {...rest}><slot /></Tag>
+
+<style>
+  .card { padding: 20px; border: 1px solid var(--color-border-default); border-radius: 12px; background: var(--color-background-subtle); display: flex; flex-direction: column; gap: 6px; }
+  /* The four content roles, for the markup you slot in. */
+  .card :global(.card__kicker) { margin: 0 0 6px; color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 8px; }
+  .card :global(.card__figure) { margin: 0; font-size: clamp(2rem, 1.4rem + 1.4vw, 2.75rem); line-height: 1.05; }
+  .card :global(.card__figure--text) { font-family: var(--font-family-sans); font-weight: 600; font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem); letter-spacing: -0.02em; line-height: 1.15; color: var(--color-text-default); }
+  .card :global(.card__label) { margin: 0; color: var(--color-text-default); line-height: 1.3; }
+  .card :global(.card__note) { margin: 6px 0 0; color: var(--color-text-muted); font-size: var(--font-size-small); line-height: 1.4; }
+  /* A solid ink diamond: the one place a human call is made. */
+  .card :global(.card__marker) { width: 8px; height: 8px; background: var(--color-text-default); transform: rotate(45deg); flex: none; }
+</style>

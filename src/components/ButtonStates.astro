@@ -87,7 +87,7 @@ const states = ["Default", "Hover", "Focus", "Pressed", "Loading", "Done"];
 <style>
   .bs {
     --bs-inner: 10px;
-    --bs-pad: var(--frame-pad);
+    --bs-pad: var(--frame-padding);
     --bs-blue: #0077ff;
     --bs-blue-hover: #3395ff;
     --bs-blue-press: #0057b5;
@@ -105,14 +105,14 @@ const states = ["Default", "Hover", "Focus", "Pressed", "Loading", "Done"];
     width: 100%;
     padding: calc(var(--bs-pad) * 2.4) calc(var(--bs-pad) * 2);
     border-radius: var(--frame-radius);
-    background: var(--paper-2);
+    background: var(--color-background-subtle);
   }
   .bs-wrap { container-type: inline-size; margin-top: 28px; }
-  .bs__note { margin: 16px 0 0; padding-inline: var(--frame-radius); color: var(--ink-2); font-size: var(--t-small); }
+  .bs__note { margin: 16px 0 0; padding-inline: var(--frame-radius); color: var(--color-text-secondary); font-size: var(--font-size-small); }
   @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme="light"])) .bs { --bs-load-bg: #0c0c0b; --bs-load-line: #4a4945; --bs-load-ink: #b3b3b3; }
+    :global(:root:not([data-theme="light"])) .bs { --bs-load-bg: #0c0c0e; --bs-load-line: #4a4a50; --bs-load-ink: #b3b3b3; }
   }
-  :global(:root[data-theme="dark"]) .bs { --bs-load-bg: #0c0c0b; --bs-load-line: #4a4945; --bs-load-ink: #b3b3b3; }
+  :global(:root[data-theme="dark"]) .bs { --bs-load-bg: #0c0c0e; --bs-load-line: #4a4a50; --bs-load-ink: #b3b3b3; }
 
   .bs__stage {
     display: flex;
@@ -142,7 +142,7 @@ const states = ["Default", "Hover", "Focus", "Pressed", "Loading", "Done"];
     border-radius: 0.1429em; /* 2 / 14 */
     background: var(--bs-blue);
     color: #fff;
-    font: 700 1em/1.4286 var(--font-sans, system-ui, sans-serif); /* 20px line at 14px */
+    font: 700 1em/1.4286 var(--font-family-sans, system-ui, sans-serif); /* 20px line at 14px */
   }
   .bs__fill, .bs__ring { position: absolute; inset: 0; border-radius: inherit; opacity: 0; pointer-events: none; }
   .bs__fill--hover { background: var(--bs-blue-hover); }
@@ -159,18 +159,18 @@ const states = ["Default", "Hover", "Focus", "Pressed", "Loading", "Done"];
   .bs__layer--load .bs__ico { width: 1.15em; height: 1.15em; }
 
   /* The state names are a quiet legend: small, low contrast, the current one only a touch brighter. */
-  .bs__states { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px clamp(12px, 3vw, 22px); margin: 0; padding: 0; list-style: none; font-size: var(--t-micro); letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
-  .bs__s { color: var(--ink-3); }
+  .bs__states { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px clamp(12px, 3vw, 22px); margin: 0; padding: 0; list-style: none; font-size: var(--font-size-micro); letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-muted); }
+  .bs__s { color: var(--color-text-muted); }
 
 
-  .bs__caption { position: absolute; left: 0; right: 0; top: calc(100% - var(--bs-pad) * 2.4 + min(12px, var(--bs-pad) * 0.45)); margin: 0; padding-inline: calc(var(--bs-pad) * 2); text-align: center; color: var(--ink-2); font-size: var(--t-small); line-height: 1.35; }
+  .bs__caption { position: absolute; left: 0; right: 0; top: calc(100% - var(--bs-pad) * 2.4 + min(12px, var(--bs-pad) * 0.45)); margin: 0; padding-inline: calc(var(--bs-pad) * 2); text-align: center; color: var(--color-text-secondary); font-size: var(--font-size-small); line-height: 1.35; }
   /* Narrow frames (phones): no fixed ratio; stage, caption stack. */
   @container (max-width: 559px) {
     .bs { aspect-ratio: auto; justify-content: flex-start; padding: var(--bs-pad); }
     .bs__stage { width: 100%; aspect-ratio: auto; padding: 56px 12px 24px; }
     .bs__caption { position: static; margin-top: 12px; padding-inline: 0; text-align: left; }
   }
-  .bs__title { color: var(--ink); font-weight: 500; }
+  .bs__title { color: var(--color-text-default); font-weight: 500; }
 
   /* Loop: 10s, eased. Default 0–14%, hover 14–30%, focus 31–42%, pressed 43–55%, loading 56–76%, done 76–95%, reset. */
   @media (prefers-reduced-motion: no-preference) {
@@ -204,14 +204,14 @@ const states = ["Default", "Hover", "Focus", "Pressed", "Loading", "Done"];
     @keyframes bs-loadlbl { 0%, 51% { opacity: 0 } 58%, 73% { opacity: 1 } 78%, 100% { opacity: 0 } }
     @keyframes bs-done { 0%, 75% { opacity: 0 } 81%, 92% { opacity: 1 } 96%, 100% { opacity: 0 } }
     @keyframes bs-spin { to { transform: rotate(360deg) } }
-    @keyframes bs-s1 { 0%, 12% { color: var(--ink) } 16%, 94% { color: var(--ink-3) } 98%, 100% { color: var(--ink) } }
-    @keyframes bs-s2 { 0%, 12% { color: var(--ink-3) } 17%, 27% { color: var(--ink) } 31%, 100% { color: var(--ink-3) } }
-    @keyframes bs-s3 { 0%, 31% { color: var(--ink-3) } 35%, 39% { color: var(--ink) } 43%, 100% { color: var(--ink-3) } }
-    @keyframes bs-s4 { 0%, 43% { color: var(--ink-3) } 47%, 54% { color: var(--ink) } 58%, 100% { color: var(--ink-3) } }
-    @keyframes bs-s5 { 0%, 57% { color: var(--ink-3) } 61%, 73% { color: var(--ink) } 77%, 100% { color: var(--ink-3) } }
-    @keyframes bs-s6 { 0%, 78% { color: var(--ink-3) } 82%, 92% { color: var(--ink) } 96%, 100% { color: var(--ink-3) } }
+    @keyframes bs-s1 { 0%, 12% { color: var(--color-text-default) } 16%, 94% { color: var(--color-text-muted) } 98%, 100% { color: var(--color-text-default) } }
+    @keyframes bs-s2 { 0%, 12% { color: var(--color-text-muted) } 17%, 27% { color: var(--color-text-default) } 31%, 100% { color: var(--color-text-muted) } }
+    @keyframes bs-s3 { 0%, 31% { color: var(--color-text-muted) } 35%, 39% { color: var(--color-text-default) } 43%, 100% { color: var(--color-text-muted) } }
+    @keyframes bs-s4 { 0%, 43% { color: var(--color-text-muted) } 47%, 54% { color: var(--color-text-default) } 58%, 100% { color: var(--color-text-muted) } }
+    @keyframes bs-s5 { 0%, 57% { color: var(--color-text-muted) } 61%, 73% { color: var(--color-text-default) } 77%, 100% { color: var(--color-text-muted) } }
+    @keyframes bs-s6 { 0%, 78% { color: var(--color-text-muted) } 82%, 92% { color: var(--color-text-default) } 96%, 100% { color: var(--color-text-muted) } }
   }
   @media (prefers-reduced-motion: reduce) {
-    .bs__s--1 { color: var(--ink); }
+    .bs__s--1 { color: var(--color-text-default); }
   }
 </style>

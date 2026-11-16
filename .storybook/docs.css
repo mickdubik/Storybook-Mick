@@ -10,3 +10,20 @@
 .sbdocs a[href^="?path"]:not(.ds-card):hover,
 .sbdocs a[href="#run-it"]:not(.ds-card):hover { text-decoration-thickness: 2px; }
 .sbdocs a.ds-card:hover { border-color: #1848cc !important; }
+
+/* Docs canvases: small examples sit centred in their area, with room around them. Full-width examples (Shot, Plate, ButtonStates)
+   are left alone: they size themselves from the width of the area, and centring would shrink them to nothing. */
+.sbdocs [id^="story--components-button-variants--"] > div,
+.sbdocs [id^="story--components-content-availability--"] > div,
+.sbdocs [id^="story--components-graphics-glyph--"] > div,
+.sbdocs [id^="story--components-media-portrait--"] > div,
+.sbdocs [id^="story--components-graphics-blueprint--"] > div {
+  display: flex;
+  justify-content: safe center; /* "safe": an example wider than the area starts at the left edge and scrolls, instead of being cut off on both sides */
+  align-items: center;
+  min-height: 160px;
+  padding: 24px 0;
+}
+
+/* The results table is 12px wider than its column on each side (so row highlights have room); give it that room in the canvas. */
+.sbdocs [id^="story--components-data-results-table--"] > div { padding-inline: 12px; }

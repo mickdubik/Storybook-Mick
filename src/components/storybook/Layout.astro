@@ -1,7 +1,7 @@
 ---
 import { declared } from "./tokens";
 // Facts: rules/visual.md (Layout) and src/styles/global.css. The diagram uses the real .wrap, .sheet, .rail and .body classes.
-const spacing = ["pad-x", "gutter", "col-gap", "section", "space-block", "space-group", "space-tile"]
+const spacing = ["layout-padding-x", "space-gutter", "space-column-gap", "space-section", "space-block", "space-group", "space-tile"]
   .map((n) => declared("").find((t) => t.name === n))
   .filter((t): t is NonNullable<typeof t> => !!t);
 ---
@@ -14,7 +14,7 @@ const spacing = ["pad-x", "gutter", "col-gap", "section", "space-block", "space-
 
   <h3>The wrapper: <code>.wrap</code></h3>
   <p>
-    No maximum width. Its side padding is the page margin <code>--pad-x</code>: 72px at 1440, scaling to 96px at 1920, and centred beyond 1920. It is the same on every page, header and footer included.
+    No maximum width. Its side padding is the page margin <code>--layout-padding-x</code>: 72px at 1440, scaling to 96px at 1920, and centred beyond 1920. It is the same on every page, header and footer included.
   </p>
 
   <h3>The sheet: <code>.sheet</code></h3>
@@ -33,7 +33,7 @@ const spacing = ["pad-x", "gutter", "col-gap", "section", "space-block", "space-
   </div>
 
   <h3>Lists</h3>
-  <p>Lists are ruled tables, not cards. Sections divide by hairlines, and inset surfaces step one tone off the page (<code>--paper-2</code>).</p>
+  <p>Lists are ruled tables, not cards. Sections divide by hairlines, and inset surfaces step one tone off the page (<code>--color-background-subtle</code>).</p>
 
   <h3>Spacing tokens</h3>
   <p>The values below are read from <code>global.css</code>. See Space and shape for each one drawn to scale.</p>
@@ -46,21 +46,21 @@ const spacing = ["pad-x", "gutter", "col-gap", "section", "space-block", "space-
 </div>
 
 <style>
-  .title { margin: 0 0 12px; font-size: var(--t-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; color: var(--ink); }
-  .lay { color: var(--ink); max-width: 900px; }
-  .lead { font-size: var(--t-body); line-height: 1.5; color: var(--ink-2); max-width: var(--measure); margin: 0 0 8px; }
-  h3 { font-family: var(--font-sans); font-weight: 600; font-size: var(--t-lede); margin: 40px 0 4px; }
-  p { font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); margin: 0; max-width: var(--measure); }
-  .lead { font-size: var(--t-body); }
-  code { font-family: var(--font-mono); font-size: 0.85em; }
+  .title { margin: 0 0 12px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; color: var(--color-text-default); }
+  .lay { color: var(--color-text-default); max-width: 900px; }
+  .lead { font-size: var(--font-size-body); line-height: 1.5; color: var(--color-text-secondary); max-width: var(--size-measure); margin: 0 0 8px; }
+  h3 { font-family: var(--font-family-sans); font-weight: 600; font-size: var(--font-size-lede); margin: 40px 0 4px; }
+  p { font-size: var(--font-size-small); line-height: 1.55; color: var(--color-text-secondary); margin: 0; max-width: var(--size-measure); }
+  .lead { font-size: var(--font-size-body); }
+  code { font-family: var(--font-family-mono); font-size: 0.85em; }
   .demo { margin-top: 20px; padding-inline: 0; position: relative; }
-  .cols { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--col-gap); pointer-events: none; }
-  .cols span { background: color-mix(in srgb, var(--signal) 6%, transparent); font-family: var(--font-mono); font-size: var(--t-micro); color: var(--ink-3); text-align: center; padding-top: 4px; }
+  .cols { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--space-column-gap); pointer-events: none; }
+  .cols span { background: color-mix(in srgb, var(--color-accent) 6%, transparent); font-family: var(--font-family-mono); font-size: var(--font-size-micro); color: var(--color-text-muted); text-align: center; padding-top: 4px; }
   .sheet { position: relative; padding-top: 28px; min-height: 120px; }
-  .rail, .body { background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule); padding: 12px; display: grid; gap: 2px; align-content: start; min-height: 72px; }
+  .rail, .body { background: var(--color-background-subtle); box-shadow: inset 0 0 0 1px var(--color-border-default); padding: 12px; display: grid; gap: 2px; align-content: start; min-height: 72px; }
   .rail i, .body i { font-style: normal; font-weight: 600; }
-  small { color: var(--ink-3); font-family: var(--font-mono); font-size: var(--t-micro); }
-  table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: var(--t-small); }
-  th { text-align: left; color: var(--ink-3); font-weight: 500; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--rule); }
-  td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--rule); }
+  small { color: var(--color-text-muted); font-family: var(--font-family-mono); font-size: var(--font-size-micro); }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: var(--font-size-small); }
+  th { text-align: left; color: var(--color-text-muted); font-weight: 500; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--color-border-default); }
+  td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--color-border-default); }
 </style>

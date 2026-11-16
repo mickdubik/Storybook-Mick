@@ -30,11 +30,13 @@ const preview: Preview = {
   parameters: {
     layout: "padded",
     backgrounds: { disabled: true },
+    // Docs pages: let each example be as tall as its content, not a fixed 400px box (docs.css centres it).
+    docs: { story: { height: "auto" } },
     options: { storySort: {
         order: [
           "Getting started",
           "Foundations", ["Tokens", "Colour", ["Semantic", "Primitives"], "Typography", "Space and shape", "Layout", "Motion"],
-          "Components", ["Button", "ButtonStates", "Shot", "Glyph", "Plate", "Availability", "Portrait", "Blueprint"],
+          "Components", ["Button", ["Variants", "States demo"], "Media", ["Shot", "Portrait"], "Graphics", ["Glyph", "Plate", "Blueprint"], "Content", ["Accordion", "Availability"], "Data", ["Results table", "Comparison table"], "Layout", ["Card"]],
           "Demos", ["SmartTraffic", "DocPortal", "DoctorOnline"],
           "Guides", ["Toolkit", "What's next"],
         ],

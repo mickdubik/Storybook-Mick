@@ -5,19 +5,36 @@ const block = (re: RegExp) => css.match(re)?.[1] ?? "";
 const rootBlock = block(/:root\s*\{([\s\S]*?)\n\}/);
 const darkBlock = block(/:root\[data-theme="dark"\]\s*\{([\s\S]*?)\n\}/);
 
-const hexes = (b: string) => {
+// A token is a hex value or a reference to another token (var(--x)). References resolve inside the same theme block
+// first, then against the light block, so a token that points at --color-background-default gets the right value in each theme.
+const raw = (b: string) => {
   const out: Record<string, string> = {};
-  for (const t of b.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)) out[t[1]] = t[2].toLowerCase();
+  for (const t of b.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6}|var\(--[a-z0-9-]+\))\s*;/g)) out[t[1]] = t[2].toLowerCase();
   return out;
 };
-export const light = hexes(rootBlock);
-export const dark = hexes(darkBlock);
+const resolve = (own: Record<string, string>, base: Record<string, string>) => {
+  const out: Record<string, string> = {};
+  const get = (n: string, depth = 0): string | undefined => {
+    const v = own[n] ?? base[n];
+    if (!v || depth > 5) return undefined;
+    const ref = v.match(/^var\(--([a-z0-9-]+)\)$/);
+    return ref ? get(ref[1], depth + 1) : v;
+  };
+  for (const n of Object.keys(own)) { const v = get(n); if (v) out[n] = v; }
+  return out;
+};
+const lightRaw = raw(rootBlock);
+export const light = resolve(lightRaw, {});
+// A token written only in the light block but pointing at another token (var(--x)) takes the dark value of that token in dark.
+const lightRefs = Object.fromEntries(Object.entries(lightRaw).filter(([, v]) => v.startsWith("var(")));
+export const dark = resolve({ ...lightRefs, ...raw(darkBlock) }, lightRaw);
 
-// Every `--prefix*: value;` declaration in the stylesheet, first one wins (with its trailing comment, if any).
+// Every `--prefix*: value;` declaration in the stylesheet, first one wins (with its trailing comment on the same line, if any;
+// a comment on the next line belongs to the next declaration).
 export const declared = (prefix: string) => {
   const out: { name: string; value: string; note: string }[] = [];
   const seen = new Set<string>();
-  for (const m of css.matchAll(new RegExp(`--(${prefix}[a-z0-9-]*):\\s*([^;]+);(?:\\s*/\\*\\s*([\\s\\S]*?)\\s*\\*/)?`, "g"))) {
+  for (const m of css.matchAll(new RegExp(`--(${prefix}[a-z0-9-]*):\\s*([^;]+);(?:[ \\t]*/\\*\\s*([\\s\\S]*?)\\s*\\*/)?`, "g"))) {
     if (seen.has(m[1])) continue;
     seen.add(m[1]);
     out.push({ name: m[1], value: m[2].trim(), note: (m[3] ?? "").trim() });

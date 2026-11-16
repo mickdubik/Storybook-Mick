@@ -2,15 +2,15 @@
 import { declared, light, dark } from "./tokens";
 
 // Every custom property the system defines, by tier: global (raw scales), semantic (colour roles), component (one component's own).
-const semantic = ["paper", "paper-2", "paper-3", "ink", "ink-2", "ink-3", "rule", "rule-strong", "signal", "signal-ink", "signal-inv", "signal-wash", "hero-bg", "hero-glow", "hero-lite-a", "hero-lite-b", "card", "card-photo", "raised"];
-const global = ["font-sans", "font-mono", "t-display", "t-h1", "t-h2", "t-h3", "t-figure", "t-figure-sm", "t-lede", "t-body", "t-small", "t-label", "t-micro", "gutter", "col-gap", "section", "space-tile", "space-block", "space-group", "measure", "measure-prose", "max", "radius", "dur", "ease-out", "uw", "u", "edge", "pad-x"];
-const component = ["btn-r", "btn-inset", "tile", "btn-dur", "btn-ease", "btn-bg", "btn-bg-hover", "btn-fg", "btn-fg-hover", "btn-tile", "btn-tile-hover", "btn-glyph", "btn-glyph-hover", "frame-pad", "frame-radius"];
+const semantic = ["color-background-default", "color-background-subtle", "color-background-muted", "color-text-default", "color-text-secondary", "color-text-muted", "color-border-default", "color-border-strong", "color-accent", "color-accent-inverse", "color-accent-subtle", "color-text-on-accent", "hero-glow", "hero-lite-a", "hero-lite-b", "color-background-card"];
+const global = ["font-family-sans", "font-family-mono", "font-size-display", "font-size-h1", "font-size-h2", "font-size-h3", "font-size-figure", "font-size-figure-sm", "font-size-lede", "font-size-body", "font-size-small", "font-size-label", "font-size-micro", "space-gutter", "space-column-gap", "space-section", "space-tile", "space-block", "space-group", "size-measure", "size-measure-prose", "size-max", "radius-default", "duration-default", "easing-out", "unit-width", "unit", "layout-edge", "layout-padding-x"];
+const component = ["btn-radius", "btn-inset", "btn-tile-size", "btn-duration", "btn-easing", "btn-background", "btn-background-hover", "btn-text", "btn-text-hover", "btn-tile-background", "btn-tile-background-hover", "btn-glyph-color", "btn-glyph-color-hover", "frame-padding", "frame-radius"];
 
 const group = (n: string) =>
-  /^t-|^font-/.test(n) ? "Type"
-  : /^(paper|ink|rule|signal|hero|card|raised)/.test(n) ? "Colour"
-  : /^(dur|ease|btn-dur|btn-ease)/.test(n) ? "Motion"
-  : /^btn-|^tile$/.test(n) ? "Button"
+  /^font-/.test(n) ? "Type"
+  : /^color-|^hero-/.test(n) ? "Colour"
+  : /^(duration|easing|btn-duration|btn-easing)/.test(n) ? "Motion"
+  : /^btn-/.test(n) ? "Button"
   : /^frame/.test(n) ? "Frame"
   : "Space and layout";
 
@@ -45,7 +45,7 @@ const total = tiers.reduce((sum, t) => sum + t.rows.length, 0);
     <section>
       <h3>{t.title} <span class="count">{t.rows.length}</span></h3>
       <p class="why">{t.desc}</p>
-      <table>
+      <table class={t.title === "Semantic" ? "has-dark" : ""}>
         <thead><tr><th>Token</th><th>Group</th><th>Value</th>{t.title === "Semantic" && <th>Dark</th>}</tr></thead>
         <tbody>
           {t.rows.map((r) => (
@@ -63,16 +63,20 @@ const total = tiers.reduce((sum, t) => sum + t.rows.length, 0);
 </div>
 
 <style>
-  .tok { color: var(--ink); display: grid; gap: 40px; }
-  .title { margin: 0 0 -24px; font-size: var(--t-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
-  .intro { margin: 0; max-width: var(--measure); font-size: var(--t-body); color: var(--ink-2); }
-  h3 { margin: 0 0 4px; font-size: var(--t-lede); font-weight: 600; }
-  .count { color: var(--ink-3); font-weight: 400; font-size: var(--t-small); margin-left: 6px; }
-  .why { margin: 0 0 8px; max-width: var(--measure); color: var(--ink-2); font-size: var(--t-small); }
-  table { width: 100%; border-collapse: collapse; font-size: var(--t-small); }
-  th { text-align: left; font-weight: 500; color: var(--ink-3); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--rule); }
-  td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--rule); vertical-align: middle; overflow-wrap: anywhere; }
-  code { font-family: var(--font-mono); font-size: var(--t-small); }
-  .sw { display: inline-block; width: 20px; height: 20px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--rule-strong, var(--rule)); vertical-align: middle; margin-right: 8px; }
-  .same { color: var(--ink-3); }
+  .tok { color: var(--color-text-default); display: grid; gap: 40px; }
+  .title { margin: 0 0 -24px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .intro { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
+  h3 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
+  .count { color: var(--color-text-muted); font-weight: 400; font-size: var(--font-size-small); margin-left: 6px; }
+  .why { margin: 0 0 8px; max-width: var(--size-measure); color: var(--color-text-secondary); font-size: var(--font-size-small); }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--font-size-small); }
+  /* Fixed columns: with auto layout the one long value (a color-mix() string) made the Value column far wider than the rest. */
+  th:nth-child(1) { width: 26%; }
+  th:nth-child(2) { width: 18%; }
+  .has-dark th:nth-child(4) { width: 22%; }
+  th { text-align: left; font-weight: 500; color: var(--color-text-muted); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--color-border-default); }
+  td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--color-border-default); vertical-align: middle; overflow-wrap: anywhere; }
+  code { font-family: var(--font-family-mono); font-size: var(--font-size-small); }
+  .sw { display: inline-block; width: 20px; height: 20px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--color-border-strong, var(--color-border-default)); vertical-align: middle; margin-right: 8px; }
+  .same { color: var(--color-text-muted); }
 </style>

@@ -154,52 +154,52 @@
   /* The consent card: bottom right. It hugs its content (text block 22rem, then the buttons), so the buttons sit next to the text. */
   .consent {
     position: fixed; z-index: 60;
-    right: var(--gutter); bottom: var(--gutter);
-    width: max-content; max-width: calc(100vw - 2 * var(--gutter));
+    right: var(--space-gutter); bottom: var(--space-gutter);
+    width: max-content; max-width: calc(100vw - 2 * var(--space-gutter));
     display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px;
     padding: 24px 20px 24px 28px; /* the text side gets more room than the button side */
-    background: var(--paper); color: var(--ink);
-    border: 1px solid var(--rule);
+    background: var(--color-background-default); color: var(--color-text-default);
+    border: 1px solid var(--color-border-default);
     border-radius: 28px; /* concentric with the 12px buttons: 12 + 20 padding = 32, eased to 28 */
     /* A little lift (owner, 2026-11-15, an exception to "no card shadows" in rules/visual.md): soft, wide, low contrast. */
-    box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 6%, transparent), 0 10px 32px color-mix(in srgb, var(--ink) 12%, transparent);
-    font: 400 var(--t-small)/1.4 var(--font-sans);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-text-default) 6%, transparent), 0 10px 32px color-mix(in srgb, var(--color-text-default) 12%, transparent);
+    font: 400 var(--font-size-small)/1.4 var(--font-family-sans);
   }
   .consent__copy { flex: 0 1 18rem; display: grid; gap: 6px; }
   /* Same glass as the header: translucent paper with a strong blur; solid for reduced transparency. */
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .consent { background: color-mix(in srgb, var(--paper) 82%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+    .consent { background: color-mix(in srgb, var(--color-background-default) 82%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
   }
   @media (prefers-reduced-transparency: reduce) {
-    .consent { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .consent { background: var(--color-background-default); -webkit-backdrop-filter: none; backdrop-filter: none; }
   }
   /* Dark theme (owner, 2026-11-15): the shadow must be darker than the card. Ink is light here, so the light-theme
-     shadow would glow. Use pure black, stronger, and lift the card surface one step (--paper-2) so it reads as raised. */
+     shadow would glow. Use pure black, stronger, and lift the card surface one step (--color-background-subtle) so it reads as raised. */
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .consent {
-      background: color-mix(in srgb, var(--paper-2) 86%, transparent);
-      box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 7%, transparent), 0 1px 2px rgb(0 0 0 / 0.5), 0 12px 36px rgb(0 0 0 / 0.6);
+      background: color-mix(in srgb, var(--color-background-subtle) 86%, transparent);
+      box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-text-default) 7%, transparent), 0 1px 2px rgb(0 0 0 / 0.5), 0 12px 36px rgb(0 0 0 / 0.6);
     }
   }
   :root[data-theme="dark"] .consent {
-    background: color-mix(in srgb, var(--paper-2) 86%, transparent);
-    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 7%, transparent), 0 1px 2px rgb(0 0 0 / 0.5), 0 12px 36px rgb(0 0 0 / 0.6);
+    background: color-mix(in srgb, var(--color-background-subtle) 86%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-text-default) 7%, transparent), 0 1px 2px rgb(0 0 0 / 0.5), 0 12px 36px rgb(0 0 0 / 0.6);
   }
   @media (prefers-reduced-transparency: reduce) {
-    :root[data-theme="dark"] .consent { background: var(--paper-2); }
+    :root[data-theme="dark"] .consent { background: var(--color-background-subtle); }
   }
   .consent p { margin: 0; }
-  .consent .consent__title { font: 600 1rem/1.3 var(--font-sans); letter-spacing: -0.01em; }
+  .consent .consent__title { font: 600 1rem/1.3 var(--font-family-sans); letter-spacing: -0.01em; }
   .consent__actions { display: flex; gap: 8px; }
   /* Phones: full width, text above, the two buttons share the row. */
   @media (max-width: 560px) {
-    .consent { left: var(--gutter); width: auto; }
+    .consent { left: var(--space-gutter); width: auto; }
     .consent__copy { flex: 1 1 100%; }
     .consent__actions { width: 100%; }
     .consent__actions .btn { flex: 1; justify-content: center; }
   }
   /* <button> has a default border; the design-system .btn is an <a> with none. */
-  .consent .btn { border: 0; font-family: var(--font-sans); }
+  .consent .btn { border: 0; font-family: var(--font-family-sans); }
   .consent .btn--secondary { box-shadow: none; }
-  .consent button:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+  .consent button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 </style>

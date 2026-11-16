@@ -1,0 +1,85 @@
+---
+// A list of disclosure rows. Each closed row shows a title and, beneath it, a one-line summary; opening it shows one or two labelled
+// panels. Built on native <details>, so it works without script; the soft close (fade out before closing) comes from the page layout
+// (`details[data-soft-close]` in Base.astro) and is not part of this component.
+// Used for the AI workflow on the home page. A panel with `decision: true` carries the ink diamond, the one place a human call is made.
+interface Panel { label: string; text: string; decision?: boolean }
+interface Item { title: string; summary?: string; panels: Panel[] }
+interface Props {
+  items: Item[];
+  /** Rows that share a name open one at a time. Leave it out to let any number stay open. */
+  name?: string;
+  /** Read by screen readers before each summary. */
+  summaryLabel?: string;
+  /** Opens the first row. */
+  openFirst?: boolean;
+  /** Makes the list its own width container, so panels go two-up when it is at least 560px wide. The home page makes it a container itself. */
+  contained?: boolean;
+}
+const { items, name, summaryLabel = "Output", openFirst = false, contained = false } = Astro.props;
+---
+
+<ol class:list={["accordion", contained && "accordion--container"]}>
+  {items.map((it, i) => (
+    <li>
+      <details class="accordion__item" name={name} data-soft-close open={openFirst && i === 0 ? true : undefined}>
+        <summary class="accordion__summary">
+          <span class="accordion__title">{it.title}</span>
+          {it.summary && <span class="accordion__output"><span class="sr-only">{summaryLabel}: </span>{it.summary}</span>}
+          <span class="accordion__icon" aria-hidden="true"></span>
+        </summary>
+        <dl class="accordion__body">
+          {it.panels.map((p) => (
+            <div class:list={["accordion__cell", p.decision && "accordion__cell--decision"]}>
+              <dt class="mono">{p.decision && <span class="accordion__marker" aria-hidden="true"></span>}{p.label}</dt>
+              <dd>{p.text}</dd>
+            </div>
+          ))}
+        </dl>
+      </details>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .accordion { border-top: 1px solid var(--color-border-strong); }
+  .accordion--container { container-type: inline-size; }
+  .accordion > li { border-bottom: 1px solid var(--color-border-default); }
+  .accordion > li:last-child { border-bottom: 0; }
+  /* Closed row: title with its toggle, the summary beneath. */
+  .accordion__summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 20px;
+    grid-template-areas: "name icon" "out out";
+    align-items: baseline;
+    column-gap: 16px;
+    row-gap: 4px;
+    min-height: 64px;
+    padding-block: 20px;
+    cursor: pointer;
+    list-style: none;
+  }
+  .accordion__summary::-webkit-details-marker { display: none; }
+  .accordion__title { grid-area: name; font-family: var(--font-family-sans); font-weight: 600; font-size: var(--font-size-h3); letter-spacing: -0.02em; line-height: 1.1; transition: color 200ms ease; }
+  .accordion__output { grid-area: out; color: var(--color-text-muted); line-height: 1.35; font-size: var(--font-size-small); }
+  /* Plus that turns into a minus: the vertical bar rotates flat (transform only). */
+  .accordion__icon { grid-area: icon; position: relative; width: 14px; height: 14px; align-self: center; justify-self: end; }
+  .accordion__icon::before, .accordion__icon::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5px; margin-top: -0.75px; background: currentColor; transition: transform var(--duration-default) var(--easing-out); }
+  .accordion__icon::after { transform: rotate(90deg); }
+  .accordion__item[open] .accordion__icon::after { transform: rotate(0deg); }
+  @media (hover: hover) { .accordion__summary:hover .accordion__title, .accordion__summary:hover .accordion__icon { color: var(--color-accent); } }
+  .accordion__summary:focus-visible .accordion__title { color: var(--color-accent); }
+
+  /* Open row: one or two labelled panels. */
+  .accordion__body { display: grid; gap: 16px; padding: 0 0 32px; }
+  @container (min-width: 560px) { .accordion__body { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-column-gap); } }
+  @media (max-width: 959px) and (min-width: 640px) { .accordion__body { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-column-gap); } }
+  .accordion__item[open] .accordion__body { animation: accordion-in 320ms var(--easing-out); }
+  @keyframes accordion-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .accordion__item[open] .accordion__body { animation: none; } .accordion__icon::before, .accordion__icon::after { transition: none; } }
+  .accordion__cell dt { color: var(--color-text-muted); margin-bottom: 6px; display: inline-flex; align-items: center; gap: 8px; }
+  .accordion__cell dd { color: var(--color-text-secondary); max-width: 46ch; }
+  .accordion__cell--decision dt, .accordion__cell--decision dd { color: var(--color-text-default); }
+  /* The decision marker: a solid ink diamond. */
+  .accordion__marker { width: 8px; height: 8px; background: var(--color-text-default); transform: rotate(45deg); flex: none; }
+</style>

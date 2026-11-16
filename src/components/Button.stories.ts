@@ -3,7 +3,7 @@ import Button from "./Button.astro";
 import { contact } from "../data/site";
 
 const meta = {
-  title: "Components/Button",
+  title: "Components/Button/Variants",
   component: Button,
   tags: ["autodocs"],
   args: { href: contact.booking, variant: "primary", size: "md", icon: "arrow", slots: { default: "Book a 15-min call" } },

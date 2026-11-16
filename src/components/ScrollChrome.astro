@@ -113,12 +113,12 @@
     inset: calc(100% + 1px) 0 auto 0; /* 100% is the header's padding box; +1px clears its 1px bottom border */
     height: 2px;
     /* A faint track under the fill, so the line reads as a progress bar even at the start of the page. */
-    background: color-mix(in srgb, var(--ink) 12%, transparent);
+    background: color-mix(in srgb, var(--color-text-default) 12%, transparent);
     pointer-events: none;
   }
   .scroll-progress__bar {
     height: 100%;
-    background: var(--signal);
+    background: var(--color-accent);
     transform: scaleX(0);
     transform-origin: 0 50%;
   }

@@ -3,7 +3,7 @@ import ButtonStates from "./ButtonStates.astro";
 import { buttonStates } from "./storybook/data";
 
 const meta = {
-  title: "Components/ButtonStates",
+  title: "Components/Button/States demo",
   component: ButtonStates,
   tags: ["autodocs"],
   args: buttonStates(),

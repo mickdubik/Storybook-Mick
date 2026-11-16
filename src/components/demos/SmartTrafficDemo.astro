@@ -165,10 +165,10 @@ const piece = { format: "webp" as const, quality: 90, alt: "", decoding: "async"
   /* Same frame family as Shot: screen radius 10px, frame radius = 10px + padding, theme-aware canvas, hairline. */
   .std__frame {
     --std-inner: 10px;
-    --std-pad: var(--frame-pad);
+    --std-pad: var(--frame-padding);
     padding: var(--std-pad);
     border-radius: var(--frame-radius);
-    background: var(--paper-2);
+    background: var(--color-background-subtle);
   }
   .std__stage {
     position: relative;
@@ -177,7 +177,7 @@ const piece = { format: "webp" as const, quality: 90, alt: "", decoding: "async"
     container-type: inline-size;
     border-radius: var(--std-inner);
     background: #fff;
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text-default) 14%, transparent);
   }
   /* No permanent will-change: the browser promotes a layer while it animates and releases it when paused or off screen. */
   .std__cam { position: absolute; inset: 0; transform-origin: 0 0; }
@@ -191,7 +191,7 @@ const piece = { format: "webp" as const, quality: 90, alt: "", decoding: "async"
   /* Home card: the image carries the one radius and hairline, no canvas (same as Shot's bare mode). */
   .std--bare .std__frame { padding: 0; background: transparent; border-radius: clamp(3px, 1.5cqi, 8px); position: relative; overflow: hidden; }
   .std--bare .std__stage { border-radius: 0; box-shadow: none; }
-  .std--bare .std__frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--rule); pointer-events: none; }
+  .std--bare .std__frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--color-border-default); pointer-events: none; }
 
   /* Framed (case page): a 16:9 frame like Shot's wide frames. The screen is centred (roomier at the sides), the caption sits
      inside the frame under it and the Replay button in its top left corner. */
@@ -200,5 +200,5 @@ const piece = { format: "webp" as const, quality: 90, alt: "", decoding: "async"
   .std--framed .std__stage { flex: 1 1 0; min-height: 0; max-width: 100%; width: auto; }
   .std--framed .std__frame > :global(.replay) { top: 12px; left: 12px; }
   @container (max-width: 559px) { .std--framed .std__frame > :global(.replay) { display: none; } }
-  .std__cap { position: absolute; left: 0; right: 0; top: calc(100% - var(--std-pad) * 2 + min(12px, var(--std-pad) * 0.45)); margin: 0; padding-inline: var(--std-pad); text-align: center; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.03em; color: var(--ink-3); }
+  .std__cap { position: absolute; left: 0; right: 0; top: calc(100% - var(--std-pad) * 2 + min(12px, var(--std-pad) * 0.45)); margin: 0; padding-inline: var(--std-pad); text-align: center; font-family: var(--font-family-mono); font-size: 0.75rem; letter-spacing: 0.03em; color: var(--color-text-muted); }
 </style>

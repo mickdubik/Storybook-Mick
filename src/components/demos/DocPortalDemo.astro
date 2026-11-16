@@ -183,18 +183,18 @@ const label =
   /* Same frame family as Shot: screen radius 10px, frame radius = 10px + padding, theme-aware canvas, hairline. */
   .dpd__frame {
     --dpd-inner: 10px;
-    --dpd-pad: var(--frame-pad);
+    --dpd-pad: var(--frame-padding);
     padding: var(--dpd-pad);
     border-radius: var(--frame-radius);
-    background: var(--paper-2);
+    background: var(--color-background-subtle);
   }
   .dpd__stage {
     position: relative;
     aspect-ratio: 16 / 10;
     overflow: hidden;
     border-radius: var(--dpd-inner);
-    background: var(--paper-2);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent);
+    background: var(--color-background-subtle);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text-default) 14%, transparent);
   }
   .dpd__track { position: absolute; inset: 0; display: flex; will-change: transform; }
   .dpd__slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; }
@@ -224,8 +224,8 @@ const label =
     aspect-ratio: 16 / 10;
     overflow: hidden;
     border-radius: 10px;
-    background: var(--paper-2);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent), 0 14px 36px rgba(0, 0, 0, 0.28);
+    background: var(--color-background-subtle);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text-default) 14%, transparent), 0 14px 36px rgba(0, 0, 0, 0.28);
   }
   .dpd__card :global(picture), .dpd__card :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; object-position: 50% 0; }
   @media (prefers-reduced-motion: no-preference) {
@@ -236,6 +236,6 @@ const label =
   /* Home card: the image carries the one radius and hairline, no canvas (same as Shot's bare mode). */
   .dpd--bare .dpd__frame { padding: 0; background: transparent; border-radius: clamp(3px, 1.5cqi, 8px); position: relative; overflow: hidden; }
   .dpd--bare .dpd__stage { border-radius: 0; box-shadow: none; }
-  .dpd--bare .dpd__frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--rule); pointer-events: none; }
+  .dpd--bare .dpd__frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--color-border-default); pointer-events: none; }
 
 </style>
