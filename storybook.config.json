@@ -1,0 +1,7 @@
+{
+  "name": "Mick Dubik",
+  "tokens": "src/styles/global.css",
+  "storiesGlob": "src/components",
+  "noStory": [],
+  "publishRepoDir": "../../Storybook Portfolio"
+}

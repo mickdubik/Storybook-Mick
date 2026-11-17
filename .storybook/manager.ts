@@ -7,7 +7,7 @@ const dark = typeof window !== "undefined" && window.matchMedia("(prefers-color-
 addons.setConfig({
   theme: create({
     base: dark ? "dark" : "light",
-    brandTitle: "Mick Dubik Design System",
+    brandTitle: "MD website Design System",
     brandUrl: "https://mickdubik.vercel.app",
     brandTarget: "_blank",
   }),
@@ -15,7 +15,7 @@ addons.setConfig({
 
 // Storybook writes "<story> ⋅ Storybook" into the tab title itself; swap the suffix for the brand.
 if (typeof document !== "undefined") {
-  const BRAND = "Mick Dubik Design System";
+  const BRAND = "MD website Design System";
   const fix = () => {
     const t = document.title;
     if (t.endsWith("⋅ Storybook")) document.title = t.replace(/⋅ Storybook$/, `⋅ ${BRAND}`);

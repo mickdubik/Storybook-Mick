@@ -13,7 +13,9 @@
     "astro": "astro",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "check:contrast": "node scripts/check-contrast.mjs"
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:storybook": "node scripts/check-storybook.mjs",
+    "publish:storybook": "bash scripts/publish-storybook.sh"
   },
   "dependencies": {
     "@amplitude/unified": "^1.2.2",

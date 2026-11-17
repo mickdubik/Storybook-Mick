@@ -27,3 +27,7 @@
 
 /* The results table is 12px wider than its column on each side (so row highlights have room); give it that room in the canvas. */
 .sbdocs [id^="story--components-data-results-table--"] > div { padding-inline: 12px; }
+
+/* A case card is a list item. On the site it sits in the "cases" list; alone in the canvas it would show a bullet. */
+[id^="story--patterns-case-card--"] li.case,
+body[class*="sb-"] li.case { list-style: none; }

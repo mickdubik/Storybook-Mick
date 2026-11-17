@@ -1,7 +1,7 @@
 // Real content for the stories, read from src/data so Storybook shows the site's own copy and figures.
 import { caseStudies } from "../../data/work";
 import { aiWorkflow, aiImpact } from "../../data/site";
-import type { Metric, Img } from "../../data/work";
+import type { Metric, Img, CaseStudy } from "../../data/work";
 
 const objects: any[] = [];
 const walk = (v: unknown) => {
@@ -59,3 +59,15 @@ export const impactNote = (): string => must(aiImpact.find((x) => !x.figure), "a
 /** The rows of the first "results" and "beforeAfter" blocks found in the case studies. */
 export const resultsItems = () => must(objects.find((o) => o.t === "results"), "a results block").items.slice(0, 6);
 export const beforeAfterRows = () => must(objects.find((o) => o.t === "beforeAfter"), "a beforeAfter block").rows;
+
+/** A whole case study, found by its slug. */
+export const study = (slug: string): CaseStudy => must(caseStudies.find((c) => c.slug === slug), `case "${slug}"`);
+
+/** The first chapter (with its case and position) that holds a block of the given type, for example "results" or "decision". */
+export const chapterWith = (blockType: string) => {
+  for (const c of caseStudies) {
+    const n = c.chapters.findIndex((ch) => ch.blocks.some((b: { t: string }) => b.t === blockType));
+    if (n >= 0) return { study: c, chapter: c.chapters[n], n };
+  }
+  throw new Error(`Storybook data: no chapter with a "${blockType}" block in src/data/work.ts`);
+};

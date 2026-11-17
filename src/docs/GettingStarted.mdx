@@ -3,7 +3,7 @@ import { stats } from "../components/storybook/stats";
 
 <Meta title="Getting started" />
 
-# Mick Dubik Design System
+# MD website Design System
 
 The design system behind Mick Dubik's portfolio, a static Astro site. It is set like an annual report, outcome first (the concept is called "The Outcome Ledger"). Everything here reads from the site's own source, so it cannot drift from the live pages.
 
@@ -24,8 +24,10 @@ Read in this order. Each step builds on the one before.
   {[
     { n: "01", t: "Foundations", d: "Colour, type, space, motion and layout: the decisions everything else inherits. Flip the theme in the toolbar while you read.", l: "Colour", h: "?path=/story/foundations-colour--semantic" },
     { n: "02", t: "Components", d: "Each has a docs page with a story per variant and state. Change props in Controls, check the Accessibility panel.", l: "Button", h: "?path=/docs/components-button-variants--docs" },
-    { n: "03", t: "Demos", d: "The animated case covers, made from the same tokens and components. Where you see whether the system holds together.", l: "Smart Traffic", h: "?path=/story/demos-smarttraffic--framed" },
-    { n: "04", t: "Build with it", d: "Colour from the semantic tokens, size and space from the global ones, and reuse a component before drawing a new one.", l: "Run it", h: "#run-it" },
+    { n: "03", t: "Patterns", d: "Blocks of the site made from components: the header, the footer, a case card, the impact band and a case chapter.", l: "Case card", h: "?path=/docs/patterns-case-card--docs" },
+    { n: "04", t: "Prototypes", d: "Whole pages built from the patterns and real case content, to check a change against the live page.", l: "Case study page", h: "?path=/story/prototypes-case-study-page--design-system" },
+    { n: "05", t: "Demos", d: "The animated case covers, made from the same tokens and components. Where you see whether the system holds together.", l: "Smart Traffic", h: "?path=/story/demos-smarttraffic--framed" },
+    { n: "06", t: "Build with it", d: "Colour from the semantic tokens, size and space from the global ones, and reuse a component before drawing a new one.", l: "Run it", h: "#run-it" },
   ].map((c) => (
     <a key={c.n} className="ds-card" href={c.h} onClick={(e) => { if (c.h.startsWith("?")) { e.preventDefault(); window.__STORYBOOK_ADDONS_CHANNEL__?.emit("navigateUrl", c.h, { target: "_self" }); } }} style={{ display: "flex", flexDirection: "column", gap: "10px", border: "1px solid rgba(128,128,128,0.4)", borderRadius: "12px", padding: "24px", textDecoration: "none", color: "inherit" }}>
       <p style={{ margin: 0, opacity: 0.7, fontSize: "0.875rem", fontFamily: "var(--font-family-mono)" }}>{c.n}</p>
@@ -80,7 +82,28 @@ All tokens live in `src/styles/global.css`. Never hard-code a colour. Light and 
 - [**Results table**](?path=/docs/components-data-results-table--docs): The reported results of a case, label on the left and the figure on the right, with a soft row highlight on hover.
 - [**Comparison table**](?path=/docs/components-data-comparison-table--docs): Before and after figures, with two bars drawn to the same scale.
 - [**Availability**](?path=/docs/components-content-availability--docs): The line that says Mick is open to new projects ("Open to new projects in 2027"). The year ticks over like an odometer the first time it scrolls into view. The text comes from `availability` in `src/data/site.ts`.
-- **Demos**: Animated case covers: [Smart Traffic](?path=/story/demos-smarttraffic--framed), [DocPortal](?path=/story/demos-docportal--framed) and [Doctor Online](?path=/story/demos-doctoronline--framed). They play on screen only, and reduced motion shows a still.
+## Patterns
+
+Blocks of the site built from the components above. Each one is the same file the site renders, so a change shows here and on the page.
+
+- [**Site header**](?path=/docs/patterns-site-header--docs): The sticky masthead with the mark, section links, theme toggle and the contact button.
+- [**Site footer**](?path=/docs/patterns-site-footer--docs): The closing question, contact routes and the record of cases with their headline figures.
+- [**Case card**](?path=/docs/patterns-case-card--docs): One row of the selected-work list, with a Shot or an animated demo.
+- [**Impact band**](?path=/docs/patterns-impact-band--docs): The results of a case as a bento grid, with the headline result large.
+- [**Case chapter**](?path=/docs/patterns-case-chapter--docs): One numbered chapter of a case page, with its blocks.
+
+## Prototypes
+
+Whole pages, built from the patterns and the real content. Use them to check a change in context.
+
+- [**Home page**](?path=/story/prototypes-home-page--page): The home page body, from hero to clients.
+- [**Case study page**](?path=/story/prototypes-case-study-page--design-system): A full case page. One story per case: [Smart Traffic](?path=/story/prototypes-case-study-page--smart-traffic), [DocPortal](?path=/story/prototypes-case-study-page--doc-portal) and [Doctor Online](?path=/story/prototypes-case-study-page--doctor-online).
+
+Page scripts (counting figures, the before-and-after slider, the copy-email button) run on the site only, not in Storybook.
+
+## Demos
+
+Animated case covers: [Smart Traffic](?path=/story/demos-smarttraffic--framed), [DocPortal](?path=/story/demos-docportal--framed) and [Doctor Online](?path=/story/demos-doctoronline--framed). They play on screen only, and reduced motion shows a still.
 
 ## Run it
 

@@ -1,0 +1,109 @@
+---
+import Glyph from "../Glyph.astro";
+import Blueprint from "../Blueprint.astro";
+import type { CaseStudy } from "../../data/work";
+
+interface Props {
+  study: CaseStudy;
+  /** Blueprint marks (the design-system case only). */
+  bp?: boolean;
+  /** Show the "How measured" line under the figures (hidden site-wide for now, owner 2026-10-19). */
+  showMeasured?: boolean;
+}
+const { study: c, bp = false, showMeasured: SHOW_MEASURED = false } = Astro.props;
+// The headline result leads the Impact bento; the others follow.
+const leadMetric = c.metrics.find((m) => m.value === c.headline.value && m.label === c.headline.label) ?? c.metrics[0];
+const restMetrics = c.metrics.filter((m) => m !== leadMetric);
+---
+
+<section class={`impact${bp ? " bp-host" : ""}`} aria-labelledby="impact-title">
+  {bp && <Blueprint />}
+  <div class="wrap">
+    <h2 id="impact-title" class="impact__title mono"><span aria-hidden="true">[</span>Impact<span aria-hidden="true">]</span></h2>
+    <div class="impact__bento">
+      {[leadMetric, ...restMetrics].map((m, k) => (
+        <div class={`impact__item reveal${k === 0 ? " impact__item--lead" : ""}`}>
+          {k === 0 && <span class="mono impact__tag">Headline result</span>}
+          <span class="mono impact__qual">{m.qualifier ?? " "}</span>
+          <span class="figure-num impact__num" data-count style={k === 0 ? `view-transition-name: fig-${c.slug}` : undefined}>
+            {m.value}{m.unit}
+          </span>
+          <span class="impact__label fig-label">{m.label}</span>
+          <Glyph metric={m} />
+        </div>
+      ))}
+    </div>
+    {SHOW_MEASURED && c.measured && <p class="measured mono impact__measured"><span>How measured</span> {c.measured}</p>}
+  </div>
+</section>
+
+<style>
+/* ---------- Impact ---------- */
+  .impact { --bp-t: clamp(48px, 6vw, 88px); --bp-b: var(--bp-t); padding-block: var(--bp-t) var(--bp-b); }
+
+  .impact__title { margin-bottom: clamp(20px, 2.4vw, 32px); color: var(--color-text-muted); font-weight: 400; }
+
+  /* Bento: the headline result is the large tile on the left, the others sit in a 2-column block beside it. Same card recipe as the home "Why me" tiles. */
+  .impact__bento { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+
+@media (min-width: 640px) { .impact__bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ .impact__item--lead { grid-column: 1 / -1; }
+}
+
+@media (min-width: 1100px) {
+    .impact__bento { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: minmax(150px, auto); }
+
+    .impact__item--lead { grid-column: 1 / span 5; grid-row: 1 / span 2; }
+
+    .impact__item:not(.impact__item--lead) { grid-column: span 3; }
+
+    .impact__item:nth-child(2) { grid-column: 6 / span 3; }
+
+    .impact__item:nth-child(3) { grid-column: 9 / span 4; }
+
+    .impact__item:nth-child(4) { grid-column: 6 / span 4; }
+
+    .impact__item:nth-child(5) { grid-column: 10 / span 3; }
+
+    .impact__item:nth-child(4):last-child { grid-column: 6 / span 7; }
+}
+
+  .impact__item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: clamp(22px, 2.4vw, 32px);
+    border: 1px solid var(--color-border-default);
+    border-radius: 20px;
+    background: var(--color-background-card);
+  }
+
+  .impact__item { position: relative; overflow: hidden; isolation: isolate; }
+
+  .impact__item > * { position: relative; z-index: 1; }
+
+  /* Lead tile: the full-width result bar, a "Headline result" tag, and a quiet dot field fading in from the top right, the same language as the home "Why me" tiles. */
+  .impact__item--lead { justify-content: flex-end; min-height: 300px; }
+
+  .impact__item--lead::before { content: ""; position: absolute; inset: 0; z-index: 0; opacity: 0.2; pointer-events: none;
+    background: radial-gradient(circle, var(--color-text-default) 1.1px, transparent 1.6px) 0 0 / 18px 18px;
+    -webkit-mask-image: radial-gradient(130% 100% at 100% 0%, #000 0%, transparent 65%); mask-image: radial-gradient(130% 100% at 100% 0%, #000 0%, transparent 65%); }
+
+  .impact__item > .impact__tag { position: static; margin-bottom: auto; padding-bottom: 20px; color: var(--color-text-muted); }
+ /* in the flow, at the top of the tile: it can never run into the figure's qualifier */
+  .impact__item--lead :global(.glyph) { max-width: 100%; margin-top: 14px; }
+
+  .impact__item--lead .impact__num { font-size: var(--font-size-figure); }
+
+@media (hover: hover) { .impact__item { transition: border-color 200ms ease; }
+ .impact__item:hover { border-color: var(--color-text-muted); }
+}
+
+  .impact__qual { color: var(--color-text-muted); min-height: 1.2em; }
+
+  .impact__num { font-size: var(--font-size-figure-sm); }
+
+  .impact__label { margin-bottom: 6px; max-width: 28ch; }
+
+  .impact__measured { margin: 0; padding-block: 12px; border-top: 1px solid var(--color-border-default); }
+</style>

@@ -184,7 +184,7 @@ export const aiImpact = [
 // Exploration (owner, 2026-10-26): images, animations and prototypes, shown after Clients. Each item carries only what
 // the owner gave. The section ships only once it holds 3+ items (owner); until then it shows in dev only.
 // `embed`: an animation file in public/exploration/, played inline (once, then it rests). `href`: a prototype link.
-export const explorations: { title: string; kind: string; year: string; embed?: string; href?: string; bare?: boolean; contained?: boolean }[] = [
+export const explorations: { title: string; kind: string; year: string; embed?: string; image?: string; href?: string; bare?: boolean; contained?: boolean }[] = [
   {
     title: "ZiiP loading state",
     kind: "Animation",
@@ -200,6 +200,15 @@ export const explorations: { title: string; kind: string; year: string; embed?: 
     // Same frame and inset screen as the ZiiP tile (owner, 2026-11-12); the phone sits centred inside it. `bare`/`&fill` are no longer used.
     embed: "/exploration/paywall-flow.html?embed",
     contained: true, // a phone screen inside the tile: the container gets a tinted background (owner, 2026-11-12)
+  },
+  {
+    // The portfolio's own design system, published as Storybook (owner, 2026-11-16: add it to Experiments with a link).
+    // Name from docs/storybook/storybook.md. Year 2026 = the repo was published and renamed 2026-11-15; TODO(owner): confirm.
+    title: "MD website Design System",
+    kind: "Storybook",
+    year: "2026",
+    image: "/exploration/storybook.webp", // screenshot of the live Getting started page
+    href: "https://mickdubik.github.io/Storybook-Mick/",
   },
 ];
 // Shown in production with two items: the owner said "Publish everything" on 2026-11-12, which overrides the earlier "wait for 3+ items" rule (rules/visual.md).

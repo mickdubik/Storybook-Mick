@@ -1,0 +1,543 @@
+---
+import Avail from "../Avail.astro";
+import Portrait from "../Portrait.astro";
+import Button from "../Button.astro";
+// Owner logo "MD" from https://mickdubik.webflow.io (Webflow asset 677dc51438cc37f18bbc69d0), self-hosted with currentColor.
+import LogoMark from "../../assets/shared/logo-md.svg";
+import { contact, mailto, positioning, role, current, showExploration } from "../../data/site";
+import { caseStudies } from "../../data/work";
+
+interface Props {
+  /** The footer's closing question: [plain part, italic part]. */
+  contactHeading?: [string, string];
+  contactSubject?: string;
+  /** On the home page the links are in-page anchors; elsewhere they point to /#section. */
+  home?: boolean;
+}
+const { contactHeading = ["Bring me the problem.", "I’ll bring the numbers."], contactSubject = "Project enquiry", home = false } = Astro.props;
+const year = new Date().getFullYear();
+const h = (id: string) => (home ? `#${id}` : `/#${id}`);
+// Footer record: one list of the work (the owner preferred it to type groups), with the headline figure per
+// entry. Figures stay: the footer is reached from every case page, where the home page's figures aren't in view.
+const cs = Object.fromEntries(caseStudies.map((c) => [c.slug, c]));
+const entry = (slug: string, idx: string) => {
+  const c = cs[slug];
+  return { idx, co: c.company, name: c.shortTitle ?? c.product ?? c.title, href: `/work/${slug}`, fig: `${c.headline.value}${c.headline.unit}`, figLabel: `${c.headline.qualifier ? c.headline.qualifier + " " : ""}${c.headline.label.toLowerCase()}` };
+};
+const ziipLead = current.metrics[0];
+const record = [
+  { idx: "Now", co: current.company, name: "Current role", href: h("current"), fig: `${ziipLead.value}${ziipLead.unit}`, figLabel: ziipLead.label.toLowerCase(), cap: "courier efficiency" },
+  { ...entry("unbounce-design-system", "01"), name: "Design system", cap: "up to · features/sprint" },
+  { ...entry("unbounce-smart-traffic", "02"), name: "Smart Traffic", cap: "feature adoption" },
+  { ...entry("datarobot-self-service-docs", "03"), name: "Self-service docs", cap: "support requests" },
+  { ...entry("doctor-online-launch", "04"), name: "0 to 1 telemedicine app", cap: "concept to launch" },
+];
+---
+
+{/* The back cover. Round 5 merges the old § Contact block into the footer so the page ends on one
+     strong moment instead of two stacked closers: an inverted ink band with a display-size question, a
+     portrait, the email at headline scale, then the colophon (mini-ledger of outcomes, routes out) and a
+     full-width wordmark sign-off. References: mickdubik.webflow.io (structure, wordmark) and beew.studio
+     (scale, inversion, contact-first); see docs/DESIGN.md. */}
+<footer class="end">
+  <section class="end__cta" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      {/* Round 7: the portrait sits on the same left edge as the header logo, at a similar small scale. */}
+      {/* Portrait and headline span the width; below them the lede sits left and the site links sit in the same
+           columns as the record further down (7–12), so the two ruled lists line up. */}
+      <div class="end__intro">
+        <div class="end__me">
+          <Portrait widths={[56, 112]} sizes="56px" />
+          <p class="end__who">
+            <span class="end__hi">Hi, I’m Mick.</span>
+            <span class="end__kicker mono"><span class="live-dot" aria-hidden="true"></span><Avail /></span>
+          </p>
+        </div>
+        <h2 id="contact-title" class="end__title reveal">{contactHeading[0]} <em>{contactHeading[1]}</em></h2>
+        <p class="end__lede">Full-time or contract, with SaaS and AI teams. I lead the design and own the outcome, from first research to the metric that moved.</p>
+        <nav class="end__nav" aria-labelledby="footer-links">
+          <h2 id="footer-links" class="end__h mono">Links</h2>
+          <ul>
+            <li><a href={h("work")}>All work</a></li>
+            <li><a href={h("approach")}>Approach</a></li>
+            <li><a href={h("ai-workflow")}>AI workflow</a></li>
+            <li><a href={h("clients")}>Clients</a></li>
+            {showExploration && <li><a href={h("exploration")}>Exploration</a></li>}
+          </ul>
+        </nav>
+      </div>
+      {/* The ask at headline scale is a phrase, not the raw address (round 7); the address appears once, small,
+           with a copy control. */}
+      <a class="end__email" href={mailto(contactSubject)}>
+        <span class="end__email-text">Email me</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M8 5h11v11" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
+      </a>
+      <div class="end__addr">
+        <span class="mono">Or</span>
+        <span class="end__addr-text" data-copy-src>{contact.email}</span>
+        <button type="button" class="end__copy" data-copy>
+          <svg class="end__copy-ico end__copy-ico--copy" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.5v-.5a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3v5A1.5 1.5 0 0 0 4 9.5h.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+          <svg class="end__copy-ico end__copy-ico--ok" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3.2 3L13 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span data-copy-label>Copy</span><span class="sr-only"> email address</span>
+        </button>
+        <span class="sr-only" role="status" aria-live="polite" data-copy-status></span>
+      </div>
+      <div class="btn-row end__btns">
+        <Button href={contact.booking} variant="secondary" icon="external" external>Book a 15-min call</Button>
+        <Button href={contact.linkedin} variant="ghost" icon="external" external>LinkedIn</Button>
+        <Button href={contact.resume} variant="ghost" icon="external" external>Download resume</Button>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap end__colophon">
+    {/* Round 12: work grouped by type (after beew.studio's footer, which files case studies by what the work
+        was). Categories come from the cases' own tags and facts: AI (Smart Traffic, DataRobot's AI platform),
+        Design Systems (Unbounce; ZiiP's first design system, CV), MVP (Doctor Online). */}
+    <div class="end__brand">
+      <LogoMark class="end__markmd" aria-hidden="true" />
+      <div>
+        <p class="end__name">Mick Dubik<span>{role}</span></p>
+        <p class="end__pos">
+          <span class="end__pos-static">{positioning[0].trim().split(/(?<=\.)\s+/).map((bit) => <><span class="end__pos-bit">{bit}</span>{" "}</>)}</span>
+          <span class="end__roll" aria-hidden="true" data-roll>
+            <span class="end__roll-size">Support load down.</span>
+            <span class="end__prism">{positioning[0].trim().split(/(?<=\.)\s+/).map((bit) => <span class="end__face">{bit}</span>)}</span>
+          </span>
+          <em class="end__pos-bit">{positioning[1]}</em>{positioning[2]}
+        </p>
+        <button type="button" class="end__replay mono" data-roll-replay>Replay sign-off</button>
+      </div>
+    </div>
+
+    <nav class="end__record" aria-labelledby="footer-record">
+      <h2 id="footer-record" class="end__h mono">The record</h2>
+      <ol>
+        {record.map((it) => (
+          <li>
+            <a class="end__entry" href={it.href}>
+              <span class="mono end__idx">{it.idx}</span>
+              <span class="end__entry-name">{it.co}<span class="end__entry-co"><span class="end__dot"> · </span>{it.name}</span></span>
+              <span class="end__lead" aria-hidden="true"></span>
+              <span class="end__entry-stat"><span class="figure-num end__entry-fig">{it.fig}<span class="sr-only"> {it.figLabel}</span></span><span class="end__entry-cap mono" aria-hidden="true">{it.cap}</span></span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+
+    <div class="end__meta mono">
+      <p>© {year} Mick Dubik. Figures as reported by each engagement.</p>
+      <a class="end__top" href="#main">Back to top <span aria-hidden="true">↑</span></a>
+    </div>
+  </div>
+  {/* Sign-off: the header lockup (owner's MD mark + name), scaled to the full page width, as beew.studio
+       echoes its header logotype in its footer. Decorative. */}
+  <p class="end__mark" aria-hidden="true"><span>Mick Dubik</span></p>
+</footer>
+
+<style>
+/* ================= The back cover (footer) =================
+         The band re-declares the core tokens, so buttons, links, focus rings and figures all invert with it.
+         Light theme: ink band on a paper page. Dark theme (round 6): a lifted warm-grey surface (#2c2b27 on the
+         #10100f page) under a full-strength paper rule, so the page visibly turns over in both themes. */
+      /* Footer follows the site theme, like the header: page colours in light and dark, separated from the
+         content above by a top rule (the header mirrors this with its bottom rule). */
+      .end {
+        --end-gap: clamp(56px, 6.7vw, 96px); /* one gap between footer groups (2026-11-06); fine print and wordmark use half */
+        container-type: inline-size; /* lets the sign-off size to the footer width (cqi), not 100vw with scrollbar */
+        position: relative;
+        overflow: hidden;
+        background: var(--color-background-default);
+        color: var(--color-text-default);
+        border-top: 1px solid var(--color-border-default);
+      }
+
+
+      .end__cta { --bp-t: clamp(56px, 10vw, 152px); --bp-b: 0px; padding-block: var(--bp-t) var(--bp-b); }
+
+      .end__kicker { display: inline-flex; align-items: center; gap: 10px; color: var(--color-text-secondary); }
+
+
+      .end__title {
+        margin-top: clamp(28px, 4vw, 48px);
+        font-family: var(--font-family-sans);
+        font-weight: 700;
+        font-size: var(--font-size-display);
+        line-height: 0.94;
+        letter-spacing: -0.04em;
+        max-width: 28ch; /* wide enough for each sentence on one line at desktop; wraps, balanced, on phones */
+        text-wrap: balance;
+      }
+
+      .end__title em { display: block; font-style: normal; color: var(--color-text-secondary); }
+ /* the answer starts its own line */
+
+      /* Portrait row: same left edge as the header logo; 56px, matching the hero avatar. */
+      .end__me { display: flex; align-items: center; gap: 16px; }
+
+      .end__me :global(img) {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #dcdce3;
+        object-fit: cover;
+        filter: grayscale(1) contrast(1.05);
+      }
+
+      .end__who { display: flex; flex-direction: column; gap: 4px; }
+
+      .end__hi { font-family: var(--font-family-sans); font-weight: 600; font-size: var(--font-size-lede); letter-spacing: -0.02em; line-height: 1.1; }
+
+
+      .end__lede { margin-top: clamp(16px, 2vw, 24px); max-width: 44ch; font-size: var(--font-size-body); line-height: 1.5; color: var(--color-text-muted); text-wrap: pretty; }
+
+
+      /* The ask at headline scale: "Email me ↗" as one big mailto (round 7: a phrase, not the raw address). */
+      .end__email {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.3em;
+        margin-top: calc(var(--end-gap) - clamp(10px, 1.6vw, 22px)); /* the visible gap above the big link = --end-gap */
+        padding-block: clamp(10px, 1.6vw, 22px) clamp(14px, 2vw, 28px);
+        /* no rule above the email link (2026-11-06): the intro text already separates it */
+        font-family: var(--font-family-sans);
+        font-weight: 600;
+        font-size: clamp(2.6rem, 1rem + 6.4vw, 7.4rem);
+        letter-spacing: -0.045em;
+        line-height: 1;
+        color: var(--color-text-default);
+        transition: color 250ms ease;
+      }
+
+      .end__email-text {
+        background-image: linear-gradient(currentColor, currentColor);
+        background-size: 0% 2px;
+        background-position: 0 100%;
+        background-repeat: no-repeat;
+        padding-bottom: 0.06em;
+        transition: background-size 600ms var(--easing-out);
+      }
+
+      .end__email svg { width: 0.55em; height: 0.55em; flex: none; transition: transform var(--duration-default) var(--easing-out); }
+
+      .end__email:hover, .end__email:focus-visible { color: var(--color-accent); }
+
+      .end__email:hover .end__email-text, .end__email:focus-visible .end__email-text { background-size: 100% 2px; }
+
+      .end__email:hover svg, .end__email:focus-visible svg { transform: translate(8px, -8px); }
+
+      .end__addr {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 10px;
+        padding-block: 6px 16px;
+        border-bottom: 1px solid var(--color-border-default);
+        color: var(--color-text-secondary);
+      }
+
+      .end__addr .mono { color: var(--color-text-muted); }
+
+      .end__addr-text { font-size: var(--font-size-small); user-select: all; overflow-wrap: anywhere; }
+
+      /* Copy (round 11): a small ghost control right after the address; icon + "Copy", swapping to a check +
+         "Copied" for 2s. The visible control is compact; a pseudo-element keeps the hit area at 44px. */
+      .end__copy {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 8px;
+        border: 1px solid var(--color-border-default);
+        border-radius: 8px;
+        background: transparent;
+        color: var(--color-text-secondary);
+        font: inherit;
+        font-size: var(--font-size-label);
+        cursor: pointer;
+        transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease;
+      }
+
+      .end__copy::before { content: ""; position: absolute; inset: -10px -6px; }
+
+      .end__copy:hover, .end__copy:focus-visible { color: var(--color-accent); border-color: currentColor; }
+
+      .end__copy-ico { width: 14px; height: 14px; flex: none; }
+
+      .end__copy-ico--ok { display: none; }
+
+      .end__copy[data-state="copied"] { color: var(--color-accent); border-color: currentColor; }
+
+      .end__copy[data-state="copied"] .end__copy-ico--copy { display: none; }
+
+      .end__copy[data-state="copied"] .end__copy-ico--ok { display: block; }
+
+      .end__btns { margin-top: clamp(24px, 3vw, 36px); }
+
+      /* Intro + site links: intro on the left, links on the right, set as a ruled list like the record. */
+      .end__intro { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--space-column-gap); }
+
+      .end__nav { margin-top: 32px; }
+
+@media (min-width: 960px) {
+        /* Same 12-column grid and gap as the colophon, so the links (7–12) align with the record. */
+        .end__intro { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+
+        .end__me, .end__title { grid-column: 1 / -1; }
+
+        .end__lede { grid-column: 1 / span 5; align-self: start; }
+
+        .end__nav { grid-column: 7 / -1; margin-top: clamp(16px, 2vw, 24px); }
+}
+
+      .end__nav ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-column-gap); border-top: 1px solid var(--color-border-strong); }
+
+      .end__nav li { border-bottom: 1px solid var(--color-border-default); }
+
+      .end__nav li:last-child, .end__nav li:nth-last-child(2) { border-bottom: 0; }
+ /* last row of each of the two columns: no closing line (owner, 2026-11-06) */
+      .end__record li:last-child .end__entry { border-bottom: 0; }
+
+      .end__nav a { display: flex; align-items: center; min-height: 52px; color: var(--color-text-default); font-weight: 500; white-space: nowrap; transition: color 200ms ease, transform 300ms var(--easing-out); }
+
+@media (hover: hover) { .end__nav a:hover { color: var(--color-accent); transform: translateX(4px); }
+}
+
+      .end__nav a:focus-visible { color: var(--color-accent); }
+
+
+      /* ---- Colophon ---- */
+      /* ---- Colophon (round 12) ----
+         Desktop: row 1 = brand (cols 1–5) + one compact links group (cols 8–12); row 2 = the work index in three
+         type groups across the full width, one line per entry. Generous gaps, no wrapping at 1280/1440. */
+      .end__colophon {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 28px var(--space-column-gap);
+        position: relative;
+        padding-top: calc(var(--end-gap) * 1.5); /* the contact block and the record are separate sections: 144px at 1440 (owner, 2026-11-06) */
+      }
+
+      /* The separator spans the content column (inside the gutters), like every other rule in the footer; a
+         border on the padded box ran out into the gutters. Absolutely positioned, so it takes no grid cell. */
+      .end__colophon::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: var(--space-gutter);
+        right: var(--space-gutter);
+        /* no separator line (2026-11-06): the space is enough */
+      }
+
+@media (min-width: 960px) {
+        .end__colophon { grid-template-columns: repeat(12, minmax(0, 1fr)); row-gap: calc(var(--end-gap) / 2); }
+
+        .end__brand { grid-column: 1 / span 5; }
+
+        .end__record { grid-column: 7 / -1; }
+
+        .end__meta { grid-column: 1 / -1; }
+}
+
+      .end__brand { display: flex; gap: 12px; align-items: flex-start; }
+
+      .end__markmd { height: 14px; width: auto; flex: none; margin-top: 4px; color: var(--color-text-default); }
+
+      .end__name { font-weight: 600; line-height: 1.35; display: flex; flex-direction: column; }
+
+      .end__name span { font-weight: 400; color: var(--color-text-muted); font-size: var(--font-size-small); }
+
+      .end__pos {
+        position: relative;
+        margin-top: 18px;
+        max-width: 17ch;
+        font-family: var(--font-family-sans);
+        font-weight: 600;
+        font-size: clamp(1.6rem, 1.15rem + 1.4vw, 2.3rem);
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        text-wrap: balance;
+      }
+
+      .end__pos em { font-style: normal; color: var(--color-text-secondary); }
+
+      .end__replay { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; background: none; border: 0; color: var(--color-text-secondary); padding: 0; cursor: pointer; }
+
+      .end__replay:focus-visible { position: static; width: auto; height: auto; overflow: visible; clip-path: none; min-height: 44px; padding: 0 4px; margin-top: 6px; text-decoration: underline; text-underline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) { .end__replay { display: none; }
+}
+
+      .end__pos-bit { white-space: nowrap; }
+ /* never split a short phrase ("Retention up.") across lines */
+      /* Three phrases take turns on one line, rolling up like faces of a cube. Reduced motion shows all three. */
+      .end__roll { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+        .end__pos-static { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+        .end__pos em { display: block; }
+
+        .end__roll { display: block; position: relative; height: 1.1em; perspective: 12em; white-space: nowrap; }
+
+        .end__roll-size { visibility: hidden; display: block; height: 1.1em; }
+
+        .end__prism { position: absolute; inset: 0; transform-style: preserve-3d; animation: end-roll 6s cubic-bezier(.65,0,.35,1) 2.6667 forwards paused; }
+
+        /* a finite run (two full turns, then it rests on the last phrase): moving content that cannot be paused must stop by itself (WCAG 2.2.2). A tap or click on the line, or the Replay control for keyboards, runs it again. */
+        .end__roll.is-live .end__prism { animation-play-state: running; }
+
+        .end__roll { cursor: pointer; }
+
+        .end__pos:hover .end__prism, .end__pos:focus-within .end__prism { animation-play-state: paused; }
+
+        .end__face { position: absolute; inset: 0; backface-visibility: hidden; }
+
+        .end__face:nth-child(1) { transform: rotateX(0deg) translateZ(.318em); }
+
+        .end__face:nth-child(2) { transform: rotateX(-120deg) translateZ(.318em); }
+
+        .end__face:nth-child(3) { transform: rotateX(-240deg) translateZ(.318em); }
+}
+
+      .end__h { color: var(--color-text-muted); font-weight: 400; padding-bottom: 10px; }
+
+
+      /* The record: one full-width list, one line per engagement, with room to breathe. */
+      .end__record ol { border-top: 1px solid var(--color-border-strong); }
+
+      .end__entry {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-height: 52px;
+        padding-block: 12px;
+        border-bottom: 1px solid var(--color-border-default);
+        color: var(--color-text-default);
+        white-space: nowrap;
+        transition: color 200ms ease;
+      }
+
+      .end__idx { flex: none; width: 4ch; color: var(--color-text-muted); font-size: var(--font-size-micro); }
+
+      .end__entry-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; transition: transform 300ms var(--easing-out); }
+
+      .end__entry-co { font-weight: 400; color: var(--color-text-muted); }
+
+      .end__lead { flex: 1; min-width: 24px; }
+ /* spacer only: the dotted leader was removed (2026-11-06) */
+      .end__entry-stat { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+      .end__entry-cap { font-size: var(--font-size-micro); line-height: 1.2; color: var(--color-text-muted); text-transform: lowercase; }
+
+      .end__entry-fig { flex: none; font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.9rem); line-height: 1; color: var(--color-text-secondary); }
+
+@media (hover: hover) {
+        .end__entry:hover, .end__entry:hover .end__entry-fig { color: var(--color-accent); }
+
+        .end__entry:hover .end__entry-name { transform: translateX(4px); }
+}
+
+      .end__entry:focus-visible, .end__entry:focus-visible .end__entry-fig { color: var(--color-accent); }
+
+
+      /* Phones: the work groups come first and stack; the brand block (the name is the sign-off right below, the
+         mark is in the header) and the external links (the buttons just above) are hidden, so the footer stays no
+         longer than before. */
+@media (max-width: 639px) {
+        .end__brand { display: none; }
+
+        .end__colophon { row-gap: 18px; }
+
+        .end__record { order: 1; }
+
+        .end__h { padding-bottom: 6px; }
+
+        .end__meta { order: 3; }
+
+        .end__lead { display: none; }
+
+        .end__entry-stat { margin-left: auto; }
+
+        .end__entry-name { white-space: normal; overflow: visible; line-height: 1.25; }
+
+        .end__entry-co { display: block; }
+
+        .end__dot { display: none; }
+
+        .end__entry-cap { text-align: right; }
+
+        .end__entry { min-height: 44px; padding-block: 8px; gap: 10px; }
+}
+
+
+      .end__meta {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px 24px;
+        padding-top: 8px;
+        /* no rule above the copyright line (2026-11-06) */
+        color: var(--color-text-muted);
+      }
+
+      .end__top { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--color-text-secondary); transition: color 200ms ease; }
+
+      .end__top:hover { color: var(--color-accent); }
+
+
+      /* Sign-off: "Mick Dubik" in the header's Geist 600, fitted to the content width at every breakpoint, cropped
+         by the bottom edge and faded with a mask. Decorative only (aria-hidden). Only transform animates. */
+      .end__mark {
+        height: 0.74em;
+        max-width: none;
+        margin: calc(var(--end-gap) / 2) auto 0;
+        padding-inline: var(--layout-padding-x);
+        font-family: var(--font-family-sans);
+        font-weight: 600;
+        /* Round 11: text only, fitted to the content width ("Mick Dubik" in Geist 600 at −0.055em ≈ 4.81em). */
+        /* Fitted to the content column (the page width minus the hero margins), not the whole window. */
+        font-size: calc((100cqi - 2 * var(--layout-padding-x)) / 4.816);
+        line-height: 1;
+        letter-spacing: -0.055em;
+        white-space: nowrap;
+        user-select: none;
+        pointer-events: none;
+      }
+
+      .end__mark > span {
+        display: block;
+        color: color-mix(in srgb, var(--color-text-default) 30%, transparent);
+        -webkit-mask-image: linear-gradient(to bottom, #000 15%, transparent 92%);
+        mask-image: linear-gradient(to bottom, #000 15%, transparent 92%);
+      }
+
+}
+
+@media (prefers-reduced-motion: no-preference) {
+        @keyframes end-roll {
+          0%, 24% { transform: translateZ(-.318em) rotateX(0deg); }
+          33.33%, 57.33% { transform: translateZ(-.318em) rotateX(120deg); }
+          66.67%, 90.67% { transform: translateZ(-.318em) rotateX(240deg); }
+          100% { transform: translateZ(-.318em) rotateX(360deg); }
+        }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+        @supports (animation-timeline: view()) {
+          .end__mark > span {
+            animation-name: mark-rise; animation-timing-function: linear; animation-fill-mode: both;
+            animation-timeline: view();
+            animation-range: entry 0% entry 100%;
+          }
+        }
+}
+
+      @keyframes mark-rise {
+        from { transform: translateY(40%); }
+        to { transform: none; }
+      }
+</style>

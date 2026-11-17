@@ -1,0 +1,581 @@
+---
+import type { ImageMetadata } from "astro";
+import Glyph from "../Glyph.astro";
+import Blueprint from "../Blueprint.astro";
+import Plate from "../Plate.astro";
+import Shot from "../Shot.astro";
+import SmartTrafficDemo from "../demos/SmartTrafficDemo.astro";
+import DocPortalDemo from "../demos/DocPortalDemo.astro";
+import DoctorOnlineDemo from "../demos/DoctorOnlineDemo.astro";
+import { Image } from "astro:assets";
+import dsStrip from "../../assets/work/unbounce-design-system/ds-strip-v2.webp";
+import stHero from "../../assets/work/unbounce-smart-traffic/st-hero.webp";
+import ImpactBand from "../patterns/ImpactBand.astro";
+import CaseChapter from "../patterns/CaseChapter.astro";
+import { caseStudies, type CaseStudy } from "../../data/work";
+
+interface Props { study: CaseStudy }
+const { study: c } = Astro.props;
+const i = caseStudies.findIndex((x) => x.slug === c.slug);
+const next = caseStudies[(i + 1) % caseStudies.length];
+const prev = caseStudies[(i - 1 + caseStudies.length) % caseStudies.length];
+// The "How measured" lines are hidden for now (owner, 2026-10-19). The data stays on each case in work.ts (`measured`): set this to true to bring them back.
+const SHOW_MEASURED = false;
+// Prototype (2026-10-23, not published): the cover is the hero picture, Apple-style, on this case first.
+const heroStrips: Record<string, { src: ImageMetadata; alt: string; ar: number }> = {
+  "unbounce-design-system": { src: dsStrip, alt: "The four parts of the system: colour, typography, tokens and components.", ar: 4.18 },
+  "unbounce-smart-traffic": { src: stHero, alt: "The All Pages list in Unbounce: two pages with their visitors, conversions and rating, and the Page Performance popover comparing a 2% conversion rate with the 5.2% industry average and 17.1% estimated with Smart Traffic.", ar: 2000 / 750 },
+};
+const heroPic = heroStrips[c.slug];
+// On the Design system case the full overview image moves into the body, between chapters 07 and 08.
+const coverMoved = c.slug === "unbounce-design-system";
+// Blueprint marks (owner, 2026-11-10): the design-system case only, for now (header, In brief, Impact and the chapters).
+const bp = c.slug === "unbounce-design-system";
+// Doc portal and Doctor Online place their full animation inside a chapter (a `demo` block) instead of as the cover below "Impact".
+const demoInChapter = c.chapters.some((ch) => ch.blocks.some((b) => b.t === "demo"));
+// The headline result leads the Impact bento; the others follow.
+const leadMetric = c.metrics.find((m) => m.value === c.headline.value && m.label === c.headline.label) ?? c.metrics[0];
+const restMetrics = c.metrics.filter((m) => m !== leadMetric);
+const nn = (n: number) => String(n + 1).padStart(2, "0");
+const fmt = (n: number, unit: string) => `${n}${unit}`;
+const metricText = (m: { qualifier?: string; value: string; unit: string; label: string }) =>
+  `${m.qualifier ? m.qualifier + " " : ""}${m.value}${m.unit} ${m.label.toLowerCase()}`;
+// The impact figure that morphs from the home list is the case's headline, wherever it sits in the band.
+const isHeadline = (m: { value: string; label: string }) => m.value === c.headline.value && m.label === c.headline.label;
+---
+
+  <article class="study">
+    {/* ============ Header ============ */}
+    <header class={`study__head${bp ? " bp-host" : ""}`}>
+      {bp && <Blueprint top={false} />}
+      <div class="wrap">
+        <div class="study__first">
+        {c.demo === "smartTraffic" && <div class="study__bg"><SmartTrafficDemo backdrop /></div>}
+        {c.demo === "docPortal" && <div class="study__bg study__bg--third study__bg--stack"><DocPortalDemo backdrop stack /></div>}
+        {c.demo === "doctorOnline" && <div class="study__bg study__bg--third study__bg--strips"><DoctorOnlineDemo backdrop /></div>}
+        <nav class="crumbs mono" aria-label="Breadcrumb">
+          <a class="link" href="/#work">All work</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">Case {c.index} of {String(caseStudies.length).padStart(2, "0")}</span>
+        </nav>
+        <p class="study__co mono">{c.company} · {c.product}</p>
+        <h1 class="study__title" style={`view-transition-name: title-${c.slug}`}>{c.title}</h1>
+        {/* Hero = title, subtitle, result. Everything else (problem, my part, the facts) comes after a generous gap. */}
+        {!heroPic && <p class="lede study__sub">{c.dek}</p>}
+        {heroPic && (
+          <div class={`study__pic${coverMoved ? "" : " study__pic--shot"}${c.demo === "smartTraffic" ? " study__pic--mobile" : ""}`} style={`--cover-ar: ${heroPic.ar}`}>
+            {c.demo === "smartTraffic" ? <SmartTrafficDemo backdrop /> : <Image src={heroPic.src} alt={heroPic.alt} widths={[900, 1400, 2000, 2851]} sizes="(min-width: 1440px) 1328px, 92vw" loading="eager" />}
+          </div>
+        )}
+        {/* Puts the outcome on the first screen at every width (round 6: now also at 1440, where the impact band
+             starts below the fold). It repeats the band's headline figure, so it is hidden from assistive tech. */}
+        <p class="study__headline" aria-hidden="true">
+          <span class="figure-num">{c.headline.qualifier && <span class="mono study__headline-q">{c.headline.qualifier}</span>}{c.headline.value}{c.headline.unit}</span>
+          <span class="study__headline-label">{c.headline.label.charAt(0).toLowerCase() + c.headline.label.slice(1)}</span>
+        </p>
+        </div>
+        {/* After the gap: the facts. The problem, my part and the outcome are told once, in "In brief" below (they used to be repeated here). */}
+        <div class="study__facts">
+          <dl class="meta meta--row">
+            {c.meta.filter((m) => m.label !== "Scope").map((m) => (
+              <div>
+                <dt class="mono">{m.label}</dt>
+                <dd>{m.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </header>
+
+    {/* ============ In brief: problem → my call → outcome ============ */}
+    <section class={`brief${bp ? " bp-host" : ""}`} aria-labelledby="brief-title">
+      {bp && <Blueprint />}
+      <div class="wrap sheet">
+        <div class="rail"><h2 id="brief-title" class="rail-label"><span aria-hidden="true">[</span>In brief<span aria-hidden="true">]</span></h2></div>
+        <dl class="body brief__rows">
+          <div class="brief__row">
+            <dt class="mono">Problem</dt>
+            <dd>{c.brief.problem}</dd>
+          </div>
+          <div class="brief__row brief__row--call">
+            <dt class="mono">My part</dt>
+            <dd>
+              <p>{c.part}</p>
+              <p>{c.brief.call}</p>
+            </dd>
+          </div>
+          <div class="brief__row brief__row--out">
+            <dt class="mono">Outcome</dt>
+            <dd>{c.brief.outcome}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    {/* ============ Impact: a bento grid (2026-10-24), the headline result large, the others around it ============ */}
+    <ImpactBand study={c} bp={bp} showMeasured={SHOW_MEASURED} />
+
+    {/* ============ Cover ============ */}
+    {!coverMoved && !demoInChapter && <div class="wrap study__cover" style={`--cover-ar: ${c.demo || !c.cover ? 1.6 : c.cover.w / c.cover.h}`}>
+      {/* The cover spans the full .wrap: 92vw up to the 1440px max (1328px of content). */}
+      {c.demo === "doctorOnline" ? <DoctorOnlineDemo /> : c.demo === "docPortal" ? <DocPortalDemo /> : c.demo === "smartTraffic" ? <SmartTrafficDemo caption="Page Performance, from the list. Each page now gets a rating and a lightbulb; hovering it shows how the page compares with its industry." /> : <Shot img={c.cover} sizes="(min-width: 1920px) 1728px, (min-width: 1440px) 1296px, 92vw" />}
+    </div>}
+
+    {/* ============ Body ============ */}
+    <div class={`wrap sheet study__body${bp ? " bp-host" : ""}`}>
+      {bp && <Blueprint />}
+      <aside class="rail">
+        <nav class="toc" aria-label="On this page">
+          <p class="mono toc__title"><span aria-hidden="true">[</span>On this page<span aria-hidden="true">]</span></p>
+          <ol>
+            {c.chapters.map((ch, n) => (
+              <li><a href={`#${ch.id}`} data-toc={ch.id}><span class="mono" aria-hidden="true">{nn(n)}</span>{ch.title}</a></li>
+            ))}
+          </ol>
+        </nav>
+        <details class="jump" data-soft-close>
+          <summary class="mono"><span>Jump to section</span><svg class="jump__chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+          <ol>
+            {c.chapters.map((ch, n) => (
+              <li><a href={`#${ch.id}`}><span class="mono" aria-hidden="true">{nn(n)}</span>{ch.title}</a></li>
+            ))}
+          </ol>
+        </details>
+      </aside>
+
+      <div class="body chapters">
+        {c.chapters.map((ch, n) => (
+          <>
+          <CaseChapter study={c} chapter={ch} n={n} showMeasured={SHOW_MEASURED} />
+          {coverMoved && ch.id === "adoption" && (
+            <figure class="chapter-pic">
+              <Shot img={c.cover} sizes="(min-width: 1440px) 1000px, 92vw" />
+            </figure>
+          )}
+          </>
+        ))}
+      </div>
+    </div>
+
+    {/* ============ Pager ============ */}
+    <nav class="pager" aria-labelledby="pager-h">
+      <div class="wrap">
+        <h2 id="pager-h" class="pager__h mono"><span aria-hidden="true">[</span>Explore even more<span aria-hidden="true">]</span></h2>
+      </div>
+      <div class="wrap pager__inner">
+        {[{ d: prev, k: "← Previous case", cls: "" }, { d: next, k: "Next case →", cls: " pager__link--next" }].map(({ d, k, cls }) => (
+          <a class={`pager__link${cls}`} href={`/work/${d.slug}`}>
+            <span class="mono">{k}</span>
+            <span class="pager__fig">
+              <span class="figure-num pager__num">
+                {d.headline.qualifier && <span class="mono pager__q">{d.headline.qualifier} </span>}{d.headline.value}{d.headline.unit}
+              </span>
+              <span class="pager__label">{d.headline.label.charAt(0).toLowerCase() + d.headline.label.slice(1)}</span>
+            </span>
+            <span class="pager__title">{d.company}: {d.product}</span>
+          </a>
+        ))}
+      </div>
+    </nav>
+  </article>
+
+<script>
+  // Before / after slider: reveal the second image from the left as the range moves.
+  document.querySelectorAll<HTMLElement>("[data-cmp]").forEach((root) => {
+    const range = root.querySelector<HTMLInputElement>(".cmp__range");
+    const stack = root.querySelector<HTMLElement>(".cmp__stack");
+    if (!range || !stack) return;
+    const set = () => stack.style.setProperty("--pos", range.value + "%");
+    range.addEventListener("input", set);
+    set();
+    stack.hidden = false;
+    root.classList.add("is-ready");
+  });
+  // Current-section state for the table of contents.
+  const links = new Map<string, HTMLAnchorElement>();
+  document.querySelectorAll<HTMLAnchorElement>("[data-toc]").forEach((a) => links.set(a.dataset.toc!, a));
+  const setCurrent = (id: string) => {
+    links.forEach((a, key) => (key === id ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current")));
+  };
+  // A reading band 35–45% down the viewport: the chapter crossing it is the one being read.
+  // (Round 4: the old top-edge band lagged a section behind the heading in view.)
+  const chapters = [...document.querySelectorAll<HTMLElement>("[data-chapter]")];
+  const inBand = new Set<string>();
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => (e.isIntersecting ? inBand.add(e.target.id) : inBand.delete(e.target.id)));
+      const current = chapters.filter((ch) => inBand.has(ch.id)).pop();
+      if (current) setCurrent(current.id);
+    },
+    { rootMargin: "-35% 0px -55% 0px" }
+  );
+  chapters.forEach((s) => io.observe(s));
+  // Close the mobile jump menu after choosing a section.
+  document.querySelectorAll<HTMLAnchorElement>(".jump a").forEach((a) =>
+    a.addEventListener("click", () => a.closest("details")?.removeAttribute("open"))
+  );
+</script>
+
+<style>
+/* ---------- Header ---------- */
+  .study__head { --bp-t: 0px; --bp-b: clamp(56px, 8vw, 112px); padding-block: clamp(4px, 1vw, 12px) var(--bp-b); }
+ /* --bp-t is 0: the blueprint frame starts at the site header's bottom edge, which is its top line */
+  .crumbs { display: flex; align-items: center; gap: 10px; color: var(--color-text-muted); margin-bottom: clamp(20px, 3.4vw, 44px); }
+
+  .crumbs a { color: var(--color-text-default); display: inline-flex; align-items: center; min-height: 44px; }
+
+  .study__co { color: var(--color-text-muted); margin-bottom: 18px; }
+
+  .study__title {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: var(--font-size-h1);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+
+  /* Headline figure under the title, so the outcome is on the first screen at every width. */
+  .study__headline {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-top: clamp(32px, 4vw, 48px);
+  }
+
+  .study__sub { margin-top: clamp(20px, 2.4vw, 28px); max-width: var(--size-measure); }
+
+  .study__headline .figure-num { font-size: clamp(2.8rem, 2rem + 4vw, 3.6rem); }
+
+  .study__headline-q { font-size: var(--font-size-micro); color: var(--color-text-muted); margin-right: 8px; letter-spacing: 0.04em; vertical-align: top; line-height: 1; position: relative; top: 0.5em; }
+
+  .study__headline-label { color: var(--color-text-secondary); }
+
+@media (min-width: 960px) {
+    .study__headline { flex-wrap: nowrap; }
+
+    .study__headline .figure-num { font-size: clamp(3.2rem, 2rem + 2.6vw, 4.8rem); }
+}
+
+
+
+  .study__facts { margin-top: clamp(72px, 10vw, 136px); display: grid; gap: 28px; }
+ /* negative space: the hero stands alone */
+  .meta.meta--row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 28px 32px; padding-top: 0; border-top: 0; }
+
+  /* each fact is its own group: a hairline above it, label and value tight beneath, aligned to the top of the group */
+  .meta.meta--row div { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-content: start; padding: 14px 0 0; border: 0; border-top: 1px solid var(--color-border-strong); }
+
+  .meta.meta--row dd { color: var(--color-text-default); font-size: var(--font-size-body); line-height: 1.4; }
+
+  .meta { border-top: 1px solid var(--color-border-strong); }
+
+  .meta div {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 12px;
+    padding-block: 11px;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  .meta dt { color: var(--color-text-muted); padding-top: 0.2em; }
+
+
+  /* ---------- In brief ---------- */
+  .brief { --bp-t: clamp(44px, 6vw, 96px); --bp-b: var(--bp-t); padding-block: var(--bp-t) var(--bp-b); }
+ /* no section rule: the bracketed label and the spacing separate it, like the Impact bento below */
+  .brief .rail-label { display: block; position: static; margin: 0 0 16px; font-weight: 400; }
+
+  .brief__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px 24px;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  .brief__row:first-child { padding-top: 12px; }
+
+@media (min-width: 960px) {
+    .brief__row { grid-template-columns: 8.5rem minmax(0, 1fr); }
+
+    .brief__row:first-child { padding-top: 0; }
+}
+
+  .brief__row dt { color: var(--color-text-muted); padding-top: 0.35em; }
+
+  .brief__row dd { color: var(--color-text-secondary); max-width: var(--size-measure); text-wrap: pretty; }
+
+  /* The call is body copy; only the outcome is set large, so the two do not compete. */
+  .brief__row--out dd {
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    font-size: var(--font-size-lede);
+    line-height: 1.32;
+    letter-spacing: -0.012em;
+    color: var(--color-text-default);
+    max-width: 48ch;
+  }
+
+  .brief__row dd p + p { margin-top: 12px; }
+ /* my part: what I covered, then the call I made, one row */
+  .brief__row--out { border-bottom: 0; padding-top: 24px; }
+
+@media (min-width: 1100px) {/* three others: the last one runs the full width of the lower row */
+}
+
+
+  /* Hero picture (prototype): centred under the result, grows from 92% to full size and rises into place as it scrolls in (CSS scroll-driven, transform/opacity only; static without support or with reduced motion). */
+  .study__pic { margin: clamp(36px, 5vw, 64px) auto 0; max-width: calc(40svh * var(--cover-ar, 4.18)); }
+
+  /* Doubled class: this must beat the demo's own `img { height: 100% }` whatever order the stylesheets load in. */
+  .study__pic.study__pic :global(img) { display: block; width: 100%; height: auto; }
+
+  /* Smart Traffic: the first screen is the hero. Title top left, the result at the bottom left, and the demo is the background,
+     stuck to the bottom-right corner of the screen and bleeding off its right and bottom edges. It fades in from the top-left only,
+     from the left and from the top (an angled corner). It plays once and rests on the open popover. On narrower or squarer windows (under 1100px, or taller than 5:4) the still hero picture takes its place. */
+  .study__bg { display: none; }
+
+@media (min-width: 1100px) and (min-aspect-ratio: 5/4) {
+    .study__pic--mobile { display: none; }
+
+    .study__head:has(.study__bg) { overflow-x: clip; padding-block: 0 clamp(56px, 8vw, 112px); }
+ /* no top padding (the first screen runs under the header); keep the space under the facts */
+    .study__head .wrap { position: relative; }
+
+    /* The first screen runs under the transparent header (69px: 68px bar + 1px rule), so the picture starts at the very top of the window. */
+    .study__first { --hero-h: 100svh; position: relative; display: flex; flex-direction: column; min-height: var(--hero-h); margin-top: -69px; padding-top: 69px; padding-bottom: clamp(28px, 4vw, 56px); }
+
+    .study__first > :not(.study__bg) { position: relative; z-index: 1; }
+
+    .study__first .study__headline { margin-top: auto; padding-top: 48px; }
+
+    /* The picture is the full height of the first screen (16:10 frame), stuck to the bottom-right corner and bleeding off its edges. The fade runs
+       corner to corner, from the top-left corner of the picture to the bottom-right, with eased stops so it is smooth. */
+    .study__bg { display: block; position: absolute; right: calc(50% - 50vw); bottom: 0; width: calc(var(--hero-h) * 1.6); z-index: 0; pointer-events: none;
+      --fade: linear-gradient(to bottom right, transparent 0%, transparent 28%, rgb(0 0 0 / 0.005) 34.0%, rgb(0 0 0 / 0.035) 40.0%, rgb(0 0 0 / 0.104) 46.0%, rgb(0 0 0 / 0.210) 52.0%, rgb(0 0 0 / 0.347) 58.0%, rgb(0 0 0 / 0.500) 64.0%, rgb(0 0 0 / 0.653) 70.0%, rgb(0 0 0 / 0.790) 76.0%, rgb(0 0 0 / 0.896) 82.0%, rgb(0 0 0 / 0.965) 88.0%, rgb(0 0 0 / 0.995) 94.0%, #000 100%);
+      -webkit-mask-image: var(--fade); mask-image: var(--fade); }
+
+    .study__bg :global(.std__frame::after) { display: none; }
+
+    /* One-third variants (Doc portal, Doctor Online): the right 44% of the screen, the full height of the first screen, at 40% opacity, with no fade.
+       The 16:10 animation is sized to the screen height and centred, so the third shows its middle part. */
+    .study__bg.study__bg--third { width: 44vw; height: var(--hero-h); overflow: hidden; display: flex; justify-content: center; opacity: 0.4; -webkit-mask-image: none; mask-image: none; }
+
+    .study__bg--third > :global(figure) { flex: 0 0 auto; width: calc(var(--hero-h) * 1.6); }
+
+    /* Doctor Online: the panel shows exactly the last two strips (columns 4 and 5) of the 5-column wall, aligned to the right edge. The 16:10 wall is
+       scaled so that those two columns, from the left edge of column 4 to the frame's right edge (38.5% of its width), fill the panel; the panel clips the rest. */
+    .study__bg--third.study__bg--strips > :global(figure) { width: calc(44vw / 0.3854); }
+
+    .study__bg--third.study__bg--strips { justify-content: flex-end; align-items: flex-start; }
+
+    /* Doc portal: the screens are fitted to the panel's full width and stacked from the top. */
+    .study__bg--third.study__bg--stack { align-items: flex-start; }
+
+    .study__bg--third.study__bg--stack > :global(figure) { width: 100%; }
+
+    /* Parallax: the picture and its fade are one layer stuck to the bottom-right corner; it lags behind the page by ~25% of the screen
+       as the first screen scrolls away (CSS scroll-driven, transform only, no script). The first screen clips it vertically, not sideways. */
+    .study__first { clip-path: inset(0 -100vw 0 -100vw); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: scroll()) {
+        .study__bg { animation-name: bg-parallax; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root); animation-range: 0 var(--hero-h); }
+      }
+    }
+
+    .study__head:has(.study__bg) .study__headline-label { color: var(--color-text-default); }
+ /* the label sits on the faded picture */
+    .study__head:has(.study__bg) .study__facts { margin-top: clamp(56px, 8vw, 112px); }
+}
+
+  @keyframes bg-parallax { from { transform: translateY(0); } to { transform: translateY(calc(var(--hero-h) * 0.25)); } }
+
+  .study__pic--shot { max-width: min(1100px, calc(40svh * var(--cover-ar, 2.67))); }
+
+  /* Smart Traffic on narrower or squarer windows: the same animation as the wide hero (it plays once and rests on the open popover), as a framed picture under the title instead of a static crop. */
+  .study__pic--mobile.study__pic--shot { max-width: min(100%, calc(58svh * 1.6)); }
+
+  .study__pic--shot :global(img) { border-radius: 10px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text-default) 14%, transparent); }
+
+  .study__pic + .study__facts { margin-top: clamp(56px, 8vw, 112px); }
+
+@media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .study__pic { animation-name: pic-in; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(); animation-range: entry 0% entry 90%; transform-origin: 50% 0; }
+    }
+}
+
+  @keyframes pic-in { from { transform: translateY(48px) scale(0.92); opacity: 0.35; } to { transform: none; opacity: 1; } }
+
+@media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .stats__bar::after { animation-name: bar-grow; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(); animation-range: entry 10% entry 80%; }
+    }
+}
+
+  @keyframes bar-grow { from { transform: scaleX(0); } to { transform: scaleX(var(--p)); } }
+
+  .chapter-pic { margin: 0; padding-top: clamp(40px, 6vw, 88px); }
+
+  .study__cover { padding-top: clamp(40px, 6vw, 88px); }
+
+  /* A static cover never grows taller than ~80% of the window (so tall images are not bigger than the screen); wide ones are unaffected. */
+@media (min-width: 960px) {
+    .study__cover > :global(*) { max-width: calc(80svh * var(--cover-ar, 1.78)); margin-inline: auto; }
+}
+
+
+  /* ---------- Body ---------- */
+  .study__body { --bp-t: clamp(48px, 7vw, 104px); --bp-b: var(--bp-t); padding-block: var(--bp-t) var(--bp-b); }
+
+  .toc { display: none; }
+
+@media (min-width: 960px) {
+    .toc { display: block; position: sticky; top: calc(96px - var(--head-off, 0px)); }
+
+    .jump { display: none; }
+}
+
+  .toc__title { color: var(--color-text-muted); margin-bottom: 16px; }
+
+  .toc ol, .jump ol { border-top: 1px solid var(--color-border-default); }
+
+  .toc a, .jump a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding-block: 6px;
+    border-bottom: 1px solid var(--color-border-default);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-small);
+    transition: color 200ms ease, transform 300ms var(--easing-out);
+  }
+
+  .jump a { min-height: 44px; }
+
+  .toc a .mono, .jump a .mono { color: var(--color-text-muted); }
+
+  .toc a[aria-current="true"] { color: var(--color-text-default); font-weight: 600; padding-left: 10px; }
+
+  .toc a[aria-current="true"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 3px;
+    height: 16px;
+    margin-top: -8px;
+    background: var(--color-text-default);
+  }
+
+@media (hover: hover) {
+    .toc a:hover { color: var(--color-accent); }
+}
+
+  .jump { border: 1px solid var(--color-border-default); border-radius: 12px; background: var(--color-background-card); }
+
+  .jump summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    list-style: none;
+    border-radius: 12px;
+    min-height: 48px;
+    padding-inline: 14px;
+    cursor: pointer;
+    color: var(--color-text-default);
+  }
+
+  .jump summary::-webkit-details-marker { display: none; }
+
+  .jump summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  .jump__chev { flex: none; transition: transform var(--duration-default) var(--easing-out); }
+
+  .jump[open] .jump__chev { transform: rotate(180deg); }
+
+@media (hover: hover) { .jump summary:hover { color: var(--color-accent); }
+}
+
+@media (prefers-reduced-motion: reduce) { .jump__chev { transition: none; }
+}
+
+  .jump ol { padding: 0 14px 8px; border-top: 0; }
+
+
+  .chapters { display: flex; flex-direction: column; min-width: 0; }
+
+  /* One rule for every ruled list or table: the last row has no closing line (owner, 2026-11-06). */
+  .toc li:last-child a, .jump li:last-child a { border-bottom: 0; }
+
+  /* ---------- Pager ---------- */
+  /* The pager: a "[Explore even more]" label above the ruled two-column links, so it is not missed after a long case. */
+  /* The links are ruled top and bottom; then 2 x --space-section of space before the footer. The footer's own top rule is
+     dropped on case pages so it does not float in that space. */
+  .pager { margin-top: clamp(64px, 8vw, 120px); padding-bottom: calc(var(--space-section) * 2); }
+
+  :global(body:has(.pager) .end) { border-top: 0; }
+
+  .pager__h { color: var(--color-text-muted); font-weight: 400; font-size: var(--font-size-micro); margin: 0 0 16px; }
+
+  .pager__inner { display: grid; grid-template-columns: minmax(0, 1fr); border-top: 1px solid var(--color-border-strong); border-bottom: 1px solid var(--color-border-default); }
+
+@media (min-width: 760px) { .pager__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+  .pager__link {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-block: clamp(28px, 4vw, 48px);
+    color: var(--color-text-muted);
+  }
+
+  .pager__link + .pager__link { border-top: 1px solid var(--color-border-default); }
+
+@media (min-width: 760px) {
+    .pager__link + .pager__link { border-top: 0; border-left: 1px solid var(--color-border-default); padding-left: var(--space-column-gap); }
+
+    .pager__link--next { text-align: right; align-items: flex-end; }
+}
+
+  .pager__fig { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+
+  .pager__link--next .pager__fig { justify-content: flex-end; }
+
+  .pager__num { font-size: clamp(2.4rem, 1.8rem + 2vw, 3.6rem); color: var(--color-text-default); transition: color 200ms ease; }
+
+  .pager__q { font-size: var(--font-size-micro); color: var(--color-text-muted); letter-spacing: 0.04em; vertical-align: top; line-height: 1; position: relative; top: 0.5em; }
+
+  .pager__label { color: var(--color-text-secondary); font-size: var(--font-size-small); }
+
+@media (hover: hover) {
+    .pager__link:hover .pager__num { color: var(--color-accent); }
+}
+
+  .pager__link:focus-visible .pager__num { color: var(--color-accent); }
+
+  .pager__title {
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    font-size: var(--font-size-h3);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: var(--color-text-default);
+    transition: color 200ms ease;
+  }
+
+@media (hover: hover) {
+    .pager__link:hover .pager__title { color: var(--color-accent); }
+}
+
+  .pager__link:focus-visible .pager__title { color: var(--color-accent); }
+</style>

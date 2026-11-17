@@ -1,0 +1,129 @@
+---
+import Glyph from "../Glyph.astro";
+import Shot from "../Shot.astro";
+import SmartTrafficDemo from "../demos/SmartTrafficDemo.astro";
+import DocPortalDemo from "../demos/DocPortalDemo.astro";
+import DoctorOnlineDemo from "../demos/DoctorOnlineDemo.astro";
+import type { CaseStudy } from "../../data/work";
+
+interface Props {
+  /** One case study from `src/data/work.ts`. */
+  study: CaseStudy;
+}
+const { study: c } = Astro.props;
+const said = (c: CaseStudy) =>
+  `${c.headline.qualifier ? c.headline.qualifier + " " : ""}${c.headline.value}${c.headline.unit} ${c.headline.label.toLowerCase()}`;
+---
+
+  <li class="case">
+    <a class="case__link" href={`/work/${c.slug}`} aria-label={`${c.company} ${c.product} case study: ${said(c)}. ${c.title}`}>
+      <span class="case__index mono">{c.index}</span>
+      <div class="case__text">
+        <p class="case__co mono">{c.company} · {c.product}</p>
+        {/* The hook leads: a few words that make the reader open the case. The long headline, the summary and the role live on the case page; the aria-label keeps the full title for screen readers. */}
+        <h3 id={`case-${c.slug}`} class="case__title">{c.hook}</h3>
+        <p class="case__dek">{c.dek}</p>
+        {/* The result, smaller than the hook: number and its explanation on one line, the drawing right under it. */}
+        <div class="case__result">
+          <p class="case__line">
+            {c.headline.qualifier && <span class="case__qual mono">{c.headline.qualifier}</span>}
+            <span class="figure-num case__num" data-count style={`view-transition-name: fig-${c.slug}`}>{c.headline.value}{c.headline.unit}</span>
+            <span class="case__metric fig-label">{c.headline.label}</span>
+          </p>
+          <Glyph metric={c.headline} />
+        </div>
+        <ul class="tags" aria-label="Tags">
+          {c.tags.map((t) => <li class="tag">{t}</li>)}
+        </ul>
+        <span class="case__cta">Read the case study <span class="arrow" aria-hidden="true">→</span></span>
+      </div>
+      <div class="case__shot">{c.demo === "smartTraffic" ? <SmartTrafficDemo bare /> : c.demo === "doctorOnline" ? <DoctorOnlineDemo bare sizes="(min-width: 1440px) 80px, (min-width: 960px) 6vw, 19vw" /> : c.demo === "docPortal" ? <DocPortalDemo bare sizes="(min-width: 1920px) 560px, (min-width: 1440px) 440px, (min-width: 960px) 30vw, 100vw" /> : <Shot img={c.cover} sizes="(min-width: 1920px) 560px, (min-width: 1440px) 440px, (min-width: 960px) 30vw, 100vw" bare />}</div>
+    </a>
+  </li>
+
+<style>
+.case { border-bottom: 1px solid var(--color-border-default); }
+
+  .case:last-child { border-bottom: 0; }
+ /* the next section's own rule closes the list: no second line a few pixels above it */
+  /* Original layout: index, result, story, and a small cover thumbnail on the right. */
+  .case__link {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px var(--space-column-gap);
+    padding-block: clamp(28px, 4vw, 56px);
+    transition: background-color 250ms ease;
+  }
+
+@media (min-width: 960px) {
+    /* Option A: a narrow index column, then three equal columns (figure · text · cover) with the same gap
+       between each. The cover grows from ~22% to a third of the row. */
+    /* 24 columns with the sheet's own gap: the index takes the rail (6 = 3 of the section's 12), so the text starts exactly where the section title above starts; about and preview are equal (9 and 9). */
+    .case__link { grid-template-columns: repeat(24, minmax(0, 1fr)); column-gap: var(--space-column-gap); align-items: start; }
+
+    .case__index { grid-column: 1 / span 6; }
+
+    .case__text { grid-column: 7 / span 9; order: 0; }
+
+    .case__shot { grid-column: 16 / span 9; order: 0; margin-top: 0; }
+}
+
+  .case__index { color: var(--color-text-muted); }
+
+  /* Three columns: index, about, preview. In "about": the hook first (large), then the result smaller than the hook, number and its explanation on one line, the drawing close under it (8px), then tags and the link. */
+  .case__text { order: 1; min-width: 0; }
+
+  .case__shot { order: 3; }
+
+  .case__co { color: var(--color-text-muted); margin-bottom: 16px; }
+
+  .case__title { font-size: clamp(1.7rem, 1.15rem + 1.6vw, 2.4rem); font-weight: 600; line-height: 1.1; letter-spacing: -0.03em; max-width: 16ch; text-wrap: balance; transition: color 250ms ease; }
+
+  .case__dek { margin-top: 14px; color: var(--color-text-muted); font-size: var(--font-size-small); line-height: 1.5; max-width: 46ch; text-wrap: pretty; }
+ /* three lines: quieter than the hook so they do not compete */
+  .case__result { margin-top: 28px; display: grid; gap: 10px; max-width: 360px; }
+
+  .case__line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin: 0; }
+
+  .case__qual { color: var(--color-text-muted); }
+
+  .case__num { font-size: clamp(1.7rem, 1.3rem + 1vw, 2.2rem); line-height: 1; transition: color 250ms ease; }
+
+  .case__metric { font-size: var(--font-size-body); }
+
+  .case__text .tags { margin-top: 28px; }
+
+  /* Focus on one case at a time. At rest every card sits back (40%). With the pointer away, the card that takes up most of the screen is the lead and shows at full strength (data-lead, set on scroll); with the pointer over a card (or keyboard focus on one), that card has priority and the lead steps back. Touch screens (no hover) show everything at full strength. NOTE: at 40% the small text is below the AA contrast minimum while a card is not in focus; owner choice 2026-10-22. */
+@media (hover: hover) {
+    .case__link { opacity: 0.4; transition: opacity 300ms var(--easing-out); }
+
+    .case__link[data-lead], .case__link:hover, .case__link:focus-visible { opacity: 1; }
+}
+
+  .case__cta {
+    display: inline-flex;
+    gap: 0.5em;
+    margin-top: 28px;
+    font-weight: 500;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+  }
+
+  .case__cta .arrow { transition: transform var(--duration-default) var(--easing-out); }
+
+  .case__link:focus-visible .case__num, .case__link:focus-visible .case__title { color: var(--color-accent); }
+
+  .case__link:focus-visible .case__num { --fig-top: var(--color-accent); --fig-bot: color-mix(in srgb, var(--color-accent) 65%, var(--color-background-default)); }
+
+@media (hover: hover) {
+    .case__link:hover .case__num, .case__link:hover .case__title { color: var(--color-accent); }
+
+    .case__link:hover .case__num { --fig-top: var(--color-accent); --fig-bot: color-mix(in srgb, var(--color-accent) 65%, var(--color-background-default)); }
+
+    .case__link:hover .case__cta .arrow { transform: translateX(6px); }
+}
+
+  .case__shot { margin-top: 8px; container-type: inline-size; }
+
+  .case__link:focus-visible { outline-offset: 6px; }
+</style>

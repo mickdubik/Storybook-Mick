@@ -10,7 +10,7 @@ What is not done yet, and what to know before relying on it. Each item says why 
 
 - **Portrait and Blueprint have no usage note.** `docs/DESIGN.md` does not say when to use them, so their stories show only what they render. Without that note, a newcomer cannot tell where each one belongs.
 - **Other tile surfaces still repeat the card recipe.** The home "why me" bento tiles, the case-study cards and the stat tiles each carry their own copy of the hairline, 12px corner and tinted surface. Folding them into Card is the next clean-up.
-- **Components are shown alone.** Page context is not part of Storybook: the header, the 12-column sheet and the case template. A component can look right here and still need a check on the live page.
+- **Page scripts do not run in Storybook.** The Patterns and Prototypes show the real header, footer, home page and case pages, but the counting figures, the before-and-after slider, the table-of-contents highlight, the copy-email button and the theme toggle are page scripts, so they run on the site only. Check those on the live page.
 - **Story content is real case-study copy.** Glyph, Plate, Shot and ButtonStates read from `src/data/work.ts`, and Button uses the booking link and label from `src/data/site.ts`. The Foundations sample words and the Availability, Portrait and Blueprint stories are not case copy.
 
 ## Checks
