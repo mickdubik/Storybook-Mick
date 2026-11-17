@@ -19,6 +19,9 @@ jobs:
       # Colour tokens must keep their text contrast (WCAG AA) before anything is published.
       - run: npm run check:contrast
       - run: npm run build-storybook
+      # Every story must pass axe in light and dark. Findings the owner accepted are listed in scripts/check-a11y.mjs.
+      # Runs on the build above; the runner's Google Chrome is used, nothing is downloaded.
+      - run: npm run check:a11y -- --no-build
       # Publish from main only. Pull requests build Storybook as a check and never replace the live site.
       - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
