@@ -59,7 +59,7 @@ Tokens are written as CSS custom properties in `src/styles/global.css`. Edit the
       <p className="ds-card__n">{c.n}</p>
       <p className="ds-card__t">{c.t}</p>
       <p className="ds-card__d">{c.d}</p>
-      <p className="ds-card__ex">{c.e.map((x) => <span key={x}>{x}</span>)}</p>
+      <p className="ds-card__ex">{c.e.map((x) => <code key={x}>{x}</code>)}</p>
       <span className="ds-card__go">{tiers[i].rows.length} tokens →</span>
     </a>
   ))}

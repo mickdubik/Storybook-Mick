@@ -17,6 +17,8 @@
   font-family: var(--font-family-sans);
   color: var(--color-text-default);
 }
+/* The site's own buttons (a.btn) set their own label colour; the page-wide link colour above must not reach them. */
+:is(.sbdocs.sbdocs-content, .ds-page) a.btn { color: var(--btn-text); }
 
 /* Title and intro */
 :is(.sbdocs.sbdocs-content, .ds-page) h1 { margin: 0 0 16px; font-size: var(--ds-title); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
@@ -39,7 +41,13 @@
 
 /* Inline code and code blocks */
 :is(.sbdocs.sbdocs-content, .ds-page) :not(pre) > code { font-family: var(--font-family-mono); font-size: 0.85em; color: var(--color-text-default); background: var(--color-background-subtle); border: 1px solid var(--color-border-default); border-radius: 4px; padding: 1px 5px; white-space: normal; }
-:is(.sbdocs.sbdocs-content, .ds-page) pre { margin: 0 0 24px; background: var(--color-background-subtle) !important; border: 1px solid var(--color-border-default); border-radius: 12px; }
+/* A code block is three nested boxes in Storybook (pre > .docblock-source > pre.prismjs). Draw one box, on .docblock-source, and keep the other two plain. */
+:is(.sbdocs.sbdocs-content, .ds-page) pre { margin: 0 0 24px; padding: 0; background: none !important; border: 0; border-radius: 0; box-shadow: none; }
+:is(.sbdocs.sbdocs-content, .ds-page) .docblock-source { margin: 0; background: none; border: 1px solid var(--color-border-default); border-radius: 12px; box-shadow: none; overflow: hidden; }
+:is(.sbdocs.sbdocs-content, .ds-page) .docblock-source pre.prismjs { margin: 0; padding: 20px; background: none !important; border: 0; border-radius: 0; }
+:is(.sbdocs.sbdocs-content, .ds-page) .docblock-source pre.prismjs, :is(.sbdocs.sbdocs-content, .ds-page) .docblock-source pre.prismjs > div { color: var(--color-text-default); }
+:is(.sbdocs.sbdocs-content, .ds-page) .docblock-source button + *, :is(.sbdocs.sbdocs-content, .ds-page) .docblock-source > div:last-child { background: none; }
+:is(.sbdocs.sbdocs-content, .ds-page) .docblock-source button { background: none; color: var(--color-text-secondary); border: 0; border-left: 1px solid var(--color-border-default); border-top: 1px solid var(--color-border-default); border-radius: 12px 0 0 0; box-shadow: none; }
 :is(.sbdocs.sbdocs-content, .ds-page) pre code { font-family: var(--font-family-mono); font-size: var(--font-size-small); color: var(--color-text-default); }
 
 /* Code inside a heading is just mono, with no box: a boxed token next to a 22px title looks like a button. */
@@ -87,7 +95,7 @@
 .ds-card__n { margin: 0; font-family: var(--font-family-mono); font-size: var(--font-size-micro); letter-spacing: 0.06em; color: var(--color-text-muted); }
 :is(.sbdocs.sbdocs-content, .ds-page) .ds-card__t { margin: 0; max-width: none; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; color: var(--color-text-default); }
 :is(.sbdocs.sbdocs-content, .ds-page) .ds-card__d { flex: 1; margin: 0; max-width: none; font-size: var(--font-size-small); line-height: 1.5; color: var(--color-text-secondary); }
-:is(.sbdocs.sbdocs-content, .ds-page) .ds-card__ex { display: flex; flex-direction: column; gap: 2px; margin: 4px 0 0; max-width: none; font-family: var(--font-family-mono); font-size: var(--font-size-label); line-height: 1.5; color: var(--color-text-muted); }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-card__ex { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin: 4px 0 0; max-width: none; font-size: var(--font-size-body); line-height: 1.4; }
 :is(.sbdocs.sbdocs-content, .ds-page) .ds-card__go { margin-top: 8px; font-size: var(--font-size-small); font-weight: 600; color: var(--color-accent); }
 
 /* Read next: the closing section of every page */
