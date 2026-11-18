@@ -24,3 +24,15 @@ if (typeof document !== "undefined") {
   new MutationObserver(fix).observe(document.querySelector("title") ?? document.head, { childList: true, subtree: true, characterData: true });
   fix();
 }
+
+// The Foundations pages are reading pages: the Controls, Actions and Accessibility panel only takes a third of the screen from them.
+// Close it while one is open and bring it back, as it was, when the viewer moves to any other story.
+addons.register("md-website/foundations-panel", (api) => {
+  let hid = false;
+  const sync = () => setTimeout(() => {
+    const onFoundations = api.getCurrentStoryData()?.title?.startsWith("Foundations/") ?? false;
+    if (onFoundations && api.getIsPanelShown()) { api.togglePanel(false); hid = true; }
+    else if (!onFoundations && hid) { api.togglePanel(true); hid = false; }
+  }, 0); // after Storybook has updated the current story, not before
+  for (const event of ["storyChanged", "storyPrepared", "storyRendered", "docsRendered"]) api.on(event, sync);
+});

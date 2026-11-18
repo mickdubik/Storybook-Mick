@@ -1,10 +1,26 @@
 import type { Preview } from "@storybook-astro/framework";
+import { addons } from "storybook/preview-api";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
 import "@site/styles/global.css";
 import "./docs.css";
 
 // Same switch the site uses: data-theme="dark" on <html> (see src/layouts/Base.astro).
+// A docs page with no story on it (Getting started, Tokens, Guides) never runs the decorator below, so without this the page
+// would follow the system setting and ignore the toolbar. Guarded: the static build loads this file in Node, where there is no window.
+const setTheme = (t?: string) => document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+if (typeof window !== "undefined") {
+  setTheme("light");
+  const channel = addons.getChannel();
+  for (const event of ["setGlobals", "globalsUpdated"]) channel.on(event, (e: { globals?: { theme?: string } }) => e?.globals?.theme && setTheme(e.globals.theme));
+  // A plain <a href="?path=/..."> in a story page (the Foundations "Read next" lists) would load the bare preview; send it to the manager instead.
+  document.addEventListener("click", (e) => {
+    const a = (e.target as Element | null)?.closest?.('a[href^="?path="]');
+    if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    channel.emit("navigateUrl", a.getAttribute("href"), { target: "_self" });
+  });
+}
 const preview: Preview = {
   globalTypes: {
     theme: {
@@ -23,7 +39,7 @@ const preview: Preview = {
   initialGlobals: { theme: "light" },
   decorators: [
     (story, context) => {
-      if (typeof document !== "undefined") document.documentElement.setAttribute("data-theme", context.globals.theme ?? "light");
+      if (typeof document !== "undefined") setTheme(context.globals.theme);
       return story();
     },
   ],

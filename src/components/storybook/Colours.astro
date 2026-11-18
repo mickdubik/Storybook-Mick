@@ -90,25 +90,33 @@ const ramps = order
     })(),
   }))
   .filter((r) => r.values.length > 0);
+const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 ---
 
 {view === "semantic" ? (
-  <div class="col">
-    <h1 class="title">Semantic colour</h1>
-    <p class="intro">Semantic tokens name a role, not a value. Components use these and only these for colour. Flip the theme in the toolbar: every name stays the same while its value changes. That stability is what lets a token survive a re-skin.</p>
+  <div class="ds-page">
+    <h1>Semantic colour</h1>
+    <p>Semantic tokens name a role, not a value. Components use these and only these for colour. Flip the theme in the toolbar: every name stays the same while its value changes. That stability is what lets a token survive a re-skin.</p>
+    <nav aria-label="On this page">
+      <ul class="ds-chips">
+        {[{ t: "How to read it", n: undefined as number | undefined }, ...groups.map((g) => ({ t: g.title, n: g.rows.length })), { t: "State", n: states.length }].map((c) => <li><a href={`#${id(c.t)}`}>{c.t}{c.n !== undefined && <> <strong>{c.n}</strong></>}</a></li>)}
+      </ul>
+    </nav>
+
     <section>
-      <h2>How to read it</h2>
-      <ul class="legend">
-        <li><b>Token</b>: the CSS variable. Use it as <code>color: var(--color-text-default)</code>. Never type the hex.</li>
-        <li><b>Light and Dark</b>: the HEX value the token resolves to in each theme. The name never changes; the value does.</li>
-        <li><b>Contrast</b>: the WCAG ratio of a text token on <code>--color-background-default</code>, light and dark, with a badge for the level it reaches. AAA (7 or more) is the strongest, AA (4.5 or more) is the minimum for body text, and AA large (3 or more) is for large text only.</li>
-        <li><b>Use</b>: the job of the token. Pick by job, not by how the colour looks.</li>
+      <h2 id="how-to-read-it">How to read it</h2>
+      <ul>
+        <li><strong>Token</strong>: the CSS variable. Use it as <code>color: var(--color-text-default)</code>. Never type the hex.</li>
+        <li><strong>Light and Dark</strong>: the HEX value the token resolves to in each theme. The name never changes; the value does.</li>
+        <li><strong>Contrast</strong>: the WCAG ratio of a text token on <code>--color-background-default</code>, light and dark, with a badge for the level it reaches. AAA (7 or more) is the strongest, AA (4.5 or more) is the minimum for body text, and AA large (3 or more) is for large text only.</li>
+        <li><strong>Use</strong>: the job of the token. Pick by job, not by how the colour looks.</li>
       </ul>
     </section>
     {groups.map((g) => (
       <section>
-        <h2>{g.title}</h2>
-        <p class="why">{groupBlurb[g.title]}</p>
+        <h2 id={id(g.title)}>{g.title}</h2>
+        <p>{groupBlurb[g.title]}</p>
         <table class="tok">
           <thead>
             <tr><th>Token</th><th>Light</th><th>Dark</th><th>Contrast on page background</th><th>Use</th></tr>
@@ -135,8 +143,8 @@ const ramps = order
       </section>
     ))}
     <section>
-      <h2>State</h2>
-      <p class="why">Interactive states are not colours of their own. The button's states are component tokens that point back at the roles above, so a theme change carries them along. Only <code>--color-accent</code> marks an interactive state or a result.</p>
+      <h2 id="state">State</h2>
+      <p>Interactive states are not colours of their own. The button's states are component tokens that point back at the roles above, so a theme change carries them along. Only <code>--color-accent</code> marks an interactive state or a result.</p>
       <table class="tok tok--state">
         <thead><tr><th>Token</th><th>Resting value</th></tr></thead>
         <tbody>
@@ -144,15 +152,25 @@ const ramps = order
         </tbody>
       </table>
     </section>
+    <h2 id="read-next">Read next</h2>
+    <ul>
+      <li><a href="?path=/story/foundations-colour--primitives">Primitive colour</a>: the raw colours behind these roles.</li>
+      <li><a href="?path=/story/foundations-typography--scales">Typography</a>: one family, one step per job.</li>
+    </ul>
   </div>
 ) : (
-  <div class="col">
-    <h1 class="title">Primitive colour</h1>
-    <p class="intro">The raw colours behind the semantic tokens, in the light and dark themes. Each is named by colour family and a step: <code>neutral-50</code> is the lightest grey, <code>neutral-950</code> the darkest, and a higher step is always a darker colour. Pure white is just <code>white</code>. Primitives say what a colour is, never what it is for.</p>
+  <div class="ds-page">
+    <h1>Primitive colour</h1>
+    <p>The raw colours behind the semantic tokens, in the light and dark themes. Each is named by colour family and a step: <code>neutral-50</code> is the lightest grey, <code>neutral-950</code> the darkest, and a higher step is always a darker colour. Pure white is just <code>white</code>. Primitives say what a colour is, never what it is for.</p>
+    <nav aria-label="On this page">
+      <ul class="ds-chips">
+        {ramps.map((r) => <li><a href={`#${id(r.name)}`}>{r.name} <strong>{r.values.length}</strong></a></li>)}
+      </ul>
+    </nav>
     {ramps.map((r) => (
       <section>
-        <h2>{r.name} <span class="count">{r.values.length}</span></h2>
-        <p class="why">{r.blurb} Lightest to darkest.</p>
+        <h2 id={id(r.name)}>{r.name} <span class="count">{r.values.length}</span></h2>
+        <p>{r.blurb} Lightest to darkest.</p>
         <div class="ramp">
           {r.values.map((v) => (
             <div class="step">
@@ -163,28 +181,25 @@ const ramps = order
         </div>
       </section>
     ))}
+    <h2 id="read-next">Read next</h2>
+    <ul>
+      <li><a href="?path=/story/foundations-colour--semantic">Semantic colour</a>: the roles these colours fill, with their contrast.</li>
+      <li><a href="?path=/story/foundations-tokens--reference">Tokens</a>: every colour token in one list, with the light and dark values.</li>
+    </ul>
   </div>
 )}
 
 <style>
-  .col { display: grid; gap: 32px; color: var(--color-text-default); }
-  .title { margin: 0 0 -24px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
-  .intro { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
-  .why { margin: 0 0 8px; max-width: var(--size-measure); color: var(--color-text-secondary); font-size: var(--font-size-small); }
   .cr { display: grid; gap: 6px; }
   .cr__row { display: flex; align-items: center; gap: 8px; }
-  .cr__t { width: 38px; color: var(--color-text-muted); font-size: var(--font-size-micro); }
-  .cr__n { font-family: var(--font-family-mono); min-width: 2.2em; }
+  .cr__t { width: 40px; color: var(--color-text-muted); font-size: var(--font-size-label); }
+  .cr__n { font-family: var(--font-family-mono); min-width: 2.2em; color: var(--color-text-default); }
   /* Pass levels as coloured chips: green for AAA and AA, amber for large text only, red for a fail. Fixed light chips with dark text, so they read the same on the light and the dark theme. */
   .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: var(--font-size-micro); font-weight: 600; line-height: 1.6; letter-spacing: 0.02em; white-space: nowrap; }
   .badge--aaa { background: #b6ebc6; color: #0a4a20; }
   .badge--aa { background: #d9f2e0; color: #145a2c; }
   .badge--large { background: #fde7b8; color: #6a4200; }
   .badge--low { background: #f9cdcc; color: #7a1312; }
-  .legend { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; max-width: var(--size-measure); font-size: var(--font-size-small); color: var(--color-text-secondary); }
-  .legend b { color: var(--color-text-default); font-weight: 600; }
-  h2 { margin: 0 0 8px; font-size: var(--font-size-lede); font-weight: 600; }
-  .tok { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--font-size-small); }
   /* Fixed columns, so the Surfaces, Text, Lines and Accent tables line up with each other. */
   .tok th:nth-child(1) { width: 27%; }
   .tok th:nth-child(2), .tok th:nth-child(3) { width: 14%; }
@@ -192,13 +207,12 @@ const ramps = order
   .tok th:nth-child(5) { width: 25%; }
   .tok--state th:nth-child(1) { width: 27%; }
   .tok--state th:nth-child(2) { width: 73%; }
-  .tok th { text-align: left; font-weight: 500; color: var(--color-text-muted); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--color-border-default); }
-  .tok td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--color-border-default); vertical-align: middle; }
-  .tok code, .hex { font-family: var(--font-family-mono); font-size: var(--font-size-small); }
-  .hex { white-space: nowrap; }
-  .sw { display: inline-block; width: 28px; height: 28px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--color-border-strong, var(--color-border-default)); vertical-align: middle; margin-right: 10px; }
+  .tok code, .hex { font-family: var(--font-family-mono); font-size: 0.9em; }
+  .hex { white-space: nowrap; color: var(--color-text-default); }
+  /* The ring is a hairline that shows on a white swatch and on a near-black one, not the strong (ink) border. */
+  .sw { display: inline-block; width: 28px; height: 28px; border-radius: 6px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-text-default) 22%, transparent); vertical-align: middle; margin-right: 10px; }
   .count { color: var(--color-text-muted); font-weight: 400; font-size: var(--font-size-small); margin-left: 6px; }
-  .ramp { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 8px; margin-top: 12px; }
-  .step { display: grid; gap: 6px; }
-  .chip { display: block; height: 64px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--color-border-default); }
+  .ramp { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 8px; margin-top: 16px; }
+  .step { display: grid; gap: 8px; }
+  .chip { display: block; height: 64px; border-radius: 8px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-text-default) 22%, transparent); }
 </style>

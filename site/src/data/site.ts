@@ -203,7 +203,7 @@ export const explorations: { title: string; kind: string; year: string; embed?: 
   },
   {
     // The portfolio's own design system, published as Storybook (owner, 2026-11-16: add it to Experiments with a link).
-    // Name from docs/storybook/storybook.md. Year 2026 = the repo was published and renamed 2026-11-15; TODO(owner): confirm.
+    // Name from ../../Storybook Portfolio/rules/storybook.md. Year 2026 = the repo was published and renamed 2026-11-15; TODO(owner): confirm.
     title: "MD website Design System",
     kind: "Storybook",
     year: "2026",

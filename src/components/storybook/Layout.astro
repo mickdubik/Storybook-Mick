@@ -4,20 +4,25 @@ import { declared } from "./tokens";
 const spacing = ["layout-padding-x", "space-gutter", "space-column-gap", "space-section", "space-block", "space-group", "space-tile"]
   .map((n) => declared("").find((t) => t.name === n))
   .filter((t): t is NonNullable<typeof t> => !!t);
+const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 ---
 
-<div class="lay">
-  <h1 class="title">Layout</h1>
-  <p class="lead">
-    Every page sits in one wrapper and, where it has a section label, one 12-column sheet. Below 960px everything stacks. Every page must work at phone width with no horizontal scroll.
-  </p>
+<div class="ds-page">
+  <h1>Layout</h1>
+  <p>Every page sits in one wrapper and, where it has a section label, one 12-column sheet. Below 960px everything stacks. Every page must work at phone width with no horizontal scroll.</p>
+  <nav aria-label="On this page">
+    <ul class="ds-chips">
+      {[{ t: "The wrapper" }, { t: "The sheet" }, { t: "Lists" }, { t: "Spacing tokens", n: spacing.length }].map((c) => <li><a href={`#${id(c.t)}`}>{c.t}{c.n !== undefined && <> <strong>{c.n}</strong></>}</a></li>)}
+    </ul>
+  </nav>
 
-  <h2>The wrapper: <code>.wrap</code></h2>
+  <h2 id="the-wrapper">The wrapper: <code>.wrap</code></h2>
   <p>
     No maximum width. Its side padding is the page margin <code>--layout-padding-x</code>: 72px at 1440, scaling to 96px at 1920, and centred beyond 1920. It is the same on every page, header and footer included.
   </p>
 
-  <h2>The sheet: <code>.sheet</code></h2>
+  <h2 id="the-sheet">The sheet: <code>.sheet</code></h2>
   <p>
     Twelve columns from 960px. The <b>rail</b> (columns 1 to 3) holds the sticky section label or a case table of contents. The <b>body</b> (columns 4 to 12) holds the content. Below 960px the rail and body stack.
   </p>
@@ -32,35 +37,33 @@ const spacing = ["layout-padding-x", "space-gutter", "space-column-gap", "space-
     </div>
   </div>
 
-  <h2>Lists</h2>
+  <h2 id="lists">Lists</h2>
   <p>Lists are ruled tables, not cards. Sections divide by hairlines, and inset surfaces step one tone off the page (<code>--color-background-subtle</code>).</p>
 
-  <h2>Spacing tokens</h2>
-  <p>The values below are read from <code>global.css</code>. See Space and shape for each one drawn to scale.</p>
+  <h2 id="spacing-tokens">Spacing tokens</h2>
+  <p>The values below are read from <code>global.css</code>. See <a href="?path=/story/foundations-space-and-shape--space-and-shape">Space and shape</a> for each one drawn to scale.</p>
   <table>
     <thead><tr><th>Token</th><th>Value</th></tr></thead>
     <tbody>
       {spacing.map((t) => <tr><td><code>--{t.name}</code></td><td><code>{t.value}</code></td></tr>)}
     </tbody>
   </table>
+
+  <h2 id="read-next">Read next</h2>
+  <ul>
+    <li><a href="?path=/story/foundations-motion--durations">Motion</a>: the duration and easing tokens, and how reduced motion is handled.</li>
+    <li><a href="?path=/story/foundations-space-and-shape--space-and-shape">Space and shape</a>: each spacing token drawn to scale.</li>
+  </ul>
 </div>
 
 <style>
-  .title { margin: 0 0 12px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; color: var(--color-text-default); }
-  .lay { color: var(--color-text-default); max-width: 900px; }
-  .lead { font-size: var(--font-size-body); line-height: 1.5; color: var(--color-text-secondary); max-width: var(--size-measure); margin: 0 0 8px; }
-  h2 { font-family: var(--font-family-sans); font-weight: 600; font-size: var(--font-size-lede); margin: 40px 0 4px; }
-  p { font-size: var(--font-size-small); line-height: 1.55; color: var(--color-text-secondary); margin: 0; max-width: var(--size-measure); }
-  .lead { font-size: var(--font-size-body); }
-  code { font-family: var(--font-family-mono); font-size: 0.85em; }
-  .demo { margin-top: 20px; padding-inline: 0; position: relative; }
+  .demo { margin: 24px 0 0; padding-inline: 0; position: relative; }
   .cols { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--space-column-gap); pointer-events: none; }
   .cols span { background: color-mix(in srgb, var(--color-accent) 6%, transparent); font-family: var(--font-family-mono); font-size: var(--font-size-micro); color: var(--color-text-muted); text-align: center; padding-top: 4px; }
   .sheet { position: relative; padding-top: 28px; min-height: 120px; }
   .rail, .body { background: var(--color-background-subtle); box-shadow: inset 0 0 0 1px var(--color-border-default); padding: 12px; display: grid; gap: 2px; align-content: start; min-height: 72px; }
-  .rail i, .body i { font-style: normal; font-weight: 600; }
+  .rail i, .body i { font-style: normal; font-weight: 600; color: var(--color-text-default); }
   small { color: var(--color-text-muted); font-family: var(--font-family-mono); font-size: var(--font-size-micro); }
-  table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: var(--font-size-small); }
-  th { text-align: left; color: var(--color-text-muted); font-weight: 500; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--color-border-default); }
-  td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--color-border-default); }
+  table { margin-top: 16px; }
+  th:nth-child(1) { width: 40%; }
 </style>

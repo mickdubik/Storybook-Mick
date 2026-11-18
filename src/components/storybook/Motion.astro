@@ -4,15 +4,23 @@ const all = declared("");
 const get = (n: string) => all.find((t) => t.name === n);
 const durations = ["duration-default", "btn-duration"].map(get).filter((t): t is NonNullable<typeof t> => !!t);
 const easings = ["easing-out", "btn-easing"].map(get).filter((t): t is NonNullable<typeof t> => !!t);
+const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 ---
 
-<div class="motion" data-motion>
-  <h1 class="title">Motion</h1>
-  <p class="intro">Two timings and two curves, one pair for the page and one for the button. Everything that moves animates transform and opacity only, never width, height, padding or margin.</p>
+<div class="ds-page" data-motion>
+  <h1>Motion</h1>
+  <p>Two timings and two curves, one pair for the page and one for the button. Everything that moves animates transform and opacity only, never width, height, padding or margin.</p>
+
+  <nav aria-label="On this page">
+    <ul class="ds-chips">
+      {[{ t: "Try it", n: durations.length }, { t: "Easing", n: easings.length }, { t: "Reduced motion" }].map((c) => <li><a href={`#${id(c.t)}`}>{c.t}{c.n !== undefined && <> <strong>{c.n}</strong></>}</a></li>)}
+    </ul>
+  </nav>
 
   <section>
-    <h2>Try it</h2>
-    <p class="why">Press the button to play every track. The dot travels at the token's own duration.</p>
+    <h2 id="try-it">Try it</h2>
+    <p>Press the button to play every track. The dot travels at the token's own duration.</p>
     <button type="button" class="play" data-play>Move</button>
     {durations.map((t) => (
       <div class="row">
@@ -23,8 +31,8 @@ const easings = ["easing-out", "btn-easing"].map(get).filter((t): t is NonNullab
   </section>
 
   <section>
-    <h2>Easing</h2>
-    <p class="why">Both curves start quickly and settle, which reads as responsive rather than floaty. The tracks run slowed to 1.2 s so the curve is visible.</p>
+    <h2 id="easing">Easing</h2>
+    <p>Both curves start quickly and settle, which reads as responsive rather than floaty. The tracks run slowed to 1.2 s so the curve is visible.</p>
     {easings.map((t) => (
       <div class="row">
         <div class="meta"><code>--{t.name}</code><span>{t.value}</span></div>
@@ -34,9 +42,15 @@ const easings = ["easing-out", "btn-easing"].map(get).filter((t): t is NonNullab
   </section>
 
   <section>
-    <h2>Reduced motion</h2>
-    <p class="why">Everything that moves sits inside <code>prefers-reduced-motion: no-preference</code>. With reduced motion on, the same end state shows at once, or a defined still. Motion is a preference, not a decoration. Set it in your system accessibility settings and replay the demos to see it.</p>
+    <h2 id="reduced-motion">Reduced motion</h2>
+    <p>Everything that moves sits inside <code>prefers-reduced-motion: no-preference</code>. With reduced motion on, the same end state shows at once, or a defined still. Motion is a preference, not a decoration. Set it in your system accessibility settings and replay the demos to see it.</p>
   </section>
+
+  <h2 id="read-next">Read next</h2>
+  <ul>
+    <li><a href="?path=/docs/components-button-variants--docs">Button</a>: the button's own duration and easing in use.</li>
+    <li><a href="?path=/story/demos-smarttraffic--framed">Demos</a>: the animated case covers, made from the same tokens.</li>
+  </ul>
 </div>
 
 <script>
@@ -49,17 +63,12 @@ const easings = ["easing-out", "btn-easing"].map(get).filter((t): t is NonNullab
 </script>
 
 <style>
-  .motion { color: var(--color-text-default); display: grid; gap: 40px; }
-  .title { margin: 0 0 -24px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
-  .intro { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
-  h2 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
-  .why { margin: 0 0 12px; max-width: var(--size-measure); color: var(--color-text-secondary); font-size: var(--font-size-small); }
-  .play { font: inherit; font-weight: 600; font-size: var(--font-size-small); padding: 10px 18px; border-radius: 999px; border: 0; background: var(--color-text-default); color: var(--color-background-default); cursor: pointer; margin-bottom: 8px; }
+  .play { font: inherit; font-weight: 600; font-size: var(--font-size-small); padding: 10px 20px; border-radius: 999px; border: 0; background: var(--color-text-default); color: var(--color-background-default); cursor: pointer; margin: 0 0 8px; }
   .play:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
-  .row { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--color-border-default); }
-  .meta { display: grid; gap: 2px; }
-  code { font-family: var(--font-family-mono); font-size: var(--font-size-small); }
-  .meta span { color: var(--color-text-muted); font-size: var(--font-size-micro); word-break: break-word; }
+  .row { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--color-border-default); }
+  .meta { display: grid; gap: 4px; }
+  .meta code { font-family: var(--font-family-mono); font-size: var(--font-size-small); color: var(--color-text-default); }
+  .meta span { color: var(--color-text-muted); font-size: var(--font-size-label); word-break: break-word; }
   .track { height: 24px; background: var(--color-background-subtle); box-shadow: inset 0 0 0 1px var(--color-border-default); border-radius: 12px; padding: 4px; }
   .track i { display: block; width: 16px; height: 16px; border-radius: 50%; background: var(--color-text-default); transform: translateX(0); transition-property: transform; transition-timing-function: var(--easing-out); }
   [data-on] .track i { transform: translateX(calc(min(100vw, 900px) - 480px)); }

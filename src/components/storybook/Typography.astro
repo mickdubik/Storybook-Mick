@@ -13,15 +13,23 @@ const scale = declared("font-size-").sort((a, b) => {
 });
 const weights = [400, 500, 600, 700];
 
+const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 ---
 
-<div class="type">
-  <h1 class="title">Typography</h1>
-  <p class="intro">One family and one step per job, so neighbouring levels never look alike. Sizes are fluid where the layout needs them to be and fixed where it does not. Use a step, never a raw size.</p>
+<div class="ds-page">
+  <h1>Typography</h1>
+  <p>One family and one step per job, so neighbouring levels never look alike. Sizes are fluid where the layout needs them to be and fixed where it does not. Use a step, never a raw size.</p>
+
+  <nav aria-label="On this page">
+    <ul class="ds-chips">
+      {[{ t: "Size", n: scale.length }, { t: "Weight", n: weights.length }, { t: "Line height and measure" }, { t: "Families", n: 2 }].map((c) => <li><a href={`#${id(c.t)}`}>{c.t}{c.n !== undefined && <> <strong>{c.n}</strong></>}</a></li>)}
+    </ul>
+  </nav>
 
   <section>
-    <h2>Size</h2>
-    <p class="why">Each token has its own job. If two things need the same size, they probably do the same job.</p>
+    <h2 id="size">Size</h2>
+    <p>Each token has its own job. If two things need the same size, they probably do the same job.</p>
     {scale.map((t) => (
       <div class="row">
         <div class="meta"><code>--{t.name}</code><span>{t.value}</span></div>
@@ -32,8 +40,8 @@ const weights = [400, 500, 600, 700];
   </section>
 
   <section>
-    <h2>Weight</h2>
-    <p class="why">Four weights, set on the element. There are no weight tokens yet.</p>
+    <h2 id="weight">Weight</h2>
+    <p>Four weights, set on the element. There are no weight tokens yet.</p>
     {weights.map((w) => (
       <div class="row">
         <div class="meta"><code>{w}</code></div>
@@ -43,14 +51,14 @@ const weights = [400, 500, 600, 700];
   </section>
 
   <section>
-    <h2>Line height and measure</h2>
-    <p class="why">Body text runs at 1.55 to 1.6 and stops at <code>--size-measure</code>, about 66 characters, so a line is easy to follow back to its start.</p>
+    <h2 id="line-height-and-measure">Line height and measure</h2>
+    <p>Body text runs at 1.55 to 1.6 and stops at <code>--size-measure</code> (32em), so a line is easy to follow back to its start.</p>
     <p class="read">A figure leads each case, and the process follows it. The reader sees the outcome first, then how the work got there, in lines short enough to read without losing the place.</p>
   </section>
 
   <section>
-    <h2>Families</h2>
-    <p class="why">Geist for everything. Geist Mono only for small labels, index numbers and tags.</p>
+    <h2 id="families">Families</h2>
+    <p>Geist for everything. Geist Mono only for small labels, index numbers and tags.</p>
     <div class="row">
       <div class="meta"><code>--font-family-sans</code><span>Geist Variable</span></div>
       <div class="sample plain" style="font-family:var(--font-family-sans);font-size:var(--font-size-h3);font-weight:600">The quick brown fox</div>
@@ -60,21 +68,22 @@ const weights = [400, 500, 600, 700];
       <div class="sample plain" style="font-family:var(--font-family-mono);font-size:var(--font-size-small);text-transform:uppercase;letter-spacing:0.06em">Meta label</div>
     </div>
   </section>
+
+  <h2 id="read-next">Read next</h2>
+  <ul>
+    <li><a href="?path=/story/foundations-space-and-shape--space-and-shape">Space and shape</a>: gutters, section and block spacing, frame padding and radii.</li>
+    <li><a href="?path=/story/foundations-tokens--reference">Tokens</a>: every token in one list, with the rest of the system.</li>
+  </ul>
 </div>
 
 <style>
-  .type { color: var(--color-text-default); display: grid; gap: 40px; }
-  .title { margin: 0 0 -24px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
-  .intro { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
-  h2 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
-  .why { margin: 0 0 8px; max-width: var(--size-measure); color: var(--color-text-secondary); font-size: var(--font-size-small); }
-  .row { display: grid; grid-template-columns: 220px 1fr; gap: 8px 24px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--color-border-default); }
-  .meta { display: grid; gap: 2px; }
-  code { font-family: var(--font-family-mono); font-size: var(--font-size-small); }
-  .meta span { color: var(--color-text-muted); font-size: var(--font-size-micro); word-break: break-word; }
-  .sample { font-family: var(--font-family-sans); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; overflow-wrap: anywhere; }
+  .row { display: grid; grid-template-columns: 220px 1fr; gap: 8px 24px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--color-border-default); }
+  .meta { display: grid; gap: 4px; }
+  .meta code { font-family: var(--font-family-mono); font-size: var(--font-size-small); color: var(--color-text-default); }
+  .meta span { color: var(--color-text-muted); font-size: var(--font-size-label); word-break: break-word; }
+  .sample { font-family: var(--font-family-sans); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; overflow-wrap: anywhere; color: var(--color-text-default); }
   .sample.plain { letter-spacing: 0; line-height: 1.3; }
   .note { grid-column: 2; margin: 0; color: var(--color-text-muted); font-size: var(--font-size-small); }
-  .read { margin: 8px 0 0; max-width: var(--size-measure); font-size: var(--font-size-body); line-height: 1.58; }
+  .read { margin: 16px 0 0; }
   @media (max-width: 640px) { .row { grid-template-columns: 1fr; } .note { grid-column: 1; } }
 </style>

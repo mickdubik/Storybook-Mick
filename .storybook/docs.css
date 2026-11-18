@@ -1,15 +1,105 @@
-/* Navigation links on every docs page: one style (rules/storybook.md). Card links (.ds-card) style themselves. */
-.sbdocs a[href^="?path"]:not(.ds-card),
-.sbdocs a[href="#run-it"]:not(.ds-card) {
-  color: #1848cc;
+/* =========================================================================
+   Page shell: one look for every docs page (Getting started, Foundations, Guides, component docs).
+   Rules: rules/storybook.md ("One page shell"). Everything reads the site's tokens, so the Theme switch
+   in the toolbar restyles the page, and no colour or size is typed twice.
+   ========================================================================= */
+.sbdocs, .ds-page {
+  --ds-title: 2.25rem;           /* 36px: the page title */
+  --ds-gap: 8px;                 /* the base step; every space below is a multiple of it */
+  --ds-section: 64px;            /* above each h2: more than the gap below it, so a title belongs to what follows */
+  --ds-ring: color-mix(in srgb, var(--color-text-default) 22%, transparent); /* a hairline that shows on both themes, for swatches and chips */
+}
+.sbdocs.sbdocs-wrapper { background: var(--color-background-default) !important; }
+.sbdocs.sbdocs-content { max-width: 1000px; }
+/* A Foundations page is a story, so it has no docs wrapper: this root class gives it the same width and the same room (64px above the title, 24px at the sides) as a docs page. */
+.ds-page { max-width: 1048px; margin: 0 auto; padding: 64px 24px 96px; color: var(--color-text-default); }
+:is(.sbdocs.sbdocs-content, .ds-page), :is(.sbdocs.sbdocs-content, .ds-page) :is(h1, h2, h3, h4, p, li, td, th, a, strong, em, blockquote, label, summary) {
+  font-family: var(--font-family-sans);
+  color: var(--color-text-default);
+}
+
+/* Title and intro */
+:is(.sbdocs.sbdocs-content, .ds-page) h1 { margin: 0 0 16px; font-size: var(--ds-title); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
+:is(.sbdocs.sbdocs-content, .ds-page) h1 + p { margin: 0 0 32px; max-width: var(--size-measure); font-size: var(--font-size-lede); line-height: 1.5; color: var(--color-text-secondary); }
+
+/* Sections: h2 opens one, h3 splits it. The space above is larger than the space below, so a title belongs to what follows it. */
+:is(.sbdocs.sbdocs-content, .ds-page) h2 { margin: var(--ds-section) 0 16px; padding: 0; border: 0; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+:is(.sbdocs.sbdocs-content, .ds-page) h3 { margin: 40px 0 8px; font-size: var(--font-size-lede); font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
+
+/* Running text: the site's measure, body size, secondary ink */
+:is(.sbdocs.sbdocs-content, .ds-page) p, :is(.sbdocs.sbdocs-content, .ds-page) li { font-size: var(--font-size-body); line-height: 1.55; color: var(--color-text-secondary); }
+:is(.sbdocs.sbdocs-content, .ds-page) p { margin: 0 0 16px; max-width: var(--size-measure); }
+:is(.sbdocs.sbdocs-content, .ds-page) :is(h2, h3) + p { margin-top: 0; }
+:is(.sbdocs.sbdocs-content, .ds-page) ul, :is(.sbdocs.sbdocs-content, .ds-page) ol { margin: 0 0 24px; padding-left: 1.25em; max-width: var(--size-measure); }
+:is(.sbdocs.sbdocs-content, .ds-page) ul { list-style: disc; }
+:is(.sbdocs.sbdocs-content, .ds-page) ol { list-style: decimal; }
+:is(.sbdocs.sbdocs-content, .ds-page) li { margin: 0 0 8px; padding-left: 4px; }
+:is(.sbdocs.sbdocs-content, .ds-page) li::marker { color: var(--color-text-muted); }
+:is(.sbdocs.sbdocs-content, .ds-page) strong { font-weight: 600; color: var(--color-text-default); }
+
+/* Inline code and code blocks */
+:is(.sbdocs.sbdocs-content, .ds-page) :not(pre) > code { font-family: var(--font-family-mono); font-size: 0.85em; color: var(--color-text-default); background: var(--color-background-subtle); border: 1px solid var(--color-border-default); border-radius: 4px; padding: 1px 5px; white-space: normal; }
+:is(.sbdocs.sbdocs-content, .ds-page) pre { margin: 0 0 24px; background: var(--color-background-subtle) !important; border: 1px solid var(--color-border-default); border-radius: 12px; }
+:is(.sbdocs.sbdocs-content, .ds-page) pre code { font-family: var(--font-family-mono); font-size: var(--font-size-small); color: var(--color-text-default); }
+
+/* Code inside a heading is just mono, with no box: a boxed token next to a 22px title looks like a button. */
+:is(.sbdocs.sbdocs-content, .ds-page) :is(h1, h2, h3) code { font-size: 0.9em; background: none; border: 0; padding: 0; }
+
+/* Links: accent, semibold, underlined (colour alone does not tell a link from text). Card links style themselves. */
+:is(.sbdocs.sbdocs-content, .ds-page) a[href^="?path"]:not(.ds-card),
+:is(.sbdocs.sbdocs-content, .ds-page) a[href^="#"]:not(.ds-card) {
+  color: var(--color-accent);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
 }
-.sbdocs a[href^="?path"]:not(.ds-card):hover,
-.sbdocs a[href="#run-it"]:not(.ds-card):hover { text-decoration-thickness: 2px; }
-.sbdocs a.ds-card:hover { border-color: #1848cc !important; }
+:is(.sbdocs.sbdocs-content, .ds-page) a[href^="?path"]:not(.ds-card):hover,
+:is(.sbdocs.sbdocs-content, .ds-page) a[href^="#"]:not(.ds-card):hover { text-decoration-thickness: 2px; }
+:is(.sbdocs.sbdocs-content, .ds-page) a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: 2px; }
+
+/* Tables: ruled, never boxed. Any docs table (JSX or Astro) gets this; a page sets only its column widths. */
+:is(.sbdocs.sbdocs-content, .ds-page) table:not(.docblock-argstable) { width: 100%; margin: 0 0 8px; border-collapse: collapse; table-layout: fixed; font-size: var(--font-size-small); border: 0; }
+:is(.sbdocs.sbdocs-content, .ds-page) table:not(.docblock-argstable) :is(thead, tbody) { background: none; border: 0; }
+:is(.sbdocs.sbdocs-content, .ds-page) table:not(.docblock-argstable) :is(thead, tbody) tr:nth-of-type(n) { background: none; border: 0; }
+:is(.sbdocs.sbdocs-content, .ds-page) table:not(.docblock-argstable) th { padding: 8px 16px 8px 0; text-align: left; font-size: var(--font-size-label); font-weight: 500; color: var(--color-text-muted); border: 0; border-bottom: 1px solid var(--color-border-default); background: none; }
+:is(.sbdocs.sbdocs-content, .ds-page) table:not(.docblock-argstable) td { padding: 12px 16px 12px 0; vertical-align: middle; font-size: var(--font-size-small); line-height: 1.45; color: var(--color-text-secondary); border: 0; border-bottom: 1px solid var(--color-border-default); background: none; overflow-wrap: anywhere; }
+:is(.sbdocs.sbdocs-content, .ds-page) table:not(.docblock-argstable) td:first-child { color: var(--color-text-default); }
+:is(.sbdocs.sbdocs-content, .ds-page) :is(table, .meta) code { font-size: 0.9em; background: none; border: 0; padding: 0; }
+
+/* Storybook's own Controls table keeps its look; only the family follows the site. */
+:is(.sbdocs.sbdocs-content, .ds-page) .docblock-argstable :is(th, td, label, span, p, button) { font-family: var(--font-family-sans); }
+
+/* Count chips under the intro (Getting started, Tokens) */
+:is(.sbdocs.sbdocs-content, .ds-page) ul.ds-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; padding: 0; max-width: none; list-style: none; }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-chips li { display: inline-flex; align-items: baseline; gap: 6px; margin: 0; padding: 6px 14px; border: 1px solid var(--color-border-default); border-radius: 999px; font-size: var(--font-size-small); line-height: 1.4; color: var(--color-text-secondary); }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-chips strong { font-weight: 600; color: var(--color-text-default); }
+
+/* The chip row doubles as "On this page" when its chips are links: whole chip is the target, no underline, the border takes the accent on hover. */
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-chips li:has(> a) { padding: 0; }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-chips li:has(> a:hover) { border-color: var(--color-accent); }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-chips a[href^="#"]:not(.ds-card) { display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 14px; border-radius: 999px; font-weight: 400; text-decoration: none; color: var(--color-text-secondary); }
+
+/* Cards (Start here, The three tiers) */
+.ds-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; margin: 0 0 24px; }
+:is(.sbdocs.sbdocs-content, .ds-page) a.ds-card { display: flex; flex-direction: column; gap: 8px; padding: 24px; border: 1px solid var(--color-border-default); border-radius: 12px; background: var(--color-background-subtle); color: var(--color-text-default); text-decoration: none; transition: border-color 160ms ease; }
+:is(.sbdocs.sbdocs-content, .ds-page) a.ds-card:hover { border-color: var(--color-accent); }
+.ds-card__n { margin: 0; font-family: var(--font-family-mono); font-size: var(--font-size-micro); letter-spacing: 0.06em; color: var(--color-text-muted); }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-card__t { margin: 0; max-width: none; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; color: var(--color-text-default); }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-card__d { flex: 1; margin: 0; max-width: none; font-size: var(--font-size-small); line-height: 1.5; color: var(--color-text-secondary); }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-card__ex { display: flex; flex-direction: column; gap: 2px; margin: 4px 0 0; max-width: none; font-family: var(--font-family-mono); font-size: var(--font-size-label); line-height: 1.5; color: var(--color-text-muted); }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-card__go { margin-top: 8px; font-size: var(--font-size-small); font-weight: 600; color: var(--color-accent); }
+
+/* Read next: the closing section of every page */
+:is(.sbdocs.sbdocs-content, .ds-page) h2#read-next + ul { margin-bottom: 0; }
+
+@media (max-width: 640px) {
+  .sbdocs, .ds-page { --ds-title: 1.875rem; --ds-section: 48px; }
+  /* A table with four or five columns cannot fit a phone: let it scroll sideways instead of squeezing its text. */
+  :is(.sbdocs.sbdocs-content, .ds-page) table:not(.docblock-argstable) { display: block; overflow-x: auto; table-layout: auto; }
+  :is(.sbdocs.sbdocs-content, .ds-page) table:not(.docblock-argstable) :is(th, td) { min-width: 128px; }
+  :is(.sbdocs.sbdocs-content, .ds-page) .ds-card__t { font-size: var(--font-size-lede); }
+}
 
 /* Docs canvases: small examples sit centred in their area, with room around them. Full-width examples (Shot, Plate, ButtonStates)
    are left alone: they size themselves from the width of the area, and centring would shrink them to nothing. */
@@ -31,3 +121,10 @@
 /* A case card is a list item. On the site it sits in the "cases" list; alone in the canvas it would show a bullet. */
 [id^="story--patterns-case-card--"] li.case,
 body[class*="sb-"] li.case { list-style: none; }
+
+/* Token tables (Tokens page): fixed columns so the three tier tables line up with each other. */
+:is(.sbdocs.sbdocs-content, .ds-page) table.ds-tokens { margin-bottom: 0; }
+:is(.sbdocs.sbdocs-content, .ds-page) table.ds-tokens th:nth-child(1) { width: 30%; }
+:is(.sbdocs.sbdocs-content, .ds-page) table.ds-tokens th:nth-child(2) { width: 18%; }
+.ds-sw { display: inline-block; width: 20px; height: 20px; margin-right: 8px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--ds-ring); vertical-align: middle; }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-same { color: var(--color-text-muted); }

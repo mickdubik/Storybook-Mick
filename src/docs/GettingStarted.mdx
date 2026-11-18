@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/addon-docs/blocks";
 import { stats } from "../components/storybook/stats";
+import { tiers } from "../components/storybook/tokenTiers";
 
 <Meta title="Getting started" />
 
@@ -7,20 +8,17 @@ import { stats } from "../components/storybook/stats";
 
 The design system behind Mick Dubik's portfolio, a static Astro site. It is set like an annual report, outcome first (the concept is called "The Outcome Ledger"). Everything here reads from the site's own source, so it cannot drift from the live pages.
 
-<div style={{ display: "flex", flexWrap: "wrap", gap: "8px", margin: "20px 0 40px" }}>
+<ul className="ds-chips">
   {stats.map((s) => (
-    <p key={s.label} style={{ margin: 0, display: "inline-flex", alignItems: "baseline", gap: "6px", border: "1px solid rgba(128,128,128,0.4)", borderRadius: "999px", padding: "6px 14px", fontSize: "0.9375rem" }}>
-      <strong style={{ fontWeight: 600 }}>{s.n}</strong>
-      <span style={{ opacity: 0.85 }}>{s.label.toLowerCase()}</span>
-    </p>
+    <li key={s.label}><strong>{s.n}</strong> {s.label.toLowerCase()}</li>
   ))}
-</div>
+</ul>
 
 ## Start here
 
 Read in this order. Each step builds on the one before.
 
-<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px", margin: "24px 0 48px" }}>
+<div className="ds-cards">
   {[
     { n: "01", t: "Foundations", d: "Colour, type, space, motion and layout: the decisions everything else inherits. Flip the theme in the toolbar while you read.", l: "Colour", h: "?path=/story/foundations-colour--semantic" },
     { n: "02", t: "Components", d: "Each has a docs page with a story per variant and state. Change props in Controls, check the Accessibility panel.", l: "Button", h: "?path=/docs/components-button-variants--docs" },
@@ -29,11 +27,11 @@ Read in this order. Each step builds on the one before.
     { n: "05", t: "Demos", d: "The animated case covers, made from the same tokens and components. Where you see whether the system holds together.", l: "Smart Traffic", h: "?path=/story/demos-smarttraffic--framed" },
     { n: "06", t: "Build with it", d: "Colour from the semantic tokens, size and space from the global ones, and reuse a component before drawing a new one.", l: "Run it", h: "#run-it" },
   ].map((c) => (
-    <a key={c.n} className="ds-card" href={c.h} onClick={(e) => { if (c.h.startsWith("?")) { e.preventDefault(); window.__STORYBOOK_ADDONS_CHANNEL__?.emit("navigateUrl", c.h, { target: "_self" }); } }} style={{ display: "flex", flexDirection: "column", gap: "10px", border: "1px solid rgba(128,128,128,0.4)", borderRadius: "12px", padding: "24px", textDecoration: "none", color: "inherit" }}>
-      <p style={{ margin: 0, opacity: 0.7, fontSize: "0.875rem", fontFamily: "var(--font-family-mono)" }}>{c.n}</p>
-      <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.15 }}>{c.t}</p>
-      <p style={{ margin: 0, opacity: 0.85, fontSize: "1rem", lineHeight: 1.5, flex: 1 }}>{c.d}</p>
-      <span style={{ color: "#1848cc", fontWeight: 600, marginTop: "6px" }}>{c.l} →</span>
+    <a key={c.n} className="ds-card" href={c.h} onClick={(e) => { if (c.h.startsWith("?")) { e.preventDefault(); window.__STORYBOOK_ADDONS_CHANNEL__?.emit("navigateUrl", c.h, { target: "_self" }); } }}>
+      <p className="ds-card__n">{c.n}</p>
+      <p className="ds-card__t">{c.t}</p>
+      <p className="ds-card__d">{c.d}</p>
+      <span className="ds-card__go">{c.l} →</span>
     </a>
   ))}
 </div>
@@ -51,15 +49,27 @@ Read in this order. Each step builds on the one before.
 
 Tokens are written as CSS custom properties in `src/styles/global.css`. Edit them there, never the pages. Three tiers, from raw to specific:
 
-1. **Global.** Raw scales with no role: the fluid type steps (`--font-size-h1`, `--font-size-body`, `--font-size-label`), the spacing scale (`--space-gutter`, `--space-section`, `--space-block`, `--space-group`), the radius, the duration and easing (`--duration-default`, `--easing-out`) and the two font families. Components may use these directly.
-2. **Semantic.** Roles that say what a colour is for: `--color-background-default` and `--color-background-subtle` for surfaces, `--color-text-default`, `--color-text-secondary` and `--color-text-muted` for text, `--color-border-default` for hairlines, `--color-accent` for a result or an interactive state. Components use these and only these for colour. Theming means redefining this tier: light is the default, dark overrides the same names, so a component never knows which theme it is in.
-3. **Component.** Tokens that belong to one component. Where they take a colour they point back to the semantic tier (`--btn-background: var(--color-text-default)`): the button's `--btn-radius`, `--btn-inset`, `--btn-tile-size`, `--btn-background`, `--btn-text` and `--btn-glyph-color`, and the media frame's `--frame-padding` and `--frame-radius`. A variant sets these on one class instead of restyling the parts.
+<div className="ds-cards">
+  {[
+    { n: "01", t: "Global", d: "Raw scales with no role: type steps, spacing, radius, duration and easing, and the two font families. Components may use these directly.", e: ["--font-size-body", "--space-section", "--radius-default", "--easing-out"] },
+    { n: "02", t: "Semantic", d: "Roles that say what a colour is for. Components use these and only these for colour. Dark redefines the same names, so a component never knows which theme it is in.", e: ["--color-background-default", "--color-text-default", "--color-border-default", "--color-accent"] },
+    { n: "03", t: "Component", d: "Tokens that belong to one component. Where they take a colour they point back to the semantic tier, so a variant sets them on one class instead of restyling the parts.", e: ["--btn-radius", "--btn-background", "--frame-padding", "--frame-radius"] },
+  ].map((c, i) => (
+    <a key={c.n} className="ds-card" href="?path=/story/foundations-tokens--reference" onClick={(e) => { e.preventDefault(); window.__STORYBOOK_ADDONS_CHANNEL__?.emit("navigateUrl", "?path=/story/foundations-tokens--reference", { target: "_self" }); }}>
+      <p className="ds-card__n">{c.n}</p>
+      <p className="ds-card__t">{c.t}</p>
+      <p className="ds-card__d">{c.d}</p>
+      <p className="ds-card__ex">{c.e.map((x) => <span key={x}>{x}</span>)}</p>
+      <span className="ds-card__go">{tiers[i].rows.length} tokens →</span>
+    </a>
+  ))}
+</div>
 
 Why layers? `--color-background-default` tells you what a surface is for, so it survives a re-skin. `#ffffff` tells you only what it looks like.
 
 Two gaps, so the tiers are not oversold. Colour has no raw palette in the CSS: the semantic names point straight at hex values, so tier 1 holds scales but no colours. The Primitives page names the raw colours (`neutral-300`), but only in Storybook. And the tokens are CSS only, with no JSON source that maps to Figma variables.
 
-## Tokens
+## Foundations
 
 All tokens live in `src/styles/global.css`. Never hard-code a colour. Light and dark are both defined: the site follows the system preference unless the header toggle sets `data-theme`. Use the **Theme** switch in the Storybook toolbar to flip it here.
 
@@ -82,6 +92,7 @@ All tokens live in `src/styles/global.css`. Never hard-code a colour. Light and 
 - [**Results table**](?path=/docs/components-data-results-table--docs): The reported results of a case, label on the left and the figure on the right, with a soft row highlight on hover.
 - [**Comparison table**](?path=/docs/components-data-comparison-table--docs): Before and after figures, with two bars drawn to the same scale.
 - [**Availability**](?path=/docs/components-content-availability--docs): The line that says Mick is open to new projects ("Open to new projects in 2027"). The year ticks over like an odometer the first time it scrolls into view. The text comes from `availability` in `src/data/site.ts`.
+
 ## Patterns
 
 Blocks of the site built from the components above. Each one is the same file the site renders, so a change shows here and on the page.
@@ -116,14 +127,9 @@ npm run build-storybook  # static build into storybook-static/
 
 The site build, the only automated check on the pages, is `npm run build` in `Portfolio/Core/`.
 
-Every command and check is listed on the [Toolkit](?path=/docs/guides-toolkit--docs) page.
-
 Stories use the community Astro framework (`@storybook-astro/framework`), because Storybook has no official Astro support.
 
-## What's next
+## Read next
 
-- **Portrait and Blueprint** have no usage note yet, so their stories show what they render, not when to use them.
-- **Sync status** is not built yet. It needs a Figma library of these components first.
-- **Automated checks** stop at the contrast check and the build: no lint, type or accessibility check.
-
-[See everything in What's next](?path=/docs/guides-what-s-next--docs)
+- [Toolkit](?path=/docs/guides-toolkit--docs): every command and check, and how a change reaches the live Storybook.
+- [What's next](?path=/docs/guides-what-s-next--docs): what is not done yet, and what to know before relying on it.

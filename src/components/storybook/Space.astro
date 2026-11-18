@@ -10,7 +10,7 @@ const job: Record<string, string> = {
   "space-gutter": "Page gutter",
   "space-section": "Padding of a section",
   "space-block": "Between blocks inside a section or chapter",
-  "size-measure": "Reading line length, about 66 characters",
+  "size-measure": "Reading line length",
   "size-measure-prose": "Case-study paragraph width",
   "radius-default": "Small corners across the page",
   "btn-radius": "Outer corner of a button",
@@ -25,16 +25,24 @@ const groups = [
 ];
 const widths = pick(["size-measure", "size-measure-prose"]);
 const radii = pick(["radius-default", "btn-radius", "frame-radius"]);
+const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 ---
 
-<div class="space">
-  <h1 class="title">Space and shape</h1>
-  <p class="intro">Spacing steps are named for the job they do, not for a number. Pick the step that matches the gap you are making, so two designers never choose values one pixel apart.</p>
+<div class="ds-page">
+  <h1>Space and shape</h1>
+  <p>Spacing steps are named for the job they do, not for a number. Pick the step that matches the gap you are making, so two designers never choose values one pixel apart.</p>
+
+  <nav aria-label="On this page">
+    <ul class="ds-chips">
+      {[...groups.map((g) => ({ t: g.title, n: g.rows.length })), { t: "Line length", n: widths.length }, { t: "Radius", n: radii.length }, { t: "Elevation", n: 2 }].map((c) => <li><a href={`#${id(c.t)}`}>{c.t}{c.n !== undefined && <> <strong>{c.n}</strong></>}</a></li>)}
+    </ul>
+  </nav>
 
   {groups.map((g, i) => (
     <section>
-      <h2>{g.title}</h2>
-      <p class="why">{g.why}{i === 0 && <> The bar is as wide as the token. Fluid tokens use <code>clamp()</code>, so the bar shows the value at this window width.</>}</p>
+      <h2 id={id(g.title)}>{g.title}</h2>
+      <p>{g.why}{i === 0 && <> The bar is as wide as the token. Fluid tokens use <code>clamp()</code>, so the bar shows the value at this window width.</>}</p>
       <table class="tok">
         <thead><tr><th>Token</th><th>Value</th><th>Size</th><th>Use</th></tr></thead>
         <tbody>
@@ -52,8 +60,8 @@ const radii = pick(["radius-default", "btn-radius", "frame-radius"]);
   ))}
 
   <section>
-    <h2>Line length</h2>
-    <p class="why">The widest a line of text may run. This is a width, not a gap between things, and the bar stops at the edge of its column.</p>
+    <h2 id="line-length">Line length</h2>
+    <p>The widest a line of text may run. This is a width, not a gap between things, and the bar stops at the edge of its column.</p>
     <table class="tok">
       <thead><tr><th>Token</th><th>Value</th><th>Size</th><th>Use</th></tr></thead>
       <tbody>
@@ -70,8 +78,8 @@ const radii = pick(["radius-default", "btn-radius", "frame-radius"]);
   </section>
 
   <section>
-    <h2>Radius</h2>
-    <p class="why">Small corners on the page, rounder ones on the frames that hold media. An inner corner is the outer radius minus the gap between them.</p>
+    <h2 id="radius">Radius</h2>
+    <p>Small corners on the page, rounder ones on the frames that hold media. An inner corner is the outer radius minus the gap between them.</p>
     <table class="tok">
       <thead><tr><th>Token</th><th>Value</th><th>Shape</th><th>Use</th></tr></thead>
       <tbody>
@@ -88,8 +96,8 @@ const radii = pick(["radius-default", "btn-radius", "frame-radius"]);
   </section>
 
   <section>
-    <h2>Elevation</h2>
-    <p class="why">Two levels. Surfaces that rest on the page have no shadow: sections divide by hairlines, and an inset surface steps one tone off the page with <code>--color-background-subtle</code>. The one floating surface, the consent banner, has a soft shadow. This is the owner's single exception to "no card shadows", and shadows are not tokens yet: the banner writes its own.</p>
+    <h2 id="elevation">Elevation</h2>
+    <p>Two levels. Surfaces that rest on the page have no shadow: sections divide by hairlines, and an inset surface steps one tone off the page with <code>--color-background-subtle</code>. The one floating surface, the consent banner, has a soft shadow. This is the owner's single exception to "no card shadows", and shadows are not tokens yet: the banner writes its own.</p>
     <table class="tok">
       <thead><tr><th>Level</th><th>Value</th><th>Example</th><th>Use</th></tr></thead>
       <tbody>
@@ -108,22 +116,21 @@ const radii = pick(["radius-default", "btn-radius", "frame-radius"]);
       </tbody>
     </table>
   </section>
+
+  <h2 id="read-next">Read next</h2>
+  <ul>
+    <li><a href="?path=/story/foundations-layout--sheet">Layout</a>: the page wrapper and the 12-column sheet these steps are used in.</li>
+    <li><a href="?path=/story/foundations-tokens--reference">Tokens</a>: every token in one list, with the rest of the system.</li>
+  </ul>
 </div>
 
 <style>
-  .space { color: var(--color-text-default); display: grid; gap: 40px; }
-  .title { margin: 0 0 -24px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
-  .intro { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
-  h2 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
-  .why { margin: 0 0 8px; max-width: var(--size-measure); color: var(--color-text-secondary); font-size: var(--font-size-small); }
-  .tok { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--font-size-small); }
-  .tok th { text-align: left; font-weight: 500; color: var(--color-text-muted); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--color-border-default); }
-  .tok td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--color-border-default); vertical-align: middle; overflow-wrap: anywhere; }
   .tok th:nth-child(1) { width: 27%; }
   .tok th:nth-child(2) { width: 29%; }
   .tok th:nth-child(3) { width: 18%; }
   .tok th:nth-child(4) { width: 26%; }
-  code { font-family: var(--font-family-mono); font-size: var(--font-size-small); }
+  .tok td { padding-block: 16px; }
+  code { font-family: var(--font-family-mono); font-size: 0.9em; }
   .bar { height: 12px; max-width: 100%; background: var(--color-background-muted); box-shadow: inset 0 0 0 1px var(--color-border-default); }
   .shape { width: 64px; height: 40px; background: var(--color-background-subtle); box-shadow: inset 0 0 0 1px var(--color-border-default); }
   .demo { display: grid; place-items: center; width: 96px; height: 48px; border-radius: 12px; background: var(--color-background-default); border: 1px solid var(--color-border-default); font-family: var(--font-family-mono); font-size: var(--font-size-micro); color: var(--color-text-muted); }
