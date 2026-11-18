@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "../storybook/types";
-import CaseChapter from "./CaseChapter.astro";
+import CaseChapter from "@site/components/patterns/CaseChapter.astro";
 import { chapterWith } from "../storybook/data";
 
 // Chapters are picked by the kind of block they hold, so the story follows the data.

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Card from "./Card.astro";
+import Card from "@site/components/Card.astro";
 import { impactCardHtml, impactNote } from "./storybook/data";
 
 // The copy is the real AI-impact tiles from src/data/site.ts, as on the home page.

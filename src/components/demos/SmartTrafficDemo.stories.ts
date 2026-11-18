@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "../storybook/types";
-import Demo from "./SmartTrafficDemo.astro";
+import Demo from "@site/components/demos/SmartTrafficDemo.astro";
 
 const meta = { title: "Demos/SmartTraffic", component: Demo,
   argTypes: {

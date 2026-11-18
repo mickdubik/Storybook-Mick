@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "../storybook/types";
-import Demo from "./DoctorOnlineDemo.astro";
+import Demo from "@site/components/demos/DoctorOnlineDemo.astro";
 
 const meta = { title: "Demos/DoctorOnline", component: Demo,
   argTypes: {

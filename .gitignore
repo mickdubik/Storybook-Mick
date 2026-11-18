@@ -5,3 +5,7 @@ dist/
 .DS_Store
 .env
 .env.*
+# Working notes stay local (the repo is public): project instructions, rules, linked skills
+CLAUDE.md
+rules/
+.claude/skills/

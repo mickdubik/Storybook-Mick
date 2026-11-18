@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Logo from "./Logo.astro";
+import Logo from "@site/components/Logo.astro";
 
 // The lockup as the site header shows it: the owner's MD mark and the name, with the defaults the component carries.
 const meta = {

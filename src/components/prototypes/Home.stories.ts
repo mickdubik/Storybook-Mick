@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "../storybook/types";
-import Home from "./Home.astro";
+import Home from "@site/components/prototypes/Home.astro";
 
 const meta = {
   title: "Prototypes/Home page",

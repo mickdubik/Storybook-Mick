@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "../storybook/types";
-import SiteFooter from "./SiteFooter.astro";
+import SiteFooter from "@site/components/patterns/SiteFooter.astro";
 
 const meta = {
   title: "Patterns/Site footer",

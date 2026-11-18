@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import ButtonStates from "./ButtonStates.astro";
+import ButtonStates from "@site/components/ButtonStates.astro";
 import { buttonStates } from "./storybook/data";
 
 const meta = {

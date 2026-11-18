@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Shot from "./Shot.astro";
+import Shot from "@site/components/Shot.astro";
 import { image } from "./storybook/data";
 
 // A real case image, self-hosted through assets/work/manifest.json.

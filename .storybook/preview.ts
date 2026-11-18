@@ -1,7 +1,7 @@
 import type { Preview } from "@storybook-astro/framework";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
-import "../src/styles/global.css";
+import "@site/styles/global.css";
 import "./docs.css";
 
 // Same switch the site uses: data-theme="dark" on <html> (see src/layouts/Base.astro).

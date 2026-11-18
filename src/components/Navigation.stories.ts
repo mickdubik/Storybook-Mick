@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Navigation from "./Navigation.astro";
-import { navItems } from "../data/site";
+import Navigation from "@site/components/Navigation.astro";
+import { navItems } from "@site/data/site";
 
 // The links are the site header's own (src/data/site.ts), as the home page renders them: in-page anchors.
 const meta = {

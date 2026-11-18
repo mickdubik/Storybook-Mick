@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import ResultsTable from "./ResultsTable.astro";
+import ResultsTable from "@site/components/ResultsTable.astro";
 import { resultsItems } from "./storybook/data";
 
 // The rows are the first reported results found in src/data/work.ts.

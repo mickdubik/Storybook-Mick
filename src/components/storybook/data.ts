@@ -1,7 +1,7 @@
 // Real content for the stories, read from src/data so Storybook shows the site's own copy and figures.
-import { caseStudies } from "../../data/work";
-import { aiWorkflow, aiImpact } from "../../data/site";
-import type { Metric, Img, CaseStudy } from "../../data/work";
+import { caseStudies } from "@site/data/work";
+import { aiWorkflow, aiImpact } from "@site/data/site";
+import type { Metric, Img, CaseStudy } from "@site/data/work";
 
 const objects: any[] = [];
 const walk = (v: unknown) => {

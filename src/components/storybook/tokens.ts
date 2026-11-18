@@ -1,5 +1,5 @@
 // Reads the real tokens out of global.css so the Storybook pages cannot drift from the site.
-import css from "../../styles/global.css?raw";
+import css from "@site/styles/global.css?raw";
 
 const block = (re: RegExp) => css.match(re)?.[1] ?? "";
 const rootBlock = block(/:root\s*\{([\s\S]*?)\n\}/);

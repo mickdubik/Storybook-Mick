@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "../storybook/types";
-import ImpactBand from "./ImpactBand.astro";
+import ImpactBand from "@site/components/patterns/ImpactBand.astro";
 import { study } from "../storybook/data";
 
 const meta = {

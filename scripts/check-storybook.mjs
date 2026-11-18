@@ -1,14 +1,16 @@
-// One command for the Storybook organisation checks. Rules: skills/storybook.
+// One command for the Storybook organisation checks. Rules: rules/storybook.md.
 // Usage:  npm run check:storybook            (static checks, then build, then link check)
 //         npm run check:storybook -- --fast  (static checks only, no build)
 // Exit code 1 on any ERROR. WARN does not fail.
 import { readFileSync, readdirSync, existsSync, statSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
+import { siteSrc } from "../site.config.mjs";
 
 const root = process.cwd();
 const cfg = existsSync(join(root, "storybook.config.json")) ? JSON.parse(readFileSync(join(root, "storybook.config.json"), "utf8")) : {};
-const componentsDir = join(root, cfg.storiesGlob ?? "src/components");
+const storiesDir = join(root, cfg.storiesGlob ?? "src/components");   // stories, mirroring the site's folders
+const siteComponents = join(siteSrc, "components");                  // the site's components they render
 const noStory = new Set(cfg.noStory ?? []);
 const fast = process.argv.includes("--fast");
 let errors = 0, warns = 0;
@@ -19,13 +21,14 @@ const walk = (d) => readdirSync(d).flatMap((n) => {
   const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : [p];
 });
 
-// 1. Every component has a story next to it.
-const files = walk(componentsDir);
+// 1. Every site component has a story at the same path here (site components/X.astro -> src/components/X.stories.ts).
+const files = walk(storiesDir);
 const rel = (p) => p.slice(root.length + 1);
-for (const f of files.filter((f) => f.endsWith(".astro") && !f.includes("/storybook/"))) {
+for (const f of walk(siteComponents).filter((f) => f.endsWith(".astro"))) {
   const name = f.split("/").pop().replace(".astro", "");
   if (noStory.has(name)) continue;
-  if (!existsSync(f.replace(/\.astro$/, ".stories.ts"))) warn(`no story for component ${rel(f)} (add one, or list "${name}" in noStory)`);
+  const story = join(storiesDir, relative(siteComponents, f)).replace(/\.astro$/, ".stories.ts");
+  if (!existsSync(story)) warn(`no story for site component components/${relative(siteComponents, f)} (add ${rel(story)}, or list "${name}" in noStory)`);
 }
 
 // 2. Titles follow the pattern, stories are tagged for docs, titles are unique.

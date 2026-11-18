@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "../storybook/types";
-import SiteHeader from "./SiteHeader.astro";
+import SiteHeader from "@site/components/patterns/SiteHeader.astro";
 
 const meta = {
   title: "Patterns/Site header",

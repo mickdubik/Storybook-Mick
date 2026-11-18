@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Glyph from "./Glyph.astro";
+import Glyph from "@site/components/Glyph.astro";
 import { metric, metricAny } from "./storybook/data";
 
 // Every metric below is a real one from src/data/work.ts.

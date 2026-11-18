@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Button from "./Button.astro";
-import { contact } from "../data/site";
+import Button from "@site/components/Button.astro";
+import { contact } from "@site/data/site";
 
 const meta = {
   title: "Components/Button/Variants",

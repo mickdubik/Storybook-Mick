@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Accordion from "./Accordion.astro";
+import Accordion from "@site/components/Accordion.astro";
 import { accordionItems } from "./storybook/data";
 
 // The rows are the first stages of the real AI workflow in src/data/site.ts.

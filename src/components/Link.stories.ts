@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Link from "./Link.astro";
-import { allWork } from "../data/site";
+import Link from "@site/components/Link.astro";
+import { allWork } from "@site/data/site";
 
 // The link text and address are the real "All work" link at the start of a case page's breadcrumb (src/data/site.ts).
 const meta = {

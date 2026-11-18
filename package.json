@@ -1,5 +1,5 @@
 {
-  "name": "mick-dubik-portfolio",
+  "name": "mick-dubik-storybook",
   "type": "module",
   "version": "0.1.0",
   "private": true,
@@ -7,17 +7,14 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:storybook": "node scripts/check-storybook.mjs",
-    "publish:storybook": "bash scripts/publish-storybook.sh",
+    "check:a11y": "node scripts/check-a11y.mjs",
     "check:types": "astro check",
-    "check:a11y": "node scripts/check-a11y.mjs"
+    "sync:site": "bash scripts/sync-site.sh",
+    "publish:storybook": "bash scripts/publish-storybook.sh"
   },
   "dependencies": {
     "@amplitude/unified": "^1.2.2",

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Plate from "./Plate.astro";
+import Plate from "@site/components/Plate.astro";
 import { plate } from "./storybook/data";
 
 // Titles, captions and notes are the real ones from the case studies in src/data/work.ts.

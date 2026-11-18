@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Tags from "./Tags.astro";
+import Tags from "@site/components/Tags.astro";
 import { study } from "./storybook/data";
 
 // Tags are the real ones from the case studies in src/data/work.ts.

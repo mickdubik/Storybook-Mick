@@ -1,11 +1,12 @@
 {
   "name": "Mick Dubik",
-  "tokens": "src/styles/global.css",
+  "site": "../Portfolio/Core",
+  "siteCopy": "site",
+  "tokens": "@site/styles/global.css",
   "storiesGlob": "src/components",
   "noStory": [
     "Analytics",
     "Replay",
     "ScrollChrome"
-  ],
-  "publishRepoDir": "../../Storybook Portfolio"
+  ]
 }

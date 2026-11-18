@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import ComparisonTable from "./ComparisonTable.astro";
+import ComparisonTable from "@site/components/ComparisonTable.astro";
 import { beforeAfterRows } from "./storybook/data";
 
 // The rows are the first before-and-after block found in src/data/work.ts.

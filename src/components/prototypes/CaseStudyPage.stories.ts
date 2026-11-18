@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "../storybook/types";
-import CaseStudyPage from "./CaseStudyPage.astro";
+import CaseStudyPage from "@site/components/prototypes/CaseStudyPage.astro";
 import { study } from "../storybook/data";
 
 const meta = {

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "./storybook/types";
-import Portrait from "./Portrait.astro";
+import Portrait from "@site/components/Portrait.astro";
 
 const meta = {
   title: "Components/Media/Portrait",
