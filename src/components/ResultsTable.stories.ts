@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "./storybook/types";
 import ResultsTable from "./ResultsTable.astro";
 import { resultsItems } from "./storybook/data";
 
@@ -6,6 +6,11 @@ import { resultsItems } from "./storybook/data";
 const meta = {
   title: "Components/Data/Results table",
   component: ResultsTable,
+  argTypes: {
+    items: { control: false, description: "The rows, from src/data/work.ts." },
+    caption: { control: "text", description: "Read by screen readers." },
+    heads: { control: "object", description: "The two column headings." },
+  },
   tags: ["autodocs"],
   parameters: {
     docs: {

@@ -1,6 +1,7 @@
 ---
 import Glyph from "../Glyph.astro";
 import Shot from "../Shot.astro";
+import Tags from "../Tags.astro";
 import SmartTrafficDemo from "../demos/SmartTrafficDemo.astro";
 import DocPortalDemo from "../demos/DocPortalDemo.astro";
 import DoctorOnlineDemo from "../demos/DoctorOnlineDemo.astro";
@@ -11,16 +12,14 @@ interface Props {
   study: CaseStudy;
 }
 const { study: c } = Astro.props;
-const said = (c: CaseStudy) =>
-  `${c.headline.qualifier ? c.headline.qualifier + " " : ""}${c.headline.value}${c.headline.unit} ${c.headline.label.toLowerCase()}`;
 ---
 
   <li class="case">
-    <a class="case__link" href={`/work/${c.slug}`} aria-label={`${c.company} ${c.product} case study: ${said(c)}. ${c.title}`}>
+    <a class="case__link" href={`/work/${c.slug}`}>
       <span class="case__index mono">{c.index}</span>
       <div class="case__text">
         <p class="case__co mono">{c.company} · {c.product}</p>
-        {/* The hook leads: a few words that make the reader open the case. The long headline, the summary and the role live on the case page; the aria-label keeps the full title for screen readers. */}
+        {/* The hook leads: a few words that make the reader open the case. The long headline, the summary and the role live on the case page; the link's name is its own visible text (WCAG 2.5.3), so there is no aria-label. */}
         <h3 id={`case-${c.slug}`} class="case__title">{c.hook}</h3>
         <p class="case__dek">{c.dek}</p>
         {/* The result, smaller than the hook: number and its explanation on one line, the drawing right under it. */}
@@ -32,9 +31,7 @@ const said = (c: CaseStudy) =>
           </p>
           <Glyph metric={c.headline} />
         </div>
-        <ul class="tags" aria-label="Tags">
-          {c.tags.map((t) => <li class="tag">{t}</li>)}
-        </ul>
+        <Tags items={c.tags} label="Tags" />
         <span class="case__cta">Read the case study <span class="arrow" aria-hidden="true">→</span></span>
       </div>
       <div class="case__shot">{c.demo === "smartTraffic" ? <SmartTrafficDemo bare /> : c.demo === "doctorOnline" ? <DoctorOnlineDemo bare sizes="(min-width: 1440px) 80px, (min-width: 960px) 6vw, 19vw" /> : c.demo === "docPortal" ? <DocPortalDemo bare sizes="(min-width: 1920px) 560px, (min-width: 1440px) 440px, (min-width: 960px) 30vw, 100vw" /> : <Shot img={c.cover} sizes="(min-width: 1920px) 560px, (min-width: 1440px) 440px, (min-width: 960px) 30vw, 100vw" bare />}</div>
@@ -91,7 +88,7 @@ const said = (c: CaseStudy) =>
 
   .case__metric { font-size: var(--font-size-body); }
 
-  .case__text .tags { margin-top: 28px; }
+  .case__text :global(.tags) { margin-top: 28px; }
 
   /* Focus on one case at a time. At rest every card sits back (40%). With the pointer away, the card that takes up most of the screen is the lead and shows at full strength (data-lead, set on scroll); with the pointer over a card (or keyboard focus on one), that card has priority and the lead steps back. Touch screens (no hover) show everything at full strength. NOTE: at 40% the small text is below the AA contrast minimum while a card is not in focus; owner choice 2026-10-22. */
 @media (hover: hover) {

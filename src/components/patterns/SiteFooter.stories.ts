@@ -1,9 +1,14 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "../storybook/types";
 import SiteFooter from "./SiteFooter.astro";
 
 const meta = {
   title: "Patterns/Site footer",
   component: SiteFooter,
+  argTypes: {
+    contactHeading: { control: "object", description: "The footer's closing question: [plain part, italic part]." },
+    contactSubject: { control: "text", description: "Subject of the contact e-mail." },
+    home: { control: "boolean", description: "On the home page the links are in-page anchors; elsewhere they point to /#section." },
+  },
   tags: ["autodocs"],
   parameters: {
     layout: "fullscreen",

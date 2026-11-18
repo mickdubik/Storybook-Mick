@@ -1,8 +1,8 @@
 ---
 import Button from "../Button.astro";
-// Owner logo "MD" from https://mickdubik.webflow.io (Webflow asset 677dc51438cc37f18bbc69d0), self-hosted with currentColor.
-import LogoMark from "../../assets/shared/logo-md.svg";
-import { mailto, showExploration } from "../../data/site";
+import Logo from "../Logo.astro";
+import Navigation from "../Navigation.astro";
+import { mailto, navItems } from "../../data/site";
 
 interface Props {
   /** The header sits transparent at the top of the page and turns into the blurred bar once the page scrolls. */
@@ -11,22 +11,12 @@ interface Props {
   home?: boolean;
 }
 const { heroHeader = true, home = false } = Astro.props;
-const h = (id: string) => (home ? `#${id}` : `/#${id}`);
 ---
 
 <header class:list={["masthead", heroHeader && "masthead--hero"]}>
   <div class:list={["wrap", "masthead__inner"]}>
-    <a class="brand" href="/" aria-label="Mick Dubik, home">
-      <LogoMark class="brand__mark" aria-hidden="true" />
-      <span class="brand__name">Mick Dubik</span>
-    </a>
-    <nav class="masthead__nav" aria-label="Primary">
-      <a href={h("work")}>Work</a>
-      <a href={h("approach")} class="hide-sm">Approach</a>
-      <a href={h("ai-workflow")} class="hide-sm">AI workflow</a>
-      <a href={h("clients")} class="hide-sm">Clients</a>
-      {showExploration && <a href={h("exploration")} class="hide-sm">Exploration</a>}
-    </nav>
+    <Logo />
+    <Navigation links={navItems(home)} />
     <div class="masthead__actions">
       <button class="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" data-theme-toggle>
         <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
@@ -73,38 +63,11 @@ const h = (id: string) => (home ? `#${id}` : `/#${id}`);
         min-height: 68px;
       }
 
-      /* Lockup (round 9): the owner's MD mark at its exact original geometry, tight viewBox (clear space comes from
-         the gap, not from padding baked into the SVG), sized to an integer 14px height so its horizontals land on
-         the pixel grid, and baseline-aligned with the name: the mark's bottom sits on the text baseline and
-         overshoots the Geist cap height (~11.5px) slightly, as the original did against Montserrat. No separator. */
-      .brand { display: inline-flex; align-items: baseline; gap: 10px; padding-block: 14px 13px; }
 
-      .brand__mark { display: block; height: 14px; width: auto; flex: none; color: var(--color-text-default); transition: color 200ms ease; }
-
-@media (hover: hover) { .brand:hover .brand__mark { color: var(--color-accent); }
-}
-
-      .brand__name { font-size: 1rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1; white-space: nowrap; }
-
-      /* Very narrow phones: the mark alone (the link keeps its aria-label), so the logo, the theme toggle and the button fit the gutters. */
-@media (max-width: 345px) { .brand__name { display: none; }
-}
-
-      .masthead__nav {
-        display: flex;
-        justify-content: center;
-        gap: clamp(14px, 2.5vw, 36px);
-        font-size: var(--font-size-small);
-      }
-
-      .masthead__nav a { display: inline-flex; align-items: center; min-height: 44px; white-space: nowrap; color: var(--color-text-secondary); transition: color 200ms ease; }
-
-@media (hover: hover) { .masthead__nav a:hover { color: var(--color-accent); }
-}
 
       .masthead__actions { display: flex; align-items: center; gap: 10px; justify-self: end; }
 
-      .brand { justify-self: start; }
+      .masthead__inner > :global(.brand) { justify-self: start; }
 
       /* Home: the header sits transparent over the hero (which slides up under it) until the page scrolls, and its
          content stands on the hero's own margins, so the logo lines up with the name and the button with the right edge. */
@@ -135,20 +98,11 @@ const h = (id: string) => (home ? `#${id}` : `/#${id}`);
 @media (prefers-reduced-motion: reduce) { .theme-toggle:active { transform: none; }
 }
 
-@media (max-width: 720px) {
-        .masthead__nav { justify-content: flex-end; }
-}
-
-      /* Below 760px the nav can't fit beside the lockup and the button without wrapping or crowding the name;
-         the same links sit in the footer. */
+      /* Below 760px the nav (in Navigation.astro) can't fit beside the lockup and the button without wrapping or crowding the name;
+         it hides and the same links sit in the footer. The header's own grid then gives the room to the button. */
 @media (max-width: 760px) {
-        .masthead__nav { display: none; }
-
         .masthead__inner { grid-template-columns: auto 1fr auto; }
 
         .masthead__actions { grid-column: 3; }
 }
-
-@media (max-width: 720px) {
-        .hide-sm { display: none; }
 </style>

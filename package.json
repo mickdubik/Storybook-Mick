@@ -15,7 +15,9 @@
     "build-storybook": "storybook build",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:storybook": "node scripts/check-storybook.mjs",
-    "publish:storybook": "bash scripts/publish-storybook.sh"
+    "publish:storybook": "bash scripts/publish-storybook.sh",
+    "check:types": "astro check",
+    "check:a11y": "node scripts/check-a11y.mjs"
   },
   "dependencies": {
     "@amplitude/unified": "^1.2.2",
@@ -29,11 +31,14 @@
     "esbuild": true
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
     "@storybook-astro/framework": "^1.16.0",
     "@storybook/addon-a11y": "^10.6.7",
     "@storybook/addon-docs": "^10.6.7",
     "@storybook/builder-vite": "^10.6.7",
+    "playwright-core": "^1.65.1",
     "storybook": "^10.6.7",
-    "storybook-addon-pseudo-states": "^10.6.7"
+    "storybook-addon-pseudo-states": "^10.6.7",
+    "typescript": "^6.0.3"
   }
 }

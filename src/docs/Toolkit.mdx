@@ -13,7 +13,9 @@ The site has no test suite or linter. These are the checks there are.
 - **Site build.** `npm run build` builds the whole site into `dist/` in about a second. It is the only automated check on the pages themselves, so run it before you say a change is done.
 - **Contrast.** `npm run check:contrast` reads the colour tokens in `src/styles/global.css` and checks the text pairs in light and dark: the three text colours on the page background and on the inset panel, and the accent on the page background, all at 4.5:1. It fails below WCAG AA. It also runs before every publish.
 - **Storybook build.** `npm run build-storybook` builds the static Storybook into `storybook-static/`. A story that fails to render is dropped from the build, so look for "Dropped story" in the log.
-- **Accessibility panel.** Open it on any component story to check that story in the browser.
+- **Type check.** `npm run check:types` runs Astro's type check over the pages, components and story files. It must report 0 errors.
+- **Accessibility check.** `npm run check:a11y` builds Storybook, runs axe on every story in light and dark, and deletes the build. Serious and critical findings fail it; moderate and minor ones are warnings. Findings the owner has accepted are listed as KNOWN and do not fail it. It drives your installed Google Chrome.
+- **Accessibility panel.** Open it on any story to check that story by hand.
 
 ## Commands
 
@@ -23,10 +25,12 @@ The site has no test suite or linter. These are the checks there are.
 - `npm run build`: the site build.
 - `npm run preview`: serves the built site.
 - `npm run check:contrast`: the contrast check.
+- `npm run check:types`: the type check.
+- `npm run check:a11y`: the accessibility check.
 
 ## Publishing
 
-A push to `main` of the Storybook repo runs a GitHub Actions workflow: install, contrast check, Storybook build, then deploy to GitHub Pages. A pull request runs the same checks and never replaces the live site. The live Storybook changes only when the owner says "Publish it".
+A push to `main` of the Storybook repo runs a GitHub Actions workflow: install, contrast check, Storybook build, accessibility check, then deploy to GitHub Pages. A pull request runs the same checks and never replaces the live site. The live Storybook changes only when the owner says "Publish it".
 
 ## Where the rules live
 
@@ -42,7 +46,5 @@ The `rules/` folder holds the detail: `rules/storybook.md` for stories and docs 
 ## What's next
 
 - **Sync status** is not built yet. Once the components exist in Figma, it becomes a check here.
-- **No lint or type check.** `npm run build` is the only automated check on the pages.
-- **No accessibility check in the build.** The Accessibility panel runs by hand.
 
 [See everything in What's next](?path=/docs/guides-what-s-next--docs)

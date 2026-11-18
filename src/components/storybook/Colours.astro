@@ -97,7 +97,7 @@ const ramps = order
     <h1 class="title">Semantic colour</h1>
     <p class="intro">Semantic tokens name a role, not a value. Components use these and only these for colour. Flip the theme in the toolbar: every name stays the same while its value changes. That stability is what lets a token survive a re-skin.</p>
     <section>
-      <h3>How to read it</h3>
+      <h2>How to read it</h2>
       <ul class="legend">
         <li><b>Token</b>: the CSS variable. Use it as <code>color: var(--color-text-default)</code>. Never type the hex.</li>
         <li><b>Light and Dark</b>: the HEX value the token resolves to in each theme. The name never changes; the value does.</li>
@@ -107,7 +107,7 @@ const ramps = order
     </section>
     {groups.map((g) => (
       <section>
-        <h3>{g.title}</h3>
+        <h2>{g.title}</h2>
         <p class="why">{groupBlurb[g.title]}</p>
         <table class="tok">
           <thead>
@@ -135,7 +135,7 @@ const ramps = order
       </section>
     ))}
     <section>
-      <h3>State</h3>
+      <h2>State</h2>
       <p class="why">Interactive states are not colours of their own. The button's states are component tokens that point back at the roles above, so a theme change carries them along. Only <code>--color-accent</code> marks an interactive state or a result.</p>
       <table class="tok tok--state">
         <thead><tr><th>Token</th><th>Resting value</th></tr></thead>
@@ -151,7 +151,7 @@ const ramps = order
     <p class="intro">The raw colours behind the semantic tokens, in the light and dark themes. Each is named by colour family and a step: <code>neutral-50</code> is the lightest grey, <code>neutral-950</code> the darkest, and a higher step is always a darker colour. Pure white is just <code>white</code>. Primitives say what a colour is, never what it is for.</p>
     {ramps.map((r) => (
       <section>
-        <h3>{r.name} <span class="count">{r.values.length}</span></h3>
+        <h2>{r.name} <span class="count">{r.values.length}</span></h2>
         <p class="why">{r.blurb} Lightest to darkest.</p>
         <div class="ramp">
           {r.values.map((v) => (
@@ -183,7 +183,7 @@ const ramps = order
   .badge--low { background: #f9cdcc; color: #7a1312; }
   .legend { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; max-width: var(--size-measure); font-size: var(--font-size-small); color: var(--color-text-secondary); }
   .legend b { color: var(--color-text-default); font-weight: 600; }
-  h3 { margin: 0 0 8px; font-size: var(--font-size-lede); font-weight: 600; }
+  h2 { margin: 0 0 8px; font-size: var(--font-size-lede); font-weight: 600; }
   .tok { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--font-size-small); }
   /* Fixed columns, so the Surfaces, Text, Lines and Accent tables line up with each other. */
   .tok th:nth-child(1) { width: 27%; }

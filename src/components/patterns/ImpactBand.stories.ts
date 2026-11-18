@@ -1,10 +1,15 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "../storybook/types";
 import ImpactBand from "./ImpactBand.astro";
 import { study } from "../storybook/data";
 
 const meta = {
   title: "Patterns/Impact band",
   component: ImpactBand,
+  argTypes: {
+    study: { control: false, description: "One case study from src/data/work.ts. Pick another story to change it." },
+    bp: { control: "boolean", description: "Blueprint marks (the design-system case only)." },
+    showMeasured: { control: "boolean", description: "Shows the \"How measured\" line under the figures." },
+  },
   tags: ["autodocs"],
   parameters: {
     layout: "fullscreen",

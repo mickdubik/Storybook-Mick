@@ -20,7 +20,7 @@ const weights = [400, 500, 600, 700];
   <p class="intro">One family and one step per job, so neighbouring levels never look alike. Sizes are fluid where the layout needs them to be and fixed where it does not. Use a step, never a raw size.</p>
 
   <section>
-    <h3>Size</h3>
+    <h2>Size</h2>
     <p class="why">Each token has its own job. If two things need the same size, they probably do the same job.</p>
     {scale.map((t) => (
       <div class="row">
@@ -32,7 +32,7 @@ const weights = [400, 500, 600, 700];
   </section>
 
   <section>
-    <h3>Weight</h3>
+    <h2>Weight</h2>
     <p class="why">Four weights, set on the element. There are no weight tokens yet.</p>
     {weights.map((w) => (
       <div class="row">
@@ -43,13 +43,13 @@ const weights = [400, 500, 600, 700];
   </section>
 
   <section>
-    <h3>Line height and measure</h3>
+    <h2>Line height and measure</h2>
     <p class="why">Body text runs at 1.55 to 1.6 and stops at <code>--size-measure</code>, about 66 characters, so a line is easy to follow back to its start.</p>
     <p class="read">A figure leads each case, and the process follows it. The reader sees the outcome first, then how the work got there, in lines short enough to read without losing the place.</p>
   </section>
 
   <section>
-    <h3>Families</h3>
+    <h2>Families</h2>
     <p class="why">Geist for everything. Geist Mono only for small labels, index numbers and tags.</p>
     <div class="row">
       <div class="meta"><code>--font-family-sans</code><span>Geist Variable</span></div>
@@ -66,7 +66,7 @@ const weights = [400, 500, 600, 700];
   .type { color: var(--color-text-default); display: grid; gap: 40px; }
   .title { margin: 0 0 -24px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
   .intro { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
-  h3 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
+  h2 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
   .why { margin: 0 0 8px; max-width: var(--size-measure); color: var(--color-text-secondary); font-size: var(--font-size-small); }
   .row { display: grid; grid-template-columns: 220px 1fr; gap: 8px 24px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--color-border-default); }
   .meta { display: grid; gap: 2px; }

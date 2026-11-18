@@ -18,8 +18,11 @@
 ---
 
 <script>
-  import { initAll, track as amplitudeTrack } from "@amplitude/unified";
-  import mixpanel from "mixpanel-browser";
+  // Amplitude and Mixpanel (about 1.2 MB with session replay) are imported only after consent, so a visitor who
+  // ignores or declines the banner downloads none of it (2026-11-17).
+  type MixpanelLib = typeof import("mixpanel-browser").default;
+  let mixpanel: MixpanelLib | undefined;
+  let amplitudeTrack: ((name: string) => unknown) | undefined;
 
   const GA_ID = "G-XSW698HT2B";
   // Token and optional API host (EU residency: https://api-eu.mixpanel.com) come from PUBLIC_MIXPANEL_*.
@@ -47,28 +50,32 @@
     w.gtag("js", new Date());
     w.gtag("config", GA_ID);
   };
-  const startMixpanel = () => {
+  const startMixpanel = async () => {
     if (mpReady || !mpToken) return;
+    mpReady = true; // claimed up front so a second call cannot start it twice
     try {
-      mixpanel.init(mpToken, {
+      const lib = (await import("mixpanel-browser")).default;
+      lib.init(mpToken, {
         api_host: import.meta.env.PUBLIC_MIXPANEL_API_HOST || "https://api-js.mixpanel.com",
         track_pageview: "full-url",
         persistence: "localStorage",
         debug: !import.meta.env.PROD,
       });
-      mpReady = true;
-    } catch { /* analytics must never break the page */ }
+      mixpanel = lib;
+    } catch { mpReady = false; /* analytics must never break the page */ }
   };
-  const startAmplitude = () => {
+  const startAmplitude = async () => {
     if (ampReady || !amplitudeKey) return;
+    ampReady = true;
     try {
+      const { initAll, track } = await import("@amplitude/unified");
       initAll(amplitudeKey, {
         serverZone: "EU",
         analytics: { autocapture: true },
         sessionReplay: { sampleRate: 1 },
       });
-      ampReady = true;
-    } catch { /* analytics must never break the page */ }
+      amplitudeTrack = track;
+    } catch { ampReady = false; /* analytics must never break the page */ }
   };
   const startAll = () => { startGA(); startMixpanel(); startAmplitude(); };
 
@@ -104,7 +111,7 @@
 
   const send = (name: string, data?: Record<string, string>) => {
     if (gaReady) { try { (window as any).gtag("event", name, data || {}); } catch { /* analytics must never break the page */ } }
-    if (mpReady) { try { mixpanel.track(name, data); } catch { /* same for Mixpanel */ } }
+    if (mixpanel) { try { mixpanel.track(name, data); } catch { /* same for Mixpanel */ } }
   };
   const here = () => location.pathname.replace(/\/$/, "") || "/";
 
@@ -125,7 +132,7 @@
       const m = url.pathname.match(/^\/work\/([^/]+)\/?$/);
       if (m) {
         send("case_open", { case: m[1] });
-        if (ampReady) { try { amplitudeTrack("case_open"); } catch { /* same for Amplitude */ } }
+        if (amplitudeTrack) { try { amplitudeTrack("case_open"); } catch { /* same for Amplitude */ } }
       }
     }
   });

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "../storybook/types";
 import CaseChapter from "./CaseChapter.astro";
 import { chapterWith } from "../storybook/data";
 
@@ -6,6 +6,12 @@ import { chapterWith } from "../storybook/data";
 const meta = {
   title: "Patterns/Case chapter",
   component: CaseChapter,
+  argTypes: {
+    study: { control: false, description: "The case the chapter belongs to, from src/data/work.ts." },
+    chapter: { control: false, description: "The chapter to show, from the case. Pick another story to change it." },
+    n: { control: "number", description: "Position of the chapter in the case (0 for chapter 01)." },
+    showMeasured: { control: "boolean", description: "Shows the \"How measured\" blocks." },
+  },
   tags: ["autodocs"],
   parameters: {
     docs: {

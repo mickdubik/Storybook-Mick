@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "./storybook/types";
 import ComparisonTable from "./ComparisonTable.astro";
 import { beforeAfterRows } from "./storybook/data";
 
@@ -6,6 +6,11 @@ import { beforeAfterRows } from "./storybook/data";
 const meta = {
   title: "Components/Data/Comparison table",
   component: ComparisonTable,
+  argTypes: {
+    rows: { control: false, description: "The rows, from src/data/work.ts." },
+    caption: { control: "text", description: "Read by screen readers." },
+    heads: { control: "object", description: "The three column headings." },
+  },
   tags: ["autodocs"],
   parameters: {
     docs: {

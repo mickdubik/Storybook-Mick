@@ -1,0 +1,10 @@
+---
+// An inline text link: a one-pixel underline in the text colour that turns to the signal colour on hover. The look lives in global.css (.link).
+interface Props {
+  href: string;
+  class?: string;
+}
+const { href, class: extra } = Astro.props;
+---
+
+<a class:list={["link", extra]} href={href}><slot /></a>

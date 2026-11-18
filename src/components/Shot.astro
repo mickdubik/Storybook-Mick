@@ -28,8 +28,10 @@ interface Props {
   eager?: boolean;
   /** Round 10: no canvas, just the image with one radius and a hairline (home previews). */
   bare?: boolean;
+  /** Gallery pairs: size the screen's width as if the image had this aspect (the narrowest in the set), so every screen in the set is the same width and only the heights differ. */
+  fitAr?: number;
 }
-const { img, sizes = "(min-width: 960px) 66vw, 100vw", eager = false, bare = false } = Astro.props;
+const { img, sizes = "(min-width: 960px) 66vw, 100vw", eager = false, bare = false, fitAr } = Astro.props;
 const isGif = img.src.endsWith(".gif");
 const key = img.src.split("/").pop()!;
 const entry = (manifest as Record<string, { file: string; alpha: boolean; fade?: string }>)[key];
@@ -54,7 +56,7 @@ const widths = asset ? [400, 640, 960, 1320, 1800, 2600].filter((x) => x < asset
 ---
 
 <figure class={`shot${bare ? "" : " shot--framed"}`}>
-  <div class={`shot__frame${entry?.alpha || (isGif && !poster) ? " shot__frame--alpha" : ""}${bare ? " shot__frame--bare" : ""}${light ? " shot__frame--light" : ""}${wide ? " shot__frame--wide" : ""}${wide && entry?.fade === "x" ? " shot__frame--bleed" : ""}`} style={wide ? `--ar: ${(w / h).toFixed(4)}` : undefined}>
+  <div class={`shot__frame${entry?.alpha || (isGif && !poster) ? " shot__frame--alpha" : ""}${bare ? " shot__frame--bare" : ""}${light ? " shot__frame--light" : ""}${wide ? " shot__frame--wide" : ""}${wide && entry?.fade === "x" ? " shot__frame--bleed" : ""}`} style={wide ? `--ar: ${(w / h).toFixed(4)};--ar-w: ${Math.min(w / h, fitAr ?? w / h).toFixed(4)}` : undefined}>
     <div class="shot__media" style={`aspect-ratio: ${w} / ${h}`}>
       {isGif ? (
         <>
@@ -131,10 +133,13 @@ const widths = asset ? [400, 640, 960, 1320, 1800, 2600].filter((x) => x < asset
      the extra room; the caption sits inside the frame under the screen. */
   .shot__frame--wide {
     /* --ar is the image's aspect. The screen is as tall as the frame allows (height-limited) or as wide as it allows (width-limited). */
-    --shot-h: min(calc(56.25cqi - var(--shot-pad) * 4), calc((100cqi - var(--shot-pad) * 4) / var(--ar)));
+    /* --ar-w is the aspect the width is sized by: the image's own, or the narrowest in its gallery (then all screens share one width). --shot-h stays the screen's real height. */
+    --shot-h-w: min(calc(56.25cqi - var(--shot-pad) * 4), calc((100cqi - var(--shot-pad) * 4) / var(--ar-w)));
+    --shot-w: calc(var(--shot-h-w) * var(--ar-w));
+    --shot-h: calc(var(--shot-w) / var(--ar));
     display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 16 / 9; padding: calc(var(--shot-pad) * 2);
   }
-  .shot__frame--wide .shot__media { flex: none; width: calc(var(--shot-h) * var(--ar)); max-width: 100%; }
+  .shot__frame--wide .shot__media { flex: none; width: var(--shot-w); max-width: 100%; }
   /* The screen is the subject and sits dead centre; the caption is support, tucked into the bottom margin. */
   .shot__cap.shot__cap--in { margin: 12px 0 0; text-align: center; } /* natural frames: under the screen, inside the frame */
   /* The caption sits 12px under the screen wherever the screen ends: --ar is the image's aspect, the screen is as tall as the

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "../storybook/types";
 import Home from "./Home.astro";
 
 const meta = {

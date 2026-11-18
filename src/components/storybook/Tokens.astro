@@ -41,9 +41,14 @@ const total = tiers.reduce((sum, t) => sum + t.rows.length, 0);
 <div class="tok">
   <h1 class="title">Tokens</h1>
   <p class="intro">Every token in <code>src/styles/global.css</code>, {total} in all, by tier. Change a value there, never in a page or a component. A token's name stays fixed; its value may change with the theme or the window width.</p>
+  <nav class="tiers" aria-label="Jump to a tier">
+    {tiers.map((t) => (
+      <a class="chip" href={`#tier-${t.title.toLowerCase()}`}><strong>{t.rows.length}</strong> <span>{t.title.toLowerCase()}</span></a>
+    ))}
+  </nav>
   {tiers.map((t) => (
-    <section>
-      <h3>{t.title} <span class="count">{t.rows.length}</span></h3>
+    <section id={`tier-${t.title.toLowerCase()}`}>
+      <h2>{t.title} <span class="count">{t.rows.length}</span></h2>
       <p class="why">{t.desc}</p>
       <table class={t.title === "Semantic" ? "has-dark" : ""}>
         <thead><tr><th>Token</th><th>Group</th><th>Value</th>{t.title === "Semantic" && <th>Dark</th>}</tr></thead>
@@ -60,13 +65,26 @@ const total = tiers.reduce((sum, t) => sum + t.rows.length, 0);
       </table>
     </section>
   ))}
+  {/* Relative links with target _top: the story runs in an iframe, and this works on the live site as well as locally. */}
+  <p class="next">
+    How the three tiers fit together is on <a href="./index.html?path=/docs/getting-started--docs" target="_top">Getting started</a>.
+    The raw colours behind the semantic tier are on <a href="./index.html?path=/story/foundations-colour--primitives" target="_top">Colour</a>.
+  </p>
 </div>
 
 <style>
   .tok { color: var(--color-text-default); display: grid; gap: 40px; }
   .title { margin: 0 0 -24px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .tiers { display: flex; flex-wrap: wrap; gap: 8px; margin-top: -8px; }
+  .chip { display: inline-flex; align-items: baseline; gap: 6px; border: 1px solid var(--color-border-default); border-radius: 999px; padding: 6px 14px; font-size: var(--font-size-small); color: var(--color-text-default); text-decoration: none; }
+  .chip:hover, .chip:focus-visible { border-color: var(--color-text-default); }
+  .chip strong { font-weight: 600; }
+  section { scroll-margin-top: 24px; }
+  .next { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
+  .next a { color: var(--color-text-default); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .next a:hover { text-decoration-thickness: 2px; }
   .intro { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
-  h3 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
+  h2 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
   .count { color: var(--color-text-muted); font-weight: 400; font-size: var(--font-size-small); margin-left: 6px; }
   .why { margin: 0 0 8px; max-width: var(--size-measure); color: var(--color-text-secondary); font-size: var(--font-size-small); }
   table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--font-size-small); }

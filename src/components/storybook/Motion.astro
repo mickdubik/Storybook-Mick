@@ -11,7 +11,7 @@ const easings = ["easing-out", "btn-easing"].map(get).filter((t): t is NonNullab
   <p class="intro">Two timings and two curves, one pair for the page and one for the button. Everything that moves animates transform and opacity only, never width, height, padding or margin.</p>
 
   <section>
-    <h3>Try it</h3>
+    <h2>Try it</h2>
     <p class="why">Press the button to play every track. The dot travels at the token's own duration.</p>
     <button type="button" class="play" data-play>Move</button>
     {durations.map((t) => (
@@ -23,7 +23,7 @@ const easings = ["easing-out", "btn-easing"].map(get).filter((t): t is NonNullab
   </section>
 
   <section>
-    <h3>Easing</h3>
+    <h2>Easing</h2>
     <p class="why">Both curves start quickly and settle, which reads as responsive rather than floaty. The tracks run slowed to 1.2 s so the curve is visible.</p>
     {easings.map((t) => (
       <div class="row">
@@ -34,7 +34,7 @@ const easings = ["easing-out", "btn-easing"].map(get).filter((t): t is NonNullab
   </section>
 
   <section>
-    <h3>Reduced motion</h3>
+    <h2>Reduced motion</h2>
     <p class="why">Everything that moves sits inside <code>prefers-reduced-motion: no-preference</code>. With reduced motion on, the same end state shows at once, or a defined still. Motion is a preference, not a decoration. Set it in your system accessibility settings and replay the demos to see it.</p>
   </section>
 </div>
@@ -52,7 +52,7 @@ const easings = ["easing-out", "btn-easing"].map(get).filter((t): t is NonNullab
   .motion { color: var(--color-text-default); display: grid; gap: 40px; }
   .title { margin: 0 0 -24px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
   .intro { margin: 0; max-width: var(--size-measure); font-size: var(--font-size-body); color: var(--color-text-secondary); }
-  h3 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
+  h2 { margin: 0 0 4px; font-size: var(--font-size-lede); font-weight: 600; }
   .why { margin: 0 0 12px; max-width: var(--size-measure); color: var(--color-text-secondary); font-size: var(--font-size-small); }
   .play { font: inherit; font-weight: 600; font-size: var(--font-size-small); padding: 10px 18px; border-radius: 999px; border: 0; background: var(--color-text-default); color: var(--color-background-default); cursor: pointer; margin-bottom: 8px; }
   .play:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }

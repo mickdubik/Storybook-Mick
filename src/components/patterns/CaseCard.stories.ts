@@ -1,11 +1,14 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
-import CaseCard from "./CaseCard.astro";
+import type { Meta, StoryObj } from "../storybook/types";
+import CaseCard from "../storybook/CaseCardInList.astro";
 import { study } from "../storybook/data";
 
 // Real cases from src/data/work.ts, as the home page's "Selected work" list renders them.
 const meta = {
   title: "Patterns/Case card",
   component: CaseCard,
+  argTypes: {
+    study: { control: false, description: "One case study from src/data/work.ts. Pick another story to change it." },
+  },
   tags: ["autodocs"],
   parameters: {
     docs: {

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "./storybook/types";
 import Glyph from "./Glyph.astro";
 import { metric, metricAny } from "./storybook/data";
 
@@ -6,6 +6,9 @@ import { metric, metricAny } from "./storybook/data";
 const meta = {
   title: "Components/Graphics/Glyph",
   component: Glyph,
+  argTypes: {
+    metric: { control: false, description: "The metric the glyph draws, from src/data/work.ts. Pick another story to change it." },
+  },
   tags: ["autodocs"],
   args: { metric: metric("Duplicated components, 167 to 53") },
 } satisfies Meta<typeof Glyph>;

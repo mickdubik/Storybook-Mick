@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "./storybook/types";
 import Plate from "./Plate.astro";
 import { plate } from "./storybook/data";
 

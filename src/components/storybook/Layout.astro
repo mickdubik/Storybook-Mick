@@ -12,12 +12,12 @@ const spacing = ["layout-padding-x", "space-gutter", "space-column-gap", "space-
     Every page sits in one wrapper and, where it has a section label, one 12-column sheet. Below 960px everything stacks. Every page must work at phone width with no horizontal scroll.
   </p>
 
-  <h3>The wrapper: <code>.wrap</code></h3>
+  <h2>The wrapper: <code>.wrap</code></h2>
   <p>
     No maximum width. Its side padding is the page margin <code>--layout-padding-x</code>: 72px at 1440, scaling to 96px at 1920, and centred beyond 1920. It is the same on every page, header and footer included.
   </p>
 
-  <h3>The sheet: <code>.sheet</code></h3>
+  <h2>The sheet: <code>.sheet</code></h2>
   <p>
     Twelve columns from 960px. The <b>rail</b> (columns 1 to 3) holds the sticky section label or a case table of contents. The <b>body</b> (columns 4 to 12) holds the content. Below 960px the rail and body stack.
   </p>
@@ -32,10 +32,10 @@ const spacing = ["layout-padding-x", "space-gutter", "space-column-gap", "space-
     </div>
   </div>
 
-  <h3>Lists</h3>
+  <h2>Lists</h2>
   <p>Lists are ruled tables, not cards. Sections divide by hairlines, and inset surfaces step one tone off the page (<code>--color-background-subtle</code>).</p>
 
-  <h3>Spacing tokens</h3>
+  <h2>Spacing tokens</h2>
   <p>The values below are read from <code>global.css</code>. See Space and shape for each one drawn to scale.</p>
   <table>
     <thead><tr><th>Token</th><th>Value</th></tr></thead>
@@ -49,7 +49,7 @@ const spacing = ["layout-padding-x", "space-gutter", "space-column-gap", "space-
   .title { margin: 0 0 12px; font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; color: var(--color-text-default); }
   .lay { color: var(--color-text-default); max-width: 900px; }
   .lead { font-size: var(--font-size-body); line-height: 1.5; color: var(--color-text-secondary); max-width: var(--size-measure); margin: 0 0 8px; }
-  h3 { font-family: var(--font-family-sans); font-weight: 600; font-size: var(--font-size-lede); margin: 40px 0 4px; }
+  h2 { font-family: var(--font-family-sans); font-weight: 600; font-size: var(--font-size-lede); margin: 40px 0 4px; }
   p { font-size: var(--font-size-small); line-height: 1.55; color: var(--color-text-secondary); margin: 0; max-width: var(--size-measure); }
   .lead { font-size: var(--font-size-body); }
   code { font-family: var(--font-family-mono); font-size: 0.85em; }

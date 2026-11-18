@@ -1,9 +1,13 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "../storybook/types";
 import SiteHeader from "./SiteHeader.astro";
 
 const meta = {
   title: "Patterns/Site header",
   component: SiteHeader,
+  argTypes: {
+    heroHeader: { control: "boolean", description: "The header sits transparent at the top of the page and turns into the blurred bar once the page scrolls." },
+    home: { control: "boolean", description: "On the home page the nav links are in-page anchors; elsewhere they point to /#section." },
+  },
   tags: ["autodocs"],
   parameters: {
     layout: "fullscreen",

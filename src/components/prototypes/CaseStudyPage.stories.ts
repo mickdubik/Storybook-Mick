@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "../storybook/types";
 import CaseStudyPage from "./CaseStudyPage.astro";
 import { study } from "../storybook/data";
 

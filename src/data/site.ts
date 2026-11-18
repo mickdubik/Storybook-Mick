@@ -213,3 +213,15 @@ export const explorations: { title: string; kind: string; year: string; embed?: 
 ];
 // Shown in production with two items: the owner said "Publish everything" on 2026-11-12, which overrides the earlier "wait for 3+ items" rule (rules/visual.md).
 export const showExploration = true;
+
+// Primary navigation of the header. `hideSm` links drop out on narrow screens. On the home page the links are in-page anchors; elsewhere they point to /#section.
+const primaryNav = [
+  { id: "work", label: "Work", hideSm: false },
+  { id: "approach", label: "Approach", hideSm: true },
+  { id: "ai-workflow", label: "AI workflow", hideSm: true },
+  { id: "clients", label: "Clients", hideSm: true },
+  ...(showExploration ? [{ id: "exploration", label: "Exploration", hideSm: true }] : []),
+];
+export const navItems = (home = false) => primaryNav.map((n) => ({ href: home ? `#${n.id}` : `/#${n.id}`, label: n.label, hideSm: n.hideSm }));
+// The link at the start of a case page's breadcrumb.
+export const allWork = { label: "All work", href: "/#work" };

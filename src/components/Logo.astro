@@ -1,0 +1,35 @@
+---
+// The lockup: the owner's MD mark (https://mickdubik.webflow.io, Webflow asset 677dc51438cc37f18bbc69d0, self-hosted with currentColor) and the name.
+import LogoMark from "../assets/shared/logo-md.svg";
+interface Props {
+  /** Where the logo links to. */
+  href?: string;
+  /** Accessible name; on very narrow phones the visible name is hidden and this is all a screen reader gets. */
+  label?: string;
+  /** The visible name. */
+  name?: string;
+}
+const { href = "/", label = "Mick Dubik, home", name = "Mick Dubik" } = Astro.props;
+---
+
+<a class="brand" href={href} aria-label={label}>
+  <LogoMark class="brand__mark" aria-hidden="true" />
+  <span class="brand__name">{name}</span>
+</a>
+
+<style>
+  /* Lockup (round 9): the owner's MD mark at its exact original geometry, tight viewBox (clear space comes from
+     the gap, not from padding baked into the SVG), sized to an integer 14px height so its horizontals land on
+     the pixel grid, and baseline-aligned with the name: the mark's bottom sits on the text baseline and
+     overshoots the Geist cap height (~11.5px) slightly, as the original did against Montserrat. No separator. */
+  .brand { display: inline-flex; align-items: baseline; gap: 10px; padding-block: 14px 13px; }
+
+  .brand__mark { display: block; height: 14px; width: auto; flex: none; color: var(--color-text-default); transition: color 200ms ease; }
+
+  @media (hover: hover) { .brand:hover .brand__mark { color: var(--color-accent); } }
+
+  .brand__name { font-size: 1rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1; white-space: nowrap; }
+
+  /* Very narrow phones: the mark alone (the link keeps its aria-label), so the logo, the theme toggle and the button fit the gutters. */
+  @media (max-width: 345px) { .brand__name { display: none; } }
+</style>

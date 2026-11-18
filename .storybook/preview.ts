@@ -36,7 +36,7 @@ const preview: Preview = {
         order: [
           "Getting started",
           "Foundations", ["Tokens", "Colour", ["Semantic", "Primitives"], "Typography", "Space and shape", "Layout", "Motion"],
-          "Components", ["Button", ["Variants", "States demo"], "Media", ["Shot", "Portrait"], "Graphics", ["Glyph", "Plate", "Blueprint"], "Content", ["Accordion", "Availability"], "Data", ["Results table", "Comparison table"], "Layout", ["Card"]],
+          "Components", ["Button", ["Variants", "States demo"], "Link", "Navigation", "Media", ["Shot", "Portrait"], "Graphics", ["Logo", "Glyph", "Plate", "Blueprint"], "Content", ["Accordion", "Availability", "Tags"], "Data", ["Results table", "Comparison table"], "Layout", ["Card"]],
           "Patterns", ["Site header", "Site footer", "Case card", "Impact band", "Case chapter"],
           "Prototypes", ["Home page", "Case study page"],
           "Demos", ["SmartTraffic", "DocPortal", "DoctorOnline"],

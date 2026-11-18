@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "./storybook/types";
 import Button from "./Button.astro";
 import { contact } from "../data/site";
 
@@ -6,6 +6,8 @@ const meta = {
   title: "Components/Button/Variants",
   component: Button,
   tags: ["autodocs"],
+  // Centre the button in the story canvas, not the top-left corner. The docs page centres its examples in docs.css.
+  parameters: { layout: "centered" },
   args: { href: contact.booking, variant: "primary", size: "md", icon: "arrow", slots: { default: "Book a 15-min call" } },
   argTypes: {
     variant: { control: "inline-radio", options: ["primary", "ghost", "secondary"] },

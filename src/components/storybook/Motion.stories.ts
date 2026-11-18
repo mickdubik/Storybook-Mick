@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "./types";
 import Page from "./Motion.astro";
 
 const meta = { title: "Foundations/Motion", component: Page, parameters: { layout: "padded" } } satisfies Meta<typeof Page>;

@@ -1,4 +1,5 @@
 ---
+import Tags from "../Tags.astro";
 import Shot from "../Shot.astro";
 import Plate from "../Plate.astro";
 import ButtonStates from "../ButtonStates.astro";
@@ -115,7 +116,7 @@ const nn = (k: number) => String(k + 1).padStart(2, "0");
       {b.t === "tags" && (
         <>
           {b.label && <p class="block__label mono">{b.label}</p>}
-          <ul class="tags">{b.items.map((t) => <li class="tag">{t}</li>)}</ul>
+          <Tags items={b.items} />
         </>
       )}
 
@@ -175,7 +176,7 @@ const nn = (k: number) => String(k + 1).padStart(2, "0");
         </div>
       )}
       {b.t === "gallery" && !b.compare && (
-        <div class:list={["gallery", b.wide && "gallery--wide"]}>{b.imgs.map((img) => <Shot img={img} />)}</div>
+        <div class:list={["gallery", b.wide && "gallery--wide"]}>{b.imgs.map((img) => <Shot img={img} fitAr={Math.min(...b.imgs.map((i) => i.w / i.h).filter((r) => r >= 1.4))} />)}</div>
       )}
 
       {b.t === "demo" && (

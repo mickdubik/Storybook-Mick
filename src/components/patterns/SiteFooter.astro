@@ -22,7 +22,7 @@ const h = (id: string) => (home ? `#${id}` : `/#${id}`);
 const cs = Object.fromEntries(caseStudies.map((c) => [c.slug, c]));
 const entry = (slug: string, idx: string) => {
   const c = cs[slug];
-  return { idx, co: c.company, name: c.shortTitle ?? c.product ?? c.title, href: `/work/${slug}`, fig: `${c.headline.value}${c.headline.unit}`, figLabel: `${c.headline.qualifier ? c.headline.qualifier + " " : ""}${c.headline.label.toLowerCase()}` };
+  return { idx, co: c.company, name: c.product ?? c.title, href: `/work/${slug}`, fig: `${c.headline.value}${c.headline.unit}`, figLabel: `${c.headline.qualifier ? c.headline.qualifier + " " : ""}${c.headline.label.toLowerCase()}` };
 };
 const ziipLead = current.metrics[0];
 const record = [

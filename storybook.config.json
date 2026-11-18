@@ -2,6 +2,10 @@
   "name": "Mick Dubik",
   "tokens": "src/styles/global.css",
   "storiesGlob": "src/components",
-  "noStory": [],
+  "noStory": [
+    "Analytics",
+    "Replay",
+    "ScrollChrome"
+  ],
   "publishRepoDir": "../../Storybook Portfolio"
 }

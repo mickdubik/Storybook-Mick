@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "./storybook/types";
 import Card from "./Card.astro";
 import { impactCardHtml, impactNote } from "./storybook/data";
 

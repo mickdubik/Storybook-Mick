@@ -4,6 +4,8 @@ import Glyph from "../Glyph.astro";
 import Blueprint from "../Blueprint.astro";
 import Plate from "../Plate.astro";
 import Shot from "../Shot.astro";
+import Link from "../Link.astro";
+import { allWork } from "../../data/site";
 import SmartTrafficDemo from "../demos/SmartTrafficDemo.astro";
 import DocPortalDemo from "../demos/DocPortalDemo.astro";
 import DoctorOnlineDemo from "../demos/DoctorOnlineDemo.astro";
@@ -54,7 +56,7 @@ const isHeadline = (m: { value: string; label: string }) => m.value === c.headli
         {c.demo === "docPortal" && <div class="study__bg study__bg--third study__bg--stack"><DocPortalDemo backdrop stack /></div>}
         {c.demo === "doctorOnline" && <div class="study__bg study__bg--third study__bg--strips"><DoctorOnlineDemo backdrop /></div>}
         <nav class="crumbs mono" aria-label="Breadcrumb">
-          <a class="link" href="/#work">All work</a>
+          <Link href={allWork.href}>{allWork.label}</Link>
           <span aria-hidden="true">/</span>
           <span aria-current="page">Case {c.index} of {String(caseStudies.length).padStart(2, "0")}</span>
         </nav>

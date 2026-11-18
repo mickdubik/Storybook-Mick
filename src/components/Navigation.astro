@@ -1,0 +1,37 @@
+---
+// The primary navigation row: text links in the secondary colour, signal colour on hover, 44px tall targets.
+interface Props {
+  links: { href: string; label: string; /** Drops out on narrow screens. */ hideSm?: boolean }[];
+  /** Accessible name of the nav landmark. */
+  label?: string;
+}
+const { links, label = "Primary" } = Astro.props;
+---
+
+<nav class="masthead__nav" aria-label={label}>
+  {links.map((l) => <a href={l.href} class:list={[l.hideSm && "hide-sm"]}>{l.label}</a>)}
+</nav>
+
+<style>
+  .masthead__nav {
+    display: flex;
+    justify-content: center;
+    gap: clamp(14px, 2.5vw, 36px);
+    font-size: var(--font-size-small);
+  }
+
+  .masthead__nav a { display: inline-flex; align-items: center; min-height: 44px; white-space: nowrap; color: var(--color-text-secondary); transition: color 200ms ease; }
+
+  @media (hover: hover) { .masthead__nav a:hover { color: var(--color-accent); } }
+
+  @media (max-width: 720px) {
+    .masthead__nav { justify-content: flex-end; }
+    .hide-sm { display: none; }
+  }
+
+  /* Below 760px the nav can't fit beside the lockup and the button without wrapping or crowding the name;
+     the same links sit in the footer. */
+  @media (max-width: 760px) {
+    .masthead__nav { display: none; }
+  }
+</style>

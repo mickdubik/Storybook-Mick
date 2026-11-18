@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook-astro/framework";
+import type { Meta, StoryObj } from "./storybook/types";
 import Accordion from "./Accordion.astro";
 import { accordionItems } from "./storybook/data";
 
@@ -6,6 +6,13 @@ import { accordionItems } from "./storybook/data";
 const meta = {
   title: "Components/Content/Accordion",
   component: Accordion,
+  argTypes: {
+    items: { control: false, description: "The rows, from the data files. Not editable here." },
+    name: { control: "text", description: "Rows that share a name open one at a time. Leave it out to let any number stay open." },
+    summaryLabel: { control: "text", description: "Read by screen readers before each summary." },
+    openFirst: { control: "boolean", description: "Opens the first row." },
+    contained: { control: "boolean", description: "Makes the list its own width container, so panels go two-up when it is at least 560px wide." },
+  },
   tags: ["autodocs"],
   parameters: {
     docs: {

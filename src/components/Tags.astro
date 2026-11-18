@@ -1,0 +1,12 @@
+---
+// A row of tag pills. The look lives in global.css (.tags, .tag); this component only renders the list.
+interface Props {
+  /** The tag texts, in order. */
+  items: string[];
+  /** Accessible name of the list, when the tags need one. */
+  label?: string;
+}
+const { items, label } = Astro.props;
+---
+
+<ul class="tags" aria-label={label}>{items.map((t) => <li class="tag">{t}</li>)}</ul>

@@ -1,0 +1,8 @@
+---
+// Story-only wrapper: the case card is a list item, so the story renders it inside the same ordered list the home page uses.
+import CaseCard from "../patterns/CaseCard.astro";
+import type { CaseStudy } from "../../data/work";
+interface Props { study: CaseStudy }
+const { study } = Astro.props;
+---
+<ol class="cases"><CaseCard study={study} /></ol>
