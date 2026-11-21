@@ -1,4 +1,6 @@
 ---
+import TokenTable from "./TokenTable.astro";
+const { view = "overview" } = Astro.props as { view?: "overview" | "tokens" };
 import { declared } from "./tokens";
 const all = declared("");
 const pick = (names: string[]) => names.map((n) => all.find((t) => t.name === n)).filter((t): t is NonNullable<typeof t> => !!t);
@@ -29,6 +31,7 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
 
 ---
 
+{view === "tokens" ? <TokenTable area="Space and shape" /> : (
 <div class="ds-page">
   <h1>Space and shape</h1>
   <p>Spacing steps are named for the job they do, not for a number. Pick the step that matches the gap you are making, so two designers never choose values one pixel apart.</p>
@@ -120,9 +123,10 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
   <h2 id="read-next">Read next</h2>
   <ul>
     <li><a href="?path=/story/foundations-layout--sheet">Layout</a>: the page wrapper and the 12-column sheet these steps are used in.</li>
-    <li><a href="?path=/story/foundations-tokens--reference">Tokens</a>: every token in one list, with the rest of the system.</li>
+    <li><a href="?path=/story/foundations-space-and-shape--tokens">Tokens</a>: every token in this group, with its tier.</li>
   </ul>
 </div>
+)}
 
 <style>
   .tok th:nth-child(1) { width: 27%; }

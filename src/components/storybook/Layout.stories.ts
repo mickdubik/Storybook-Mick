@@ -3,5 +3,6 @@ import Page from "./Layout.astro";
 
 const meta = { title: "Foundations/Layout", component: Page, parameters: { layout: "padded" } } satisfies Meta<typeof Page>;
 export default meta;
-// One story named like its page, so the sidebar shows a single entry instead of a folder with one item. The id stays sheet.
-export const Sheet: StoryObj<typeof meta> = { name: "Layout" };
+// The page, then its tokens (owner, 2026-11-21: tokens sit inside each group). The first id stays sheet.
+export const Sheet: StoryObj<typeof meta> = { name: "Overview" };
+export const Tokens: StoryObj<typeof meta> = { args: { view: "tokens" } };

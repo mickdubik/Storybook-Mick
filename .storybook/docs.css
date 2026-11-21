@@ -136,3 +136,18 @@ body[class*="sb-"] li.case { list-style: none; }
 :is(.sbdocs.sbdocs-content, .ds-page) table.ds-tokens th:nth-child(2) { width: 18%; }
 .ds-sw { display: inline-block; width: 20px; height: 20px; margin-right: 8px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--ds-ring); vertical-align: middle; }
 :is(.sbdocs.sbdocs-content, .ds-page) .ds-same { color: var(--color-text-muted); }
+
+/* Getting started opening (owner, 2026-11-21, after the Refero comparison): line, screenshot of the live site, about, site link. */
+:is(.sbdocs.sbdocs-content, .ds-page) a.ds-hero { display: block; margin: 0 0 32px; border: 1px solid var(--ds-ring); border-radius: 12px; overflow: hidden; line-height: 0; transition: border-color 160ms ease; }
+:is(.sbdocs.sbdocs-content, .ds-page) a.ds-hero:hover { border-color: var(--color-accent); }
+:is(.sbdocs.sbdocs-content, .ds-page) a.ds-hero img { display: block; width: 100%; height: auto; }
+:is(.sbdocs.sbdocs-content, .ds-page) p.ds-site { margin: 0 0 24px; }
+
+/* Do and don't: two ruled lists. */
+.ds-dd { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 40px; margin: 0 0 24px; }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-dd ul { margin: 0; padding: 0; list-style: none; }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-dd li { position: relative; margin: 0; padding: 12px 0 12px 24px; border-bottom: 1px solid var(--color-border-default); }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-dd li::before { position: absolute; left: 0; font-family: var(--font-family-mono); font-weight: 600; color: var(--color-text-default); }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-dd > div:first-child li::before { content: "+"; }
+:is(.sbdocs.sbdocs-content, .ds-page) .ds-dd > div:last-child li::before { content: "\2212"; }
+:is(.sbdocs.sbdocs-content, .ds-page) p.ds-dd__h { margin: 0 0 4px; font-family: var(--font-family-mono); font-size: var(--font-size-micro); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-muted); }

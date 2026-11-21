@@ -10,6 +10,7 @@ DEST=$(node -e 'console.log(JSON.parse(require("fs").readFileSync("storybook.con
 mkdir -p "$DEST/scripts"
 rsync -a --delete --exclude .DS_Store --exclude _unused "$SRC/src/" "$DEST/src/"
 cp "$SRC/scripts/check-contrast.mjs" "$DEST/scripts/"
+mkdir -p "$DEST/public/og" && cp "$SRC/public/og/home.png" "$DEST/public/og/"   # the screenshot on Getting started
 echo "Synced $SRC/src into $DEST/src."
 
 # Storybook renders the site's components with this project's packages; warn if the versions have drifted.

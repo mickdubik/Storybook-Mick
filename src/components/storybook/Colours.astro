@@ -1,8 +1,9 @@
 ---
 import { light, dark, ratio, grade, declared, lum } from "./tokens";
+import TokenTable from "./TokenTable.astro";
 
 // "semantic" shows the roles, grouped by what they are for. "primitives" shows the raw values behind them.
-const { view = "semantic" } = Astro.props as { view?: "semantic" | "primitives" };
+const { view = "semantic" } = Astro.props as { view?: "semantic" | "primitives" | "tokens" };
 
 // Roles are the owner's, copied from src/pages/system.astro. Other notes come from the comments in global.css.
 const roles: Record<string, string> = {
@@ -94,7 +95,7 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
 
 ---
 
-{view === "semantic" ? (
+{view === "tokens" ? <TokenTable area="Colour" /> : view === "semantic" ? (
   <div class="ds-page">
     <h1>Semantic colour</h1>
     <p>Semantic tokens name a role, not a value. Components use these and only these for colour. Flip the theme in the toolbar: every name stays the same while its value changes. That stability is what lets a token survive a re-skin.</p>
@@ -109,7 +110,7 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
       <ul>
         <li><strong>Token</strong>: the CSS variable. Use it as <code>color: var(--color-text-default)</code>. Never type the hex.</li>
         <li><strong>Light and Dark</strong>: the HEX value the token resolves to in each theme. The name never changes; the value does.</li>
-        <li><strong>Contrast</strong>: the WCAG ratio of a text token on <code>--color-background-default</code>, light and dark, with a badge for the level it reaches. AAA (7 or more) is the strongest, AA (4.5 or more) is the minimum for body text, and AA large (3 or more) is for large text only.</li>
+        <li><strong>Contrast</strong>: under the hex of a text token, its WCAG ratio on <code>--color-background-default</code> in that theme, in a badge with the level it reaches ("18.7 AAA"). AAA (7 or more) is the strongest, AA (4.5 or more) is the minimum for body text, and AA large (3 or more) is for large text only.</li>
         <li><strong>Use</strong>: the job of the token. Pick by job, not by how the colour looks.</li>
       </ul>
     </section>
@@ -119,22 +120,20 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
         <p>{groupBlurb[g.title]}</p>
         <table class="tok">
           <thead>
-            <tr><th>Token</th><th>Light</th><th>Dark</th><th>Contrast on page background</th><th>Use</th></tr>
+            <tr><th>Token</th><th>Light</th><th>Dark</th><th>Use</th></tr>
           </thead>
           <tbody>
             {g.rows.map((r) => (
               <tr>
                 <td><code>--{r.n}</code></td>
-                <td><span class="sw" style={`background:${r.l}`}></span><code>{r.l}</code></td>
-                <td><span class="sw" style={`background:${r.d}`}></span><code>{r.d}</code></td>
-                <td>
-                  {r.lr && r.dr ? (
-                    <div class="cr">
-                      <div class="cr__row"><span class="cr__t">Light</span><span class="cr__n">{r.lr.toFixed(1)}</span><span class={`badge badge--${levelClass(grade(r.lr))}`}>{grade(r.lr)}</span></div>
-                      <div class="cr__row"><span class="cr__t">Dark</span><span class="cr__n">{r.dr.toFixed(1)}</span><span class={`badge badge--${levelClass(grade(r.dr))}`}>{grade(r.dr)}</span></div>
+                {[[r.l, r.lr], [r.d, r.dr]].map(([hex, cr]) => (
+                  <td>
+                    <div class="val">
+                      <span class="val__hex"><span class="sw" style={`background:${hex}`}></span><code>{hex}</code></span>
+                      {cr ? <span class={`badge badge--${levelClass(grade(cr as number))}`} title="Contrast on the page background"><span class="badge__n">{(cr as number).toFixed(1)}</span> {grade(cr as number)}</span> : null}
                     </div>
-                  ) : "—"}
-                </td>
+                  </td>
+                ))}
                 <td>{r.role}</td>
               </tr>
             ))}
@@ -184,27 +183,25 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
     <h2 id="read-next">Read next</h2>
     <ul>
       <li><a href="?path=/story/foundations-colour--semantic">Semantic colour</a>: the roles these colours fill, with their contrast.</li>
-      <li><a href="?path=/story/foundations-tokens--reference">Tokens</a>: every colour token in one list, with the light and dark values.</li>
+      <li><a href="?path=/story/foundations-colour--tokens">Colour tokens</a>: every colour token in one list, with its tier and light and dark values.</li>
     </ul>
   </div>
 )}
 
 <style>
-  .cr { display: grid; gap: 6px; }
-  .cr__row { display: flex; align-items: center; gap: 8px; }
-  .cr__t { width: 40px; color: var(--color-text-muted); font-size: var(--font-size-label); }
-  .cr__n { font-family: var(--font-family-mono); min-width: 2.2em; color: var(--color-text-default); }
+  .val { display: grid; justify-items: start; gap: 8px; }
+  .val__hex { display: inline-flex; align-items: center; }
   /* Pass levels as coloured chips: green for AAA and AA, amber for large text only, red for a fail. Fixed light chips with dark text, so they read the same on the light and the dark theme. */
   .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: var(--font-size-micro); font-weight: 600; line-height: 1.6; letter-spacing: 0.02em; white-space: nowrap; }
+  .badge__n { font-family: var(--font-family-mono); font-variant-numeric: tabular-nums; }
   .badge--aaa { background: #b6ebc6; color: #0a4a20; }
   .badge--aa { background: #d9f2e0; color: #145a2c; }
   .badge--large { background: #fde7b8; color: #6a4200; }
   .badge--low { background: #f9cdcc; color: #7a1312; }
   /* Fixed columns, so the Surfaces, Text, Lines and Accent tables line up with each other. */
   .tok th:nth-child(1) { width: 27%; }
-  .tok th:nth-child(2), .tok th:nth-child(3) { width: 14%; }
-  .tok th:nth-child(4) { width: 20%; }
-  .tok th:nth-child(5) { width: 25%; }
+  .tok th:nth-child(2), .tok th:nth-child(3) { width: 20%; }
+  .tok th:nth-child(4) { width: 33%; }
   .tok--state th:nth-child(1) { width: 27%; }
   .tok--state th:nth-child(2) { width: 73%; }
   .tok code, .hex { font-family: var(--font-family-mono); font-size: 0.9em; }

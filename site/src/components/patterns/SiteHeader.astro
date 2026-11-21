@@ -43,13 +43,9 @@ const { heroHeader = true, home = false } = Astro.props;
         border-bottom: 1px solid var(--color-border-default);
       }
 
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-        .masthead {
-          background: color-mix(in srgb, var(--color-background-default) 82%, transparent);
-          -webkit-backdrop-filter: blur(20px);
-          backdrop-filter: blur(20px);
-        }
-}
+/* 2026-11-20 (owner screenshots): no backdrop blur. With it, full-width bands of a darker, warmer tone appeared on the page while scrolling,
+         in steps of about 160px (measured: #0a0a0c against #050407). The header is now the plain page colour, as the reduced-transparency
+         fallback always was. */
 
 @media (prefers-reduced-transparency: reduce) {
         .masthead { background: var(--color-background-default); -webkit-backdrop-filter: none; backdrop-filter: none; }

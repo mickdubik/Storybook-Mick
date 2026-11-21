@@ -1,4 +1,6 @@
 ---
+import TokenTable from "./TokenTable.astro";
+const { view = "overview" } = Astro.props as { view?: "overview" | "tokens" };
 import { declared } from "./tokens";
 // Largest first. A fluid step is ranked by the top of its clamp(), then by the bottom of it, so two steps that reach the same
 // size on a wide screen (display and figure) are ordered by which is bigger on a narrow one. A fixed step uses its value (all in rem).
@@ -17,6 +19,7 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
 
 ---
 
+{view === "tokens" ? <TokenTable area="Typography" /> : (
 <div class="ds-page">
   <h1>Typography</h1>
   <p>One family and one step per job, so neighbouring levels never look alike. Sizes are fluid where the layout needs them to be and fixed where it does not. Use a step, never a raw size.</p>
@@ -72,9 +75,10 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
   <h2 id="read-next">Read next</h2>
   <ul>
     <li><a href="?path=/story/foundations-space-and-shape--space-and-shape">Space and shape</a>: gutters, section and block spacing, frame padding and radii.</li>
-    <li><a href="?path=/story/foundations-tokens--reference">Tokens</a>: every token in one list, with the rest of the system.</li>
+    <li><a href="?path=/story/foundations-typography--tokens">Tokens</a>: every token in this group, with its tier.</li>
   </ul>
 </div>
+)}
 
 <style>
   .row { display: grid; grid-template-columns: 220px 1fr; gap: 8px 24px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--color-border-default); }

@@ -41,7 +41,7 @@ for (const f of files.filter((f) => f.endsWith(".stories.ts"))) {
   if (!titleRe.test(title)) err(`${rel(f)}: title "${title}" breaks the pattern (Components/<Group>/<Component>, Patterns/<Name>, Prototypes/<Name>, Demos/<Name>, Foundations/<Name>, Guides/<Name>; max three levels)`);
   if (seen.has(title)) err(`${rel(f)}: duplicate title "${title}" (also in ${seen.get(title)})`);
   seen.set(title, rel(f));
-  const isFoundation = title.startsWith("Foundations/") || title.startsWith("Demos/") || title.startsWith("Prototypes/"); // Foundations pages, demos and prototypes are not component docs
+  const isFoundation = title.startsWith("Foundations/") || title.startsWith("Demos/") || title.startsWith("Prototypes/") || title.endsWith("/Tokens"); // Foundations pages, demos, prototypes and token lists are not component docs
   if (!isFoundation && !/tags:\s*\[[^\]]*["']autodocs["']/.test(src)) warn(`${rel(f)}: missing tags: ["autodocs"]`);
 }
 

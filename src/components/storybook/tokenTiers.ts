@@ -6,13 +6,16 @@ const semantic = ["color-background-default", "color-background-subtle", "color-
 const global = ["font-family-sans", "font-family-mono", "font-size-display", "font-size-h1", "font-size-h2", "font-size-h3", "font-size-figure", "font-size-figure-sm", "font-size-lede", "font-size-body", "font-size-small", "font-size-label", "font-size-micro", "space-gutter", "space-column-gap", "space-section", "space-tile", "space-block", "space-group", "size-measure", "size-measure-prose", "size-max", "radius-default", "duration-default", "easing-out", "unit-width", "unit", "layout-edge", "layout-padding-x"];
 const component = ["btn-radius", "btn-inset", "btn-tile-size", "btn-duration", "btn-easing", "btn-background", "btn-background-hover", "btn-text", "btn-text-hover", "btn-tile-background", "btn-tile-background-hover", "btn-glyph-color", "btn-glyph-color-hover", "frame-padding", "frame-radius"];
 
-const group = (n: string) =>
-  /^font-/.test(n) ? "Type"
+// The Foundations area (or component) each token is shown under: each area ends with its own Tokens page.
+export type Area = "Colour" | "Typography" | "Space and shape" | "Layout" | "Motion" | "Button";
+const layout = ["size-max", "layout-edge", "layout-padding-x", "unit", "unit-width", "space-gutter", "space-column-gap"];
+const group = (n: string): Area =>
+  /^font-/.test(n) ? "Typography"
   : /^color-|^hero-/.test(n) ? "Colour"
   : /^(duration|easing|btn-duration|btn-easing)/.test(n) ? "Motion"
   : /^btn-/.test(n) ? "Button"
-  : /^frame/.test(n) ? "Frame"
-  : "Space and layout";
+  : layout.includes(n) ? "Layout"
+  : "Space and shape";
 
 const find = (n: string) => declared("").find((d) => d.name === n);
 export const tiers = [
@@ -36,3 +39,6 @@ export const tiers = [
   rows: t.rows.map((n) => ({ n, group: group(n), value: light[n] ?? find(n)?.value ?? "", dk: dark[n] })).filter((r) => r.value),
 }));
 export const total = tiers.reduce((sum, t) => sum + t.rows.length, 0);
+
+// Every token in one area, with the tier it belongs to.
+export const tokensIn = (area: Area) => tiers.flatMap((t) => t.rows.filter((r) => r.group === area).map((r) => ({ ...r, tier: t.title })));

@@ -1,0 +1,37 @@
+---
+// The Tokens page at the end of each Foundations group (and under Components/Button): every token of one area,
+// read from the site's global.css, with its tier. How the tiers work: Getting started, "The three token tiers".
+import { tokensIn, type Area } from "./tokenTiers";
+const { area } = Astro.props as { area: Area };
+const rows = tokensIn(area);
+const themed = rows.some((r) => r.dk && r.dk !== r.value);
+const title = area === "Button" ? "Button tokens" : `${area} tokens`;
+---
+
+<div class="ds-page">
+  <h1>{title}</h1>
+  <p>{rows.length} {area === "Button" ? "button" : area.toLowerCase()} tokens, with their tier.</p>
+  <p>All of them live in <code>src/styles/global.css</code>. Change a value there, never in a page or a component.</p>
+  <table class="ds-tokens">
+    <thead>
+      <tr><th>Token</th><th>Tier</th><th>{themed ? "Light" : "Value"}</th>{themed && <th>Dark</th>}</tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <td><code>--{r.n}</code></td>
+          <td>{r.tier}</td>
+          <td>{/^#/.test(r.value) && <span class="ds-sw" style={`background:${r.value}`}></span>}<code>{r.value}</code></td>
+          {themed && (
+            <td>{r.dk && r.dk !== r.value ? (<>{/^#/.test(r.dk) && <span class="ds-sw" style={`background:${r.dk}`}></span>}<code>{r.dk}</code></>) : <span class="ds-same">same</span>}</td>
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <h2 id="read-next">Read next</h2>
+  <ul>
+    <li><a href="?path=/docs/getting-started--docs">Getting started</a>: the three tiers (global, semantic, component) and why they are layered.</li>
+  </ul>
+</div>

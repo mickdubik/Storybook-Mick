@@ -1,4 +1,6 @@
 ---
+import TokenTable from "./TokenTable.astro";
+const { view = "overview" } = Astro.props as { view?: "overview" | "tokens" };
 import { declared } from "./tokens";
 const all = declared("");
 const get = (n: string) => all.find((t) => t.name === n);
@@ -8,6 +10,7 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
 
 ---
 
+{view === "tokens" ? <TokenTable area="Motion" /> : (
 <div class="ds-page" data-motion>
   <h1>Motion</h1>
   <p>Two timings and two curves, one pair for the page and one for the button. Everything that moves animates transform and opacity only, never width, height, padding or margin.</p>
@@ -52,6 +55,7 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
     <li><a href="?path=/story/demos-smarttraffic--framed">Demos</a>: the animated case covers, made from the same tokens.</li>
   </ul>
 </div>
+)}
 
 <script>
   document.querySelectorAll<HTMLElement>("[data-motion]").forEach((root) => {

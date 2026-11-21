@@ -1,4 +1,6 @@
 ---
+import TokenTable from "./TokenTable.astro";
+const { view = "overview" } = Astro.props as { view?: "overview" | "tokens" };
 import { declared } from "./tokens";
 // Facts: rules/visual.md (Layout) and src/styles/global.css. The diagram uses the real .wrap, .sheet, .rail and .body classes.
 const spacing = ["layout-padding-x", "space-gutter", "space-column-gap", "space-section", "space-block", "space-group", "space-tile"]
@@ -8,6 +10,7 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
 
 ---
 
+{view === "tokens" ? <TokenTable area="Layout" /> : (
 <div class="ds-page">
   <h1>Layout</h1>
   <p>Every page sits in one wrapper and, where it has a section label, one 12-column sheet. Below 960px everything stacks. Every page must work at phone width with no horizontal scroll.</p>
@@ -55,6 +58,7 @@ const id = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
     <li><a href="?path=/story/foundations-space-and-shape--space-and-shape">Space and shape</a>: each spacing token drawn to scale.</li>
   </ul>
 </div>
+)}
 
 <style>
   .demo { margin: 24px 0 0; padding-inline: 0; position: relative; }
